@@ -3,7 +3,49 @@
 Portfólio em pixel art com temática de velho oeste/cangaço.
 
 > **Migração em andamento:** o protótipo original (HTML, CSS e JavaScript puro) está em `legacy/` e está sendo levado para
-> `frontend/` (Angular) e `api/` (.NET). Este README descreve o protótipo; a versão nova será documentada ao fim da migração.
+> `frontend/` (Angular) e `api/` (.NET). A versão nova está resumida logo abaixo; o resto deste README descreve o protótipo.
+
+## Versão nova: `api/` (.NET 10) e `frontend/` (Angular 22)
+
+Requisitos: .NET SDK 10 (veja `global.json`) e Node 22.22+ ou 24.15+.
+
+```bash
+# API em http://localhost:5080 (serve a placa do GitHub em /api/github/contributions)
+dotnet user-secrets set "GitHub:Token" "<seu token>" --project api   # uma vez; sem token a placa responde 503
+dotnet run --project api
+
+# site em http://localhost:4200 (em desenvolvimento a placa já aponta para a API local)
+cd frontend
+npm ci
+npm start
+```
+
+O token **não** fica em nenhum arquivo do repositório: em desenvolvimento vai nos user-secrets (`UserSecretsId` = `forasteiro-api`),
+em produção na configuração do App Service. Detalhes do endpoint, das chaves e do comportamento da placa em `docs/INTEGRACAO-GITHUB.md`.
+
+Testes e build:
+
+```bash
+dotnet build Forasteiro.slnx && dotnet test Forasteiro.slnx   # na raiz
+cd frontend && npm test && npx ng build                          # site estático em frontend/dist/forasteiro/browser
+```
+
+### CI e deploy (GitHub Actions)
+
+- `.github/workflows/ci.yml`: build e testes da API e do site em todo PR e push fora da main.
+- `.github/workflows/deploy.yml`: na main (ou manualmente), roda o CI e publica o site no **Azure Static Web Apps**
+  (com `frontend/staticwebapp.config.json`) e a API no **Azure App Service**.
+
+O que configurar no GitHub (Settings → Secrets and variables → Actions):
+
+| Tipo | Nome | Onde pegar |
+|---|---|---|
+| Secret | `AZURE_STATIC_WEB_APPS_API_TOKEN` | Static Web App → Manage deployment token |
+| Secret | `AZURE_WEBAPP_PUBLISH_PROFILE` | App Service → Download publish profile |
+| Variable | `AZURE_WEBAPP_NAME` | nome do App Service da API |
+
+E no App Service (Environment variables): `GitHub__Token`, `Cors__AllowedOrigins__0` (URL do site) e, se quiser, `GitHub__Login`.
+Para a placa usar a API publicada, troque `githubEndpoint` em `frontend/src/environments/environment.ts` pela URL dela.
 
 ## Rodar o protótipo (`legacy/`)
 
