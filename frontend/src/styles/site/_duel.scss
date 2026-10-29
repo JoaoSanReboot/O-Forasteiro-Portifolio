@@ -1,0 +1,61 @@
+/* Duelo: cena, regras, dificuldade, barra de reflexo e carimbo (legacy/site.html, linhas 462-465, 498-527, 577-587 e 599-613) */
+/* Duelo */
+#duelo .wrap { gap: 28px; }
+#duelo .scene { scroll-margin-top: 12px; }
+#duel-scene.armed canvas { cursor: crosshair; }
+/* Duelo de saque rápido */
+.duel { background: var(--papel); border: 4px solid var(--tição); box-shadow: 8px 8px 0 var(--tição); padding: 22px; box-sizing: border-box; width: 100%; max-width: 760px; margin: 0 auto; }
+.duel h3 { font-family: var(--f-west); font-weight: 400; font-size: 28px; margin: 0 0 12px; }
+.rules { margin: 0 0 18px; padding-left: 36px; display: grid; gap: 6px; line-height: 1.5; list-style: upper-roman; }
+.rules li::marker { font-family: var(--f-west); font-weight: 700; color: var(--vinho); }
+.duel-actions { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.duel-best { font-family: var(--f-pixel); font-size: 14px; color: var(--madeira); }
+#site .link-btn { all: unset; cursor: pointer; color: var(--vinho); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+#site .link-btn:focus-visible { outline: 3px solid var(--poente); }
+.duel-score { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-family: var(--f-pixel); font-size: 16px; }
+.duel-score b { color: var(--vinho); }
+.duel-call { font-family: var(--f-west); font-size: clamp(34px, 5vw, 48px); margin: 10px 0 4px; line-height: 1.05; }
+.duel-call.draw { color: var(--vinho); }
+.duel-why { margin: 12px 0 0; min-height: 1.4em; font-weight: 600; text-align: center; }
+.reflex { position: relative; height: 26px; margin: 16px 0 12px; background: #e2cc9c; border: 3px solid var(--tição); box-shadow: 3px 3px 0 var(--tição); overflow: hidden; }
+.reflex.off .r-zone, .reflex.off .r-perfect, .reflex.off .r-marker, .reflex.off .r-fill { display: none; }
+.r-marker[hidden], .r-zone[hidden] { display: none; }
+.r-perfect.done { background: #8ad06a; } .r-zone.done { opacity: 0.45; }
+.r-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, #f6d870, #e8742a); }
+.reflex:not(.meter) .r-fill { display: none; }
+.duel-weapon { margin: -4px 0 10px; font-family: var(--f-pixel); font-size: 14px; letter-spacing: 0.06em; color: var(--vinho); }
+.rules-note { margin: -8px 0 16px; font-size: 13.5px; color: #5a3820; }
+.r-zone { position: absolute; top: 0; bottom: 0; background: #c0392b; }
+.r-perfect { position: absolute; top: 0; bottom: 0; background: #f6d870; }
+.r-marker { position: absolute; top: -3px; bottom: -3px; left: 0; width: 5px; margin-left: -2px; background: var(--tição); box-shadow: 0 0 0 2px #fff6e2; }
+.reflex.hit { border-color: #3a6e30; } .reflex.miss { border-color: #a6322a; }
+.fire-row { display: flex; justify-content: center; gap: 12px; }
+#site .fire-btn { font-size: 20px; padding: 14px 34px; touch-action: manipulation; }
+#site .fire-btn[disabled] { opacity: 0.5; cursor: default; }
+#site .fire-btn, #site #d-next { min-width: 200px; text-align: center; justify-content: center; }
+/* Duelo: dificuldade, mostrador de reflexo e carimbo do resultado */
+.levels { border: 0; padding: 0; margin: 0 0 18px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.levels legend { font-family: var(--f-pixel); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--madeira); margin-bottom: 8px; padding: 0; }
+.levels label { position: relative; cursor: pointer; }
+.levels input { position: absolute; opacity: 0; }
+.levels label span { display: grid; place-items: center; gap: 2px; height: 100%; box-sizing: border-box; padding: 10px 12px; border: 3px solid var(--tição); background: #fbf1dc; }
+.levels label b { font-family: var(--f-pixel); font-size: 16px; }
+.levels label small { font-size: 12.5px; color: #5a3820; line-height: 1.35; }
+.levels input:checked + span { background: #f2c27a; box-shadow: 3px 3px 0 var(--tição); }
+.levels input:focus-visible + span { outline: 3px solid var(--poente); outline-offset: 2px; }
+
+.stamp-slot { display: none; }
+#duel-scene.armed .stamp-slot { display: flex; justify-content: center; align-items: center; min-height: 64px; width: 100%; }
+.stamp {
+  margin: 0; white-space: nowrap; transform: rotate(-2deg);
+  font-family: var(--f-west); font-size: clamp(26px, 4vw, 38px); color: #fff6e2; background: #a6322a; border: 4px solid var(--tição); padding: 2px 20px 0; box-shadow: 5px 5px 0 var(--tição);
+}
+.stamp.win { background: #3a6e30; }
+.stamp[hidden] { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .stamp:not([hidden]) { animation: stamp 420ms cubic-bezier(.2, .8, .2, 1.4); }
+  @keyframes stamp { from { transform: rotate(-2deg) scale(1.8); opacity: 0; } }
+  .scene.shake canvas { animation: shake 260ms steps(4); }
+  @keyframes shake { 25% { transform: translate(-4px, 2px); } 50% { transform: translate(3px, -2px); } 75% { transform: translate(-2px, 1px); } }
+}
+.duel-call.perfect { color: #b8860b; }

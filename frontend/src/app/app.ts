@@ -1,19 +1,13 @@
-import { ChangeDetectionStrategy, Component, DOCUMENT, inject } from '@angular/core';
-import { environment } from '../environments/environment';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Intro } from './intro/intro';
 import { Site } from './site/site';
 
-// Casca do portfólio. A abertura entra na fase 4; até lá o site aparece direto, no modo "site-on" do legado.
-// environment.skipIntro (só no build de desenvolvimento) vai pular a abertura quando ela existir.
+// Casca do portfólio: a abertura (tela inicial, cavalgada e alto-falante) e, depois da chegada, o site.
+// Quem já chegou nesta visita, ou o build de desenvolvimento (environment.skipIntro), entra direto no mural.
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Site],
-  template: `<div appSite></div>`,
+  imports: [Intro, Site],
+  template: `<app-intro /><div appSite></div>`,
 })
-export class App {
-  protected readonly skipIntro = environment.skipIntro;
-
-  constructor() {
-    inject(DOCUMENT).documentElement.classList.add('site-on');
-  }
-}
+export class App {}

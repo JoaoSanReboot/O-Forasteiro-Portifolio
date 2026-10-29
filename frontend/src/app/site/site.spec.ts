@@ -15,8 +15,8 @@ describe('Site', () => {
 
   it('monta as seções na ordem do legado, cada uma com a sua cena', async () => {
     const { el } = await render();
-    expect([...el.querySelectorAll('main > section')].map((s) => s.id)).toEqual(['procurado', 'projetos', 'trabalhos', 'skills', 'commits', 'formacao', 'saloon']);
-    expect([...el.querySelectorAll('figure.scene')].map((f) => f.getAttribute('data-scene'))).toEqual(['ferraria', 'delegacia', 'armeiro', 'telegrafo', 'escola', 'saloon']);
+    expect([...el.querySelectorAll('main > section')].map((s) => s.id)).toEqual(['procurado', 'projetos', 'trabalhos', 'skills', 'commits', 'formacao', 'saloon', 'duelo']);
+    expect([...el.querySelectorAll('figure.scene')].map((f) => f.getAttribute('data-scene'))).toEqual(['ferraria', 'delegacia', 'armeiro', 'telegrafo', 'escola', 'saloon', 'fimdarua']);
     expect(el.querySelectorAll('.flyer')).toHaveLength(6);
     expect(el.querySelector<HTMLImageElement>('.p-photo img')?.getAttribute('src')).toBe('assets/retrato-cartaz.png');
   });
@@ -65,5 +65,29 @@ describe('Site', () => {
     expect(el.querySelector('#velha-msg')?.textContent).toBe('Sua vez.');
     await click(fixture, el.querySelector('#velha-close'));
     expect(panel.hidden).toBe(true);
+  });
+
+  it('duelo: as regras seguem o personagem e mexer antes do sino perde a rodada', async () => {
+    const { fixture, el } = await render();
+    expect(el.querySelector('#d-weapon')?.textContent).toBe('Pistoleiro clássico · arma: revólver');
+    expect(el.querySelectorAll('#d-rules li')).toHaveLength(4);
+    await click(fixture, el.querySelector('#duel-start'));
+    expect(el.querySelector<HTMLElement>('#duel-play')?.hidden).toBe(false);
+    expect(el.querySelector('#d-call')?.textContent).toBe('Preparar...');
+    el.querySelector('#d-fire')!.dispatchEvent(new Event('pointerdown'));
+    await fixture.whenStable();
+    expect(el.querySelector('#d-call')?.textContent).toBe('Desclassificado!');
+    expect(el.querySelector('#d-stamp')?.textContent?.trim()).toBe('Antes do sino!');
+    expect(el.querySelector('#d-joao')?.textContent).toBe('1');
+  });
+
+  it('rodapé: reiniciar os segredos pede confirmação ao xerife', async () => {
+    const { fixture, el } = await render();
+    expect(el.querySelector('#secrets-count')?.textContent).toMatch(/^\d\/9$/);
+    await click(fixture, el.querySelector('#reset-secrets'));
+    expect(el.querySelector('#guide-text')?.textContent).toContain('esconda tudo de novo');
+    await click(fixture, el.querySelector('#guide-actions .s-btn'));
+    expect(el.querySelector('#guide-text')?.textContent).toContain('Escondi tudo de novo');
+    expect(el.querySelector('#secrets-count')?.textContent).toBe('0/9');
   });
 });

@@ -1,0 +1,44 @@
+/* contador de segredos, xerife guia e rodapé (legacy/site.html, linhas 615-648, 650-658) */
+/* Contador de segredos */
+#site .coin-hud button svg { width: 18px; height: 18px; }
+#site .coin-hud button b { color: #f6d870; font-weight: 700; }
+.coin-hud.done button { border-color: #e8b030; }
+
+/* Xerife guia */
+.guide { position: fixed; right: max(14px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); z-index: 41; display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
+.guide > * { pointer-events: auto; }
+#site .guide-btn { all: unset; cursor: pointer; display: block; width: 56px; height: 80px; pointer-events: auto; }
+#site .guide-btn:focus-visible { outline: 3px solid var(--poente); outline-offset: 2px; }
+.guide-btn canvas { width: 56px; height: 80px; image-rendering: pixelated; display: block; }
+.guide-say {
+  position: relative; width: min(300px, calc(100vw - 104px)); margin-bottom: 30px; padding: 12px 14px; background: #fff6e2; color: var(--tinta);
+  border: 3px solid var(--tição); box-shadow: 4px 4px 0 var(--tição); font-size: 14px; line-height: 1.45;
+}
+.guide-say[hidden] { display: none; }
+.guide-say::after { content: ""; position: absolute; right: -11px; bottom: 16px; border: 8px solid transparent; border-left-color: var(--tição); border-right: 0; }
+.guide-say p { margin: 0; }
+.guide-say p b { font-family: var(--f-pixel); }
+.guide-actions { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 10px; }
+.guide-actions:empty { display: none; }
+#site .guide-actions .s-btn { padding: 5px 12px; font-size: 13px; }
+.guide-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+.guide-menu[hidden] { display: none; }
+#site .guide-menu a { font-family: var(--f-pixel); font-weight: 700; font-size: 13px; color: var(--tinta); text-decoration: none; border: 2px solid var(--tição); padding: 5px 8px; background: #f2e2bc; }
+#site .guide-menu a:hover, #site .guide-menu a:focus-visible { background: #f2c27a; }
+@media (max-width: 560px) { .coin-hud { bottom: max(14px, env(safe-area-inset-bottom, 0px)); } #site .guide-btn, .guide-btn canvas { width: 42px; height: 60px; } .guide-say { margin-bottom: 18px; font-size: 13px; } }
+
+/* Moedas escondidas */
+.coin-hud { position: fixed; left: max(14px, env(safe-area-inset-left, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); z-index: 40; display: grid; gap: 8px; justify-items: start; }
+#site .coin-hud button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 8px; background: var(--tição); color: #f3e3c3; border: 2px solid #6a4a30; font-family: var(--f-pixel); font-size: 14px; }
+#site .coin-hud button:focus-visible { outline: 3px solid var(--poente); }
+.coin-hud svg { width: 20px; height: 20px; }
+.coin-hud.done button { color: #f6d870; border-color: #e8b030; }
+@media (prefers-reduced-motion: no-preference) { .coin-hud.got button { animation: coinpop 500ms ease; } @keyframes coinpop { 40% { transform: scale(1.15); } } }
+
+.foot {
+  position: relative; z-index: 2; background: var(--tição); color: #d8c8a8;
+  padding: 34px max(20px, env(safe-area-inset-right, 0px)) max(34px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+}
+.foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
+.foot p { margin: 0; font-family: var(--f-pixel); font-size: 15px; }
+.foot-actions { display: flex; flex-wrap: wrap; gap: 12px; }
