@@ -1,0 +1,34 @@
+# Fragmento gerado pelo build.sh, usado só no artifact do claude.ai
+# (index.html também é gerado, mas fica versionado para o deploy estático funcionar sem build)
+forasteiro.html
+
+# Variáveis de ambiente e segredos (GITHUB_TOKEN etc.)
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Node (caso entre alguma dependência no futuro)
+node_modules/
+npm-debug.log*
+
+# Configurações locais do Claude Code
+.claude/settings.local.json
+.CLAUDE.md
+.REDME.md
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporários
+*.log
+*.tmp
