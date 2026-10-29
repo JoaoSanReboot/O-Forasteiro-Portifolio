@@ -6,6 +6,7 @@ import { IntroService } from '../core/intro.service';
 import { PlatformService } from '../core/platform.service';
 import { drawHero, Hero, HEROES, HeroId } from '../engine/heroes/heroes';
 import { createRide, Ride } from './ride';
+import { cancelRaf, raf } from '../engine/core/browser';
 
 // A abertura: tela inicial com a escolha do personagem, a cavalgada até a vila e o alto-falante, sempre à mão.
 // Depois da chegada, o canvas da estrada continua fixo atrás do topo do site (a cena do portão).
@@ -79,7 +80,7 @@ export class Intro {
       if (this.intro.arrivedBefore || environment.skipIntro) {
         this.gateHidden.set(true); this.skipping = true; ride.skip(); this.skipping = false; this.intro.enter(true);
       }
-      destroyRef.onDestroy(() => { window.removeEventListener('resize', onResize); ride.destroy(); cancelAnimationFrame(this.gateRaf); });
+      destroyRef.onDestroy(() => { window.removeEventListener('resize', onResize); ride.destroy(); cancelRaf(this.gateRaf); });
     });
   }
 
@@ -120,13 +121,13 @@ export class Intro {
     hv.clearRect(0, 0, 64, 64); hv.imageSmoothingEnabled = false;
     hv.fillStyle = 'rgba(0,0,0,0.35)'; hv.fillRect(20, 59, 24, 2); hv.fillRect(22, 61, 20, 1);
     hv.drawImage(S, 16, 13 + breathe, 32, 48 - breathe);
-    if (!this.gateHidden()) this.gateRaf = requestAnimationFrame(this.drawView);
+    if (!this.gateHidden()) this.gateRaf = raf(this.drawView);
   };
 
   private showGate(): void {
     this.gateHidden.set(false);
     this.paintCards();
-    cancelAnimationFrame(this.gateRaf); this.gateRaf = requestAnimationFrame(this.drawView);
+    cancelRaf(this.gateRaf); this.gateRaf = raf(this.drawView);
     this.ride?.redrawGate();
   }
 
@@ -134,7 +135,7 @@ export class Intro {
   protected start(): void {
     this.heroes.choose(this.heroId());
     this.ride!.rebuild();
-    cancelAnimationFrame(this.gateRaf);
+    cancelRaf(this.gateRaf);
     this.gateHidden.set(true); this.hudHidden.set(false); this.skipHidden.set(false); this.hintHidden.set(false);
     this.ride!.begin(this.platform.reduceMotion);
   }

@@ -9,6 +9,7 @@ import { duelHero } from '../../engine/scenes/fimdarua';
 import { DuelAnimMode } from '../../engine/scenes/duel-state';
 import { SceneCanvas } from '../../shared/scene-canvas';
 import { BLUFFS, judge, KIT, LEVEL_IDS, LevelId, LEVELS, makeZone, Zone } from './kit';
+import { cancelRaf, raf } from '../../engine/core/browser';
 
 type Phase = 'idle' | 'wait' | 'draw' | 'result';
 const pick = <T,>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)];
@@ -29,7 +30,8 @@ export class Duelo {
   private readonly secrets = inject(ProgressService);
   private readonly audio = inject(AudioService);
   private readonly storage = inject(StorageService);
-  private readonly reduceMotion = inject(PlatformService).reduceMotion;
+  private readonly platform = inject(PlatformService);
+  private readonly reduceMotion = this.platform.reduceMotion;
   private readonly injector = inject(Injector);
 
   private readonly scene = viewChild.required(SceneCanvas);
@@ -82,7 +84,8 @@ export class Duelo {
     this.showRecord();
     effect(() => { this.heroes.id(); untracked(() => { if (this.phase === 'idle') this.applyKit(); }); });
     afterNextRender(() => this.scene().whenReady(() => this.scene().pin(this.invite().nativeElement, 196, 50)));
-    inject(DestroyRef).onDestroy(() => this.clear());
+    // timers e quadros só existem no navegador; no SSR (prerender e ng serve) não há o que limpar
+    if (this.platform.isBrowser) inject(DestroyRef).onDestroy(() => this.clear());
   }
 
   private get W() { return this.kit(); }
@@ -91,7 +94,7 @@ export class Duelo {
   private hasGun = () => this.secrets.hasGun();
   private sfx = (name: Parameters<AudioService['fx']>[0]) => this.audio.fx(name);
   private later(fn: () => void, ms: number): void { this.timers.push(setTimeout(fn, ms)); }
-  private clear(): void { this.timers.forEach(clearTimeout); this.timers = []; cancelAnimationFrame(this.raf); clearInterval(this.spinSfx); }
+  private clear(): void { this.timers.forEach(clearTimeout); this.timers = []; cancelRaf(this.raf); clearInterval(this.spinSfx); }
   private focusLater(el: () => ElementRef<HTMLElement>): void { afterNextRender(() => el().nativeElement.focus({ preventScroll: true }), { injector: this.injector }); }
 
   private showRecord(): void {
@@ -173,7 +176,7 @@ export class Duelo {
     const marker = this.marker().nativeElement;
     marker.style.left = '0%';
     marker.hidden = w === 'pin' || w === 'lasso' || w === 'rifle';
-    this.t0 = performance.now(); this.lastTick = this.t0; this.raf = requestAnimationFrame(this.tick);
+    this.t0 = performance.now(); this.lastTick = this.t0; this.raf = raf(this.tick);
   }
 
   // onde o marcador está, conforme a mecânica
@@ -201,7 +204,7 @@ export class Duelo {
       if (a >= 100) { this.lose('slow'); return; }
     }
     if (now - this.t0 >= this.deadline) { this.lose('slow'); return; }
-    this.raf = requestAnimationFrame(this.tick);
+    this.raf = raf(this.tick);
   };
 
   // apertou (ou tocou): o que acontece depende da arma

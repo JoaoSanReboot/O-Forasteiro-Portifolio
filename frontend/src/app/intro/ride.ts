@@ -6,6 +6,7 @@ import { Rng } from '../engine/core/rng';
 import { ditherFill as dither, ditherPattern } from '../engine/draw/dither';
 import { drawHero, Hero } from '../engine/heroes/heroes';
 import { gateText } from '../engine/text/pixel-font';
+import { cancelRaf, raf } from '../engine/core/browser';
 
 // A abertura: cena de tela cheia em canvas de baixa resolução, narração na faixa de cima e
 // o cartaz em canvas de alta resolução por cima. Mundo único (sertão ao entardecer).
@@ -945,7 +946,7 @@ export function createRide(els: RideElements, hooks: RideHooks): Ride {
 
   function frame(now: number): void {
     if (!running) return;
-    if (hooks.siteOn() && window.scrollY > window.innerHeight * 1.05) { last = now; rafId = requestAnimationFrame(frame); return; }
+    if (hooks.siteOn() && window.scrollY > window.innerHeight * 1.05) { last = now; rafId = raf(frame); return; }
     const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
     last = now;
     wall += dt;
@@ -953,7 +954,7 @@ export function createRide(els: RideElements, hooks: RideHooks): Ride {
     rate += (target - rate) * Math.min(1, dt * 3.5);
     p += dt * rate;
     render(dt);
-    rafId = requestAnimationFrame(frame);
+    rafId = raf(frame);
   }
 
   function render(dt: number): void {
@@ -1007,13 +1008,13 @@ export function createRide(els: RideElements, hooks: RideHooks): Ride {
     void Audio.unlock().then(() => Audio.wind());
     if (reduceMotion) { skip(); return; }
     running = true; last = performance.now();
-    cancelAnimationFrame(rafId); rafId = requestAnimationFrame(frame);
+    cancelRaf(rafId); rafId = raf(frame);
   }
 
   function skip(): void {
     p = P.revealEnd; ended = false;
     running = true; last = performance.now();
-    cancelAnimationFrame(rafId); rafId = requestAnimationFrame(frame);
+    cancelRaf(rafId); rafId = raf(frame);
     if (!finished) { finished = true; hooks.onFinish(); }
   }
 
@@ -1037,14 +1038,14 @@ export function createRide(els: RideElements, hooks: RideHooks): Ride {
     begin,
     skip,
     // "Rever a chegada" volta para a tela inicial
-    stop() { running = false; finished = false; cancelAnimationFrame(rafId); },
+    stop() { running = false; finished = false; cancelRaf(rafId); },
     setBoost,
     get boosting() { return boosting; },
     get riding() { return running && !finished; },
     rebuild: buildSprites,
     resize,
     redrawGate,
-    destroy() { running = false; cancelAnimationFrame(rafId); },
+    destroy() { running = false; cancelRaf(rafId); },
     riderImg,
   };
 }

@@ -2,6 +2,7 @@ import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyR
 import { PlatformService } from '../../core/platform.service';
 import { HeatData, snapshotData } from '../../content/heat-snapshot';
 import { SceneCanvas } from '../../shared/scene-canvas';
+import { cancelRaf, raf } from '../../engine/core/browser';
 
 const fmtDay = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 const fmtMonth = new Intl.DateTimeFormat('pt-BR', { month: 'short' });
@@ -52,7 +53,7 @@ export class Commits {
   // uma varredura percorre o ano devagar; cada dia com commit acende e fica aceso (só na primeira vez)
   private animate(heat: HTMLElement, cells: { b: HTMLButtonElement; l: number }[]): () => void {
     const count = this.countRef().nativeElement, total = this.data().total;
-    let visible = false, i = 0, lit = 0, wait = 0, last = performance.now(), raf = 0;
+    let visible = false, i = 0, lit = 0, wait = 0, last = performance.now(), frameId = 0;
     const io = new IntersectionObserver((es) => es.forEach((e) => { visible = e.isIntersecting; }), { threshold: 0.3 });
     io.observe(heat);
     const SPEED = 42; // dias por segundo
@@ -76,9 +77,9 @@ export class Commits {
         }
         if (i >= cells.length) { cells.forEach((c) => c.b.classList.remove('scan')); count.textContent = String(total); io.disconnect(); return; }
       }
-      raf = requestAnimationFrame(tick);
+      frameId = raf(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(raf); io.disconnect(); };
+    frameId = raf(tick);
+    return () => { cancelRaf(frameId); io.disconnect(); };
   }
 }

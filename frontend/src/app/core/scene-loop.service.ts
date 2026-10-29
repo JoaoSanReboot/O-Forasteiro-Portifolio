@@ -2,6 +2,7 @@ import { inject, Injectable, isDevMode } from '@angular/core';
 import { IntroService } from './intro.service';
 import { SceneRunner } from '../engine/runtime/scene-runner';
 import { PlatformService } from './platform.service';
+import { cancelRaf, raf } from '../engine/core/browser';
 
 declare global {
   interface Window {
@@ -29,13 +30,13 @@ export class SceneLoopService {
 
   register(scene: SceneRunner): void {
     this.scenes.push(scene);
-    if (!this.raf && this.platform.isBrowser) { this.last = performance.now(); this.raf = requestAnimationFrame(this.loop); }
+    if (!this.raf && this.platform.isBrowser) { this.last = performance.now(); this.raf = raf(this.loop); }
   }
 
   unregister(scene: SceneRunner): void {
     const i = this.scenes.indexOf(scene);
     if (i >= 0) this.scenes.splice(i, 1);
-    if (!this.scenes.length && this.raf) { cancelAnimationFrame(this.raf); this.raf = 0; }
+    if (!this.scenes.length && this.raf) { cancelRaf(this.raf); this.raf = 0; }
   }
 
   /** as cenas paradas (fora da tela ou com movimento reduzido) se redesenham no próximo quadro */
@@ -55,6 +56,6 @@ export class SceneLoopService {
       if (s.visible) { s.t += dt; s.paint(s.t, dt); }
       else if (!s.drawn) s.paint(s.t, 0);
     }
-    this.raf = requestAnimationFrame(this.loop);
+    this.raf = raf(this.loop);
   };
 }

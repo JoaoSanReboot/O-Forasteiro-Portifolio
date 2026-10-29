@@ -11,6 +11,7 @@ import { Projetos } from './projetos/projetos';
 import { Saloon } from './saloon/saloon';
 import { Skills } from './skills/skills';
 import { Trabalhos } from './trabalhos/trabalhos';
+import { raf } from '../engine/core/browser';
 
 // O site: o portfólio por dentro das casas, na mesma ordem do legado.
 // O topo fica vazio para a cena do portão (fixa, atrás, desenhada pela abertura) aparecer.
@@ -73,7 +74,7 @@ export class Site {
       untracked(() => afterNextRender(() => {
         const mural = document.getElementById('procurado');
         window.scrollTo(0, 0);
-        requestAnimationFrame(() => {
+        raf(() => {
           mural?.scrollIntoView({ behavior: reduceMotion || e.quick ? 'auto' : 'smooth', block: 'start' });
           document.getElementById('t-mural')?.focus({ preventScroll: true });
         });
