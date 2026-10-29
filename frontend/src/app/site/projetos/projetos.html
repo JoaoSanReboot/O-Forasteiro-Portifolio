@@ -1,0 +1,37 @@
+<div class="wrap">
+  <div class="sector-top">
+    <header class="sector-head">
+      <p class="kicker">Ferreiro</p>
+      <h2 id="t-projetos">Projetos.</h2>
+      <p class="lead">Ideias brutas, código incandescente e soluções forjadas linha por linha.</p>
+    </header>
+    <figure appScene="ferraria"></figure>
+  </div>
+  <div class="forge" id="forge" aria-roledescription="carrossel" aria-label="Projetos" (keydown)="onKey($event)">
+    <div class="chest-stage" id="chest-stage" #stage (pointerdown)="swipeStart($event)" (pointerup)="swipeEnd($event)">
+      <button type="button" class="chest-btn side prev" id="chest-side-prev" tabindex="-1" aria-hidden="true" (click)="go(-1)"><canvas #prevCv width="64" height="58"></canvas></button>
+      <button type="button" class="chest-btn main" id="chest-main" #mainBtn [attr.aria-expanded]="isOpen()" aria-controls="chest-panel" [attr.aria-label]="(isOpen() ? 'Fechar o baú: ' : 'Abrir o baú: ') + project().name" (click)="toggle()"><canvas #mainCv width="64" height="58"></canvas></button>
+      <button type="button" class="chest-btn side next" id="chest-side-next" tabindex="-1" aria-hidden="true" (click)="go(1)"><canvas #nextCv width="64" height="58"></canvas></button>
+    </div>
+    <div class="chest-nav">
+      <button type="button" class="arrow" id="chest-prev" aria-label="Projeto anterior" (click)="go(-1)">←</button>
+      <div class="chest-cap" aria-live="polite"><span class="num" id="chest-num">Baú {{ project().num }}</span><span class="name" id="chest-name">{{ project().name }}</span><span class="hint" id="chest-hint">{{ isOpen() ? 'Toque de novo para fechar' : 'Toque no baú para abrir' }}</span></div>
+      <button type="button" class="arrow" id="chest-next" aria-label="Próximo projeto" (click)="go(1)">→</button>
+    </div>
+    <article class="chest-panel" id="chest-panel" #panel hidden>
+      <div class="chest-art"><img id="cp-img" [src]="shown().img" [alt]="shown().alt"></div>
+      <div class="chest-text">
+        <div class="kick-row"><p class="kick" id="cp-kick">{{ shown().kick }}</p><span class="wip" id="cp-wip" [hidden]="!shown().wip">Em produção</span></div>
+        <h3 id="cp-title">{{ shown().title }}</h3>
+        <p id="cp-desc">{{ shown().desc }}</p>
+        <ul class="chips" id="cp-chips">
+          @for (c of shown().chips; track c) {
+            <li>{{ c }}</li>
+          }
+        </ul>
+        <a id="cp-link" target="_blank" rel="noopener" [href]="shown().href">{{ shown().link }}</a>
+      </div>
+      <button type="button" class="cp-close" id="cp-close" aria-label="Fechar o baú" (click)="closeButton()">✕</button>
+    </article>
+  </div>
+</div>

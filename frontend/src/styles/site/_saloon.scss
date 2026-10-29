@@ -1,0 +1,29 @@
+/* Saloon: quadro do balcão e bebidas (legacy/site.html, linhas 449-460 481-496) */
+/* Coisas que eu gosto: o quadro do balcão */
+.menu-board {
+  background: #2e3a30; color: #f3efe2;
+  border: 12px solid #6e4426; outline: 4px solid var(--tição); box-shadow: 10px 10px 0 var(--tição);
+  padding: clamp(22px, 4vw, 42px);
+}
+.menu-board h3 { font-family: var(--f-west); font-weight: 400; font-size: clamp(26px, 3vw, 34px); text-align: center; margin: 0 0 26px; }
+.menu-board ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px 44px; }
+.menu-board li { border-bottom: 2px dashed rgba(243, 239, 226, 0.35); padding-bottom: 16px; display: grid; gap: 6px; }
+.menu-board b { font-family: var(--f-pixel); font-size: 21px; font-weight: 700; display: flex; justify-content: space-between; gap: 12px; }
+.menu-board b small { font-size: 15px; font-weight: 500; color: #e8c878; white-space: nowrap; }
+.menu-board p { margin: 0; line-height: 1.55; color: #dcd8c8; }
+/* Saloon: bebidas que levam às redes */
+.menu-board ul.drinks { list-style: none; margin: 0 auto; padding: 0; display: grid; grid-template-columns: 1fr; gap: 14px; max-width: 780px; }
+.menu-board ul.drinks > li { border-bottom: 0; padding-bottom: 0; display: block; }
+.menu-board .drink b { justify-content: flex-start; }
+.drink {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 16px; align-items: center;
+  padding: 14px 16px; border: 2px dashed rgba(243, 239, 226, 0.35); color: #f3efe2; text-decoration: none;
+}
+a.drink:hover, a.drink:focus-visible { background: rgba(243, 239, 226, 0.08); border-style: solid; }
+.drink svg { width: 44px; height: 44px; }
+.drink b { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; font-family: var(--f-pixel); font-size: 21px; margin-bottom: 4px; }
+.drink b small { font-size: 14px; color: #e8c878; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
+.drink span { line-height: 1.5; color: #dcd8c8; overflow-wrap: anywhere; }
+.drink em { font-style: normal; font-family: var(--f-pixel); font-size: 16px; color: #e8c878; white-space: nowrap; }
+#copy-msg { margin: 6px 0 0 66px; font-size: 14px; color: #e8c878; min-height: 1.2em; }
+@media (max-width: 560px) { .drink { grid-template-columns: 40px 1fr; } .drink em, .drink .s-btn { grid-column: 2; justify-self: start; } #copy-msg { margin-left: 0; } }
