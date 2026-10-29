@@ -1,16 +1,9 @@
-# Fragmento gerado pelo build.sh, usado só no artifact do claude.ai
-# (index.html também é gerado, mas fica versionado para o deploy estático funcionar sem build)
-forasteiro.html
-
 # Variáveis de ambiente e segredos (GITHUB_TOKEN etc.)
 .env
 .env.*
 !.env.example
 
-# Vercel
-.vercel/
-
-# Node (caso entre alguma dependência no futuro)
+# Node (o frontend/ tem o próprio .gitignore)
 node_modules/
 npm-debug.log*
 

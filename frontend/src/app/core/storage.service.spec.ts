@@ -10,7 +10,7 @@ describe('StorageService', () => {
   });
   afterEach(() => vi.restoreAllMocks());
 
-  it('usa as chaves do legado', () => {
+  it('usa as chaves vila-*', () => {
     storage.set(STORAGE_KEYS.hero, 'cangaceiro');
     expect(localStorage.getItem('vila-heroi')).toBe('cangaceiro');
     storage.set(STORAGE_KEYS.arrived, '1', 'session');

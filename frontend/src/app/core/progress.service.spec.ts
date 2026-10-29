@@ -5,9 +5,8 @@ describe('ProgressService', () => {
   beforeEach(() => localStorage.clear());
   afterEach(() => localStorage.clear());
 
-  it('migra o formato antigo (vila-moedas e vila-revolver)', () => {
-    localStorage.setItem('vila-moedas', JSON.stringify(['armeiro', 'saloon', 'inventada']));
-    localStorage.setItem('vila-revolver', '1');
+  it('retoma o progresso salvo, ignorando moedas que não existem', () => {
+    localStorage.setItem('vila-progresso', JSON.stringify({ coins: ['armeiro', 'saloon', 'inventada'], gun: true }));
     const p = TestBed.inject(ProgressService);
     expect(p.progress.coins).toEqual(['armeiro', 'saloon']);
     expect(p.found()).toBe(3);

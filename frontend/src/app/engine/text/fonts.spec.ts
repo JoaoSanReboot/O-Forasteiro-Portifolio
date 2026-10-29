@@ -3,7 +3,7 @@ import { charX, pixelText, textWidth } from './pixel-font';
 import { tinyText, tinyWidth } from './tiny-font';
 
 describe('fontes de pixel', () => {
-  it('mede como o legado (1 px entre letras, espaço de 2 px)', () => {
+  it('mede 1 px entre letras e 2 px de espaço', () => {
     expect(textWidth('SKILLS')).toBe(33);
     expect(textWidth('NÃO ATIRE')).toBe(textWidth('NAO ATIRE'));
     expect(charX('BUGS', 10, 2)).toBe(10 + 6 + 6);

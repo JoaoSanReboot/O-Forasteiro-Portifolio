@@ -12,8 +12,7 @@ export interface Progress { coins: CoinId[]; gun: boolean; piano: boolean; hero?
 
 const FULL_POCKETS = 'Ora, ora... Parece que seus bolsos tão cheios agora! Acho que já dá pra comprar um revórvi com o Xavier, não?';
 
-// as moedas, o revólver do Xavier e o segredo do Saloon; o progresso fica no navegador (vila-progresso),
-// e os formatos antigos (vila-moedas, vila-revolver) são lidos uma vez para ninguém perder o que achou
+// as moedas, o revólver do Xavier e o segredo do Saloon; o progresso fica no navegador (vila-progresso)
 @Injectable({ providedIn: 'root' })
 export class ProgressService {
   private readonly storage = inject(StorageService);
@@ -43,10 +42,7 @@ export class ProgressService {
   private allCoins = () => this.coinCount() === COIN_IDS.length;
 
   private readLocal(): Partial<Progress> | null {
-    const p = this.storage.getJson<Partial<Progress> | null>(STORAGE_KEYS.progress, null);
-    if (p) return p;
-    const coins = this.storage.getJson<string[]>(STORAGE_KEYS.legacyCoins, []);
-    return { coins: coins as CoinId[], gun: this.storage.get(STORAGE_KEYS.legacyGun) === '1' };
+    return this.storage.getJson<Partial<Progress> | null>(STORAGE_KEYS.progress, null);
   }
 
   private absorb(p: Partial<Progress> | null): void {
@@ -132,7 +128,7 @@ export class ProgressService {
 
   reset(): void {
     this.progress.coins = []; this.progress.gun = false; this.progress.piano = false;
-    [STORAGE_KEYS.progress, STORAGE_KEYS.legacyCoins, STORAGE_KEYS.legacyGun].forEach((k) => this.storage.remove(k));
+    this.storage.remove(STORAGE_KEYS.progress);
     this.loop.invalidate();
     this.sync();
   }

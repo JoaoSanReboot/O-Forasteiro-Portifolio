@@ -6,7 +6,7 @@ export type TrackName = 'ride' | 'village' | 'duel';
 export type DuelFx = 'shot' | 'rifle' | 'cock' | 'whoosh' | 'throw' | 'snap' | 'tap' | 'bonk' | 'bell';
 
 export interface VilaAudioOptions {
-  /** som ligado ao abrir (o legado lia `vila-som`) */
+  /** som ligado ao abrir (o AudioService lê `vila-som`) */
   enabled: boolean;
   /** faixa licenciada para o duelo, no lugar da trilha sintetizada (opcional) */
   duelMusicUrl?: string | null;

@@ -24,10 +24,11 @@ e registre aqui: título, autor, link da licença e o crédito exigido.
 A referência enviada para o duelo (vídeo do YouTube `XZ9BYXXg2MY`) não teve a licença confirmada,
 então ela não foi baixada nem incorporada. O duelo continua com a trilha original sintetizada.
 
-Para usar uma faixa licenciada no lugar, publique o arquivo junto do site e defina, antes do script do site:
+Para usar uma faixa licenciada no lugar, coloque o arquivo em `frontend/public/audio/` e aponte para ele em
+`frontend/src/environments/environment.ts` (e, se quiser ouvir em desenvolvimento, em `environment.development.ts`):
 
-```html
-<script>window.VILA_DUEL_MUSIC = "/audio/duelo.mp3";</script>
+```ts
+duelMusicUrl: '/audio/duelo.mp3',
 ```
 
 A faixa entra e sai com a mesma transição suave das outras trilhas, toca em loop durante o duelo

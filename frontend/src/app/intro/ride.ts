@@ -10,7 +10,7 @@ import { cancelRaf, raf } from '../engine/core/browser';
 
 // A abertura: cena de tela cheia em canvas de baixa resolução, narração na faixa de cima e
 // o cartaz em canvas de alta resolução por cima. Mundo único (sertão ao entardecer).
-// Port do legado (intro.src.html) quase linha a linha: o estado que muda a cada quadro fica em variáveis comuns.
+// O estado que muda a cada quadro fica em variáveis comuns, fora dos Signals.
 
 // Linha do tempo em "segundos de história" (avança mais rápido com espaço)
 export const P = {
@@ -643,7 +643,7 @@ export function createRide(els: RideElements, hooks: RideHooks): Ride {
       }
     }
   }
-  // o Object.assign do legado: os campos antigos que a peça nova não tem continuam lá
+  // Object.assign: os campos antigos que a peça nova não tem continuam lá
   const replace = (pr: Prop, next: Prop) => Object.assign(pr, next);
 
   function updateWeeds(p: number, dt: number, rate: number): void {

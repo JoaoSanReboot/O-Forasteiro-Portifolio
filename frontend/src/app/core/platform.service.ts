@@ -2,7 +2,7 @@ import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { engineEnv } from '../engine/core/env';
 
-// o que o navegador conta sobre o visitante; lido uma vez, como no legado
+// o que o navegador conta sobre o visitante; lido uma vez
 @Injectable({ providedIn: 'root' })
 export class PlatformService {
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));

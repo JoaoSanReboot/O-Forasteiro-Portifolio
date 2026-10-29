@@ -1,4 +1,4 @@
-/* base do site: página rolando, variáveis, botões e setores (legacy/site.html, linhas 6-31, 94-116 e 529-532) */
+/* base do site: página rolando, variáveis, botões e setores */
 html.site-on, html.site-on body { height: auto; overflow: visible; }
 html.site-on body { -webkit-user-select: text; user-select: text; background: #f3e3c3; }
 @media (prefers-reduced-motion: no-preference) { html.site-on { scroll-behavior: smooth; } }
