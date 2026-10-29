@@ -1,0 +1,22 @@
+<div class="wrap">
+  <div class="sector-top">
+    <header class="sector-head">
+      <p class="kicker">Armeiro</p>
+      <h2 id="t-skills">Skills.</h2>
+      <p class="lead">Um bom pistoleiro conhece seu arsenal. Um bom desenvolvedor sabe quando usar cada ferramenta.</p>
+    </header>
+    <figure appScene="armeiro"></figure>
+  </div>
+  <div class="shelves">
+    @for (shelf of shelves; track shelf.label) {
+      <div class="shelf">
+        <span class="shelf-label">{{ shelf.label }}</span>
+        <ul>
+          @for (item of shelf.items; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</div>

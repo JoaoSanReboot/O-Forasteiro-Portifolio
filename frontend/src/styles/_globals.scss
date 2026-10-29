@@ -1,0 +1,27 @@
+/* regras de página da abertura que valem também para o site (legacy/intro.src.html, linhas 21-29, 73-88 e 187) */
+html, body { height: 100%; }
+body {
+  background: var(--tição);
+  color: var(--areia);
+  font-family: var(--font-ui);
+  overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+  touch-action: manipulation;
+}
+button {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  padding: 12px 20px;
+  border: 3px solid var(--tição);
+  background: var(--poente);
+  color: var(--tição);
+  box-shadow: 4px 4px 0 var(--tição);
+  cursor: pointer;
+  min-height: 48px;
+}
+button.secondary { background: var(--areia); }
+button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--tição); }
+button:focus-visible { outline: 3px solid var(--areia); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

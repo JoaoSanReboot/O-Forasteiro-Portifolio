@@ -1,4 +1,4 @@
-import { Environment } from './environment';
+import { Environment } from './environment.model';
 
 export const environment: Environment = {
   // a API local (api/Properties/launchSettings.json)
