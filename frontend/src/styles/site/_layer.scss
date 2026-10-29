@@ -1,0 +1,44 @@
+/* balões e painéis presos às cenas e o jogo da velha (legacy/site.html, linhas 533-575) */
+#site .say {
+  all: unset; box-sizing: border-box; position: absolute; transform: translate(-50%, calc(-100% - 10px)); cursor: pointer; white-space: nowrap; pointer-events: auto;
+  font-family: var(--f-pixel); font-weight: 700; font-size: 13px; color: var(--tinta); background: #fff6e2; padding: 6px 10px;
+  border: 3px solid var(--tição); box-shadow: 3px 3px 0 var(--tição);
+}
+#site .say::after { content: ""; position: absolute; left: 50%; bottom: -10px; margin-left: -6px; border: 6px solid transparent; border-top-color: var(--tição); border-bottom: 0; }
+#site .say:hover { background: #ffe9b8; }
+#site .say:focus-visible { outline: 3px solid var(--poente); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) {
+  #site .say { animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translate(-50%, calc(-100% - 14px)); } }
+}
+@media (max-width: 560px) { #site .say { font-size: 12px; padding: 5px 8px; } }
+.scene-panel { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(20, 12, 8, 0.55); padding: 8px; }
+.scene-panel[hidden] { display: none; }
+.sp-card { display: grid; justify-items: center; gap: 6px; padding: 10px 14px 12px; background: #2e3a30; border: 4px solid #6a4024; box-shadow: 5px 5px 0 var(--tição); color: #f3efe2; max-height: 100%; overflow: auto; }
+.sp-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; }
+.sp-head h3 { margin: 0; font-family: var(--f-west); font-weight: 400; font-size: 22px; }
+#site .sp-close { all: unset; cursor: pointer; width: 30px; height: 30px; display: grid; place-items: center; color: #e8c878; font-size: 16px; }
+#site .sp-close:focus-visible { outline: 3px solid var(--poente); }
+
+/* Jogo da velha no balcão: tabuleiro, status e instruções em blocos separados */
+.velha-card { display: grid; gap: 12px; grid-template-columns: auto minmax(0, 260px); grid-template-areas: "head head" "board status" "board help"; align-items: stretch; padding: 12px 16px 14px; }
+.velha-card .sp-head { grid-area: head; }
+.velha-board { grid-area: board; display: grid; place-items: center; }
+.velha-status { grid-area: status; display: grid; align-content: center; gap: 4px; padding: 10px 12px; background: rgba(0, 0, 0, 0.22); border: 2px solid #4a5a4c; }
+.velha-help { grid-area: help; display: grid; align-content: end; gap: 10px; }
+.velha-info { margin: 0; color: #dcd8c8; font-size: 13px; line-height: 1.45; }
+.velha { --cell: 52px; display: grid; grid-template-columns: repeat(3, var(--cell)); gap: 5px; }
+#site .velha button { all: unset; box-sizing: border-box; width: var(--cell); height: var(--cell); display: grid; place-items: center; cursor: pointer; background: #e8d8b0; border: 3px solid var(--tição); }
+#site .velha button:hover:not([disabled]) { background: #f6ead0; }
+#site .velha button:focus-visible { outline: 3px solid var(--poente); outline-offset: 2px; }
+#site .velha button.win { background: #e8c878; }
+#site .velha button[disabled] { cursor: default; }
+.velha svg { width: 70%; height: 70%; }
+.velha-msg { margin: 0; font-family: var(--f-pixel); font-weight: 700; font-size: 15px; color: #e8c878; }
+.velha-score { margin: 0; font-size: 13px; color: #dcd8c8; }
+#site .velha-help .s-btn { justify-self: start; padding: 7px 14px; font-size: 14px; }
+/* no celular o jogo abre logo abaixo da cena, empilhado, sem cobrir o desenho */
+.velha-panel.inline { position: static; inset: auto; background: none; padding: 0; width: 100%; max-width: 420px; }
+.velha-panel.inline .velha-card { width: 100%; box-sizing: border-box; grid-template-columns: 1fr; grid-template-areas: "head" "board" "status" "help"; justify-items: stretch; }
+.velha-panel.inline .velha { --cell: 64px; }
+.velha-panel.inline .velha-help { align-content: start; }

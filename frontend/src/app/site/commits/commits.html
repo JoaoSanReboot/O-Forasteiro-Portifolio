@@ -1,0 +1,29 @@
+<div class="wrap">
+  <div class="sector-top">
+    <header class="sector-head">
+      <p class="kicker">Telégrafo</p>
+      <h2 id="t-commits">Commits.</h2>
+      <p class="lead">Cada quadradinho representa um dia de trabalho. Quanto mais verdinho, mais contribuições foram feitas!</p>
+    </header>
+    <figure appScene="telegrafo"></figure>
+  </div>
+  <div class="commits-grid">
+    <div class="board" id="board">
+      <p class="board-total"><b id="heat-count" #count>{{ data().total }}</b><span>contribuições no último ano</span></p>
+      <div class="heat-wrap"><div class="heat" id="heat" #heat role="group" aria-label="Contribuições por dia no último ano">
+        @for (p of pads(); track $index) {
+          <span class="pad"></span>
+        }
+        @for (c of cells(); track c.date) {
+          <button type="button" [class]="c.level ? 'l' + c.level : ''" [attr.aria-label]="c.label" [attr.tabindex]="c.level ? null : -1" (click)="tip.set(c.label + '.')"></button>
+        }
+      </div></div>
+      <div class="heat-legend"><span>{{ legend()[0].month }} <b>{{ legend()[0].year }}</b></span><span>{{ legend()[1].month }} <b>{{ legend()[1].year }}</b></span></div>
+      <p id="heat-tip" aria-live="polite">{{ tip() }}</p>
+    </div>
+    <div class="board-foot">
+      <a class="s-btn alt" href="https://github.com/JoaoSanReboot" target="_blank" rel="noopener">Ver no GitHub ↗</a>
+      <p class="note" id="heat-status" aria-live="polite">{{ status() }}</p>
+    </div>
+  </div>
+</div>

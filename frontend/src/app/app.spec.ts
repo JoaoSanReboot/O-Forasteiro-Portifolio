@@ -8,14 +8,13 @@ describe('App', () => {
     await TestBed.configureTestingModule({ imports: [App] }).compileComponents();
   });
 
-  it('abre direto no site, com a seção Skills e a cena do armeiro', async () => {
+  it('abre direto no site (modo site-on), com o topo e as seções', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
     expect(document.documentElement.classList.contains('site-on')).toBe(true);
+    expect(el.querySelector('#site > .hero#inicio h1')?.textContent).toContain('João Pedro');
     expect(el.querySelector('#skills h2')?.textContent).toBe('Skills.');
-    expect(el.querySelector('figure.scene[data-scene="armeiro"] canvas')).toBeTruthy();
-    expect(el.querySelectorAll('.shelf')).toHaveLength(5);
     expect(el.querySelectorAll('.shelf li')).toHaveLength(28);
   });
 });

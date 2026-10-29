@@ -7,4 +7,6 @@ export interface SceneDef {
   front?(g: Ctx): void;
   draw(g: Ctx, t: number, dt: number): void;
   after?(g: Ctx, t: number, dt: number): void;
+  /** com movimento reduzido a cena fica parada, a não ser enquanto isto for verdade (segredo do Saloon) */
+  acting?(): boolean;
 }

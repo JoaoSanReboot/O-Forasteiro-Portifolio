@@ -43,7 +43,7 @@ export class SceneLoopService {
   private readonly loop = (now: number): void => {
     const dt = Math.min(0.05, (now - this.last) / 1000); this.last = now;
     for (const s of this.scenes) {
-      if (this.platform.reduceMotion) { if (!s.drawn) s.paint(2.5, 0); continue; }
+      if (this.platform.reduceMotion && !s.def.acting?.()) { if (!s.drawn) s.paint(2.5, 0); continue; }
       if (s.visible) { s.t += dt; s.paint(s.t, dt); }
       else if (!s.drawn) s.paint(s.t, 0);
     }

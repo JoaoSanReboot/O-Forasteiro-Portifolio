@@ -1,0 +1,51 @@
+<div class="wrap">
+  <div class="sector-top">
+    <header class="sector-head">
+      <p class="kicker">Delegacia</p>
+      <h2 id="t-trabalhos">Trabalhos.</h2>
+      <p class="lead">Cada experiência conta uma história, resolve um problema e deixa sua marca nos registros.</p>
+    </header>
+    <figure appScene="delegacia"></figure>
+  </div>
+  <div class="cases">
+    <article class="case">
+      <header class="case-head">
+        <h3 class="role">Desenvolvedor FullStack</h3>
+        <p class="org">Agile Connect</p>
+        <ul class="case-meta"><li><span class="sr">Período: </span>jun 2026 – set 2026</li><li class="mode"><span class="sr">Modelo: </span>Híbrido</li></ul>
+      </header>
+      <p class="tech-label">Tecnologias</p>
+      <ul class="chips"><li>.NET 8</li><li>.NET 9</li><li>.NET 10</li><li>React</li><li>SQL Server</li><li>T-SQL</li><li>xUnit</li><li>Webhooks</li><li>Workers</li><li>Azure</li><li>DevOps</li><li>Claude Code</li><li>OpenCode</li><li>Jira</li></ul>
+      <details name="fichas" (toggle)="onlyOne($event)">
+        <summary><span class="open-t">Abrir a ficha</span><span class="close-t">Fechar a ficha</span></summary>
+        <ul class="bullets">
+          <li>Integrei e mantive o fluxo de APIs financeiras, corrigindo a sincronização de status de cobrança com a instituição financeira por meio de webhooks.</li>
+          <li>Refatorei transações síncronas para processamento assíncrono, reduzindo bloqueios e disparidades entre os sistemas.</li>
+          <li>Implementei a alteração de contratos em lote via worker com processamento enfileirado, substituindo edições individuais.</li>
+          <li>Otimizei consultas SQL e reduzi o carregamento do grid de contratos de <b>60 s para 4 s</b>, movendo o processamento para a camada de query.</li>
+          <li>Criei triggers em SQL Server para sincronizar os sistemas de gestão de vendas e de ocorrências.</li>
+          <li>Atuei na manutenção em produção com hotfixes, correções em logging e paginação, monitoramento via logs, testes unitários e code reviews.</li>
+        </ul>
+      </details>
+    </article>
+    <article class="case">
+      <header class="case-head">
+        <h3 class="role">Desenvolvedor Júnior</h3>
+        <p class="org">Mydas Tecnologia</p>
+        <ul class="case-meta"><li><span class="sr">Período: </span>out 2025 – jun 2026</li><li class="mode"><span class="sr">Modelo: </span>Presencial</li></ul>
+      </header>
+      <p class="tech-label">Tecnologias</p>
+      <ul class="chips"><li>Node.js</li><li>Python</li><li>Flask</li><li>FastAPI</li><li>AWS Lambda</li><li>JasperReports</li><li>APIs Financeiras</li><li>ERP</li></ul>
+      <details name="fichas" (toggle)="onlyOne($event)">
+        <summary><span class="open-t">Abrir a ficha</span><span class="close-t">Fechar a ficha</span></summary>
+        <ul class="bullets">
+          <li>Desenvolvi uma customização no ERP Senior com Node.js na AWS, reduzindo o fechamento mensal de <b>5 dias para 4 horas</b> com mensageria assíncrona e geração automática de boletos a partir de NFs.</li>
+          <li>Implementei um endpoint Flask/Python para gerar relatórios PDF com pyreportjasper e JasperReports, alimentado por um data lake de ordens de serviço.</li>
+          <li>Entreguei mais de <b>12 relatórios</b> dinâmicos em JasperReports para clientes industriais e comerciais, com filtros avançados e cálculos de impostos parametrizados.</li>
+          <li>Otimizei a regra em LSP de exportação automática de notas fiscais, reduzindo o processamento de <b>1 dia para 2 horas</b>.</li>
+          <li>Capacitei colaboradores de indústrias em relatórios JasperReports integrados ao ERP Senior e levantei requisitos de relatórios complexos.</li>
+        </ul>
+      </details>
+    </article>
+  </div>
+</div>

@@ -5,4 +5,6 @@ export interface Environment {
   githubEndpoint: string | null;
   /** faixa licenciada para o duelo; null mantém a trilha sintetizada */
   duelMusicUrl: string | null;
+  /** pula a abertura e entra direto no site (só para desenvolvimento) */
+  skipIntro: boolean;
 }
