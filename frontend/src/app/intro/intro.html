@@ -1,0 +1,32 @@
+<canvas id="stage" class="full" #stage aria-hidden="true" (pointerdown)="stagePointer($event)" (pointerup)="boost(false)" (pointercancel)="boost(false)" (pointerleave)="boost(false)"></canvas>
+<canvas id="poster-layer" class="full" #posterLayer aria-hidden="true"></canvas>
+
+<section id="gate" class="layer" aria-labelledby="gate-title" [hidden]="gateHidden()">
+  <div class="gate-grid">
+    <div class="gate-left">
+      <p class="kicker">Portfólio de João Pedro</p>
+      <h1 id="gate-title" class="title"><span class="t-small">Em busca do</span><span class="t-big">Forasteiro</span></h1>
+      <p class="sub">Escolha quem vai seguir a trilha até a vila.</p>
+      <div class="cast" id="cast" role="radiogroup" aria-label="Escolha seu personagem" (keydown)="castKey($event)">
+        @for (h of cast; track h.id) {
+          <button type="button" class="cast-card" #card [attr.data-id]="h.id" role="radio" [attr.aria-label]="h.name" [attr.aria-checked]="h.id === heroId()" [tabIndex]="h.id === heroId() ? 0 : -1" (click)="select(h.id)"><canvas width="32" height="48" aria-hidden="true"></canvas><span>{{ h.short }}</span></button>
+        }
+      </div>
+      <div class="hero-info"><p class="hero-name" id="hero-name">{{ hero().name }}</p><p class="hero-tag" id="hero-tag">{{ hero().tag }}</p></div>
+      <button id="start" type="button" (click)="start()">Iniciar aventura</button>
+      <p class="gate-hint">Na estrada, segure espaço (ou a tela) para galopar mais rápido.</p>
+    </div>
+    <div class="gate-right"><canvas id="hero-view" #heroView width="64" height="64" aria-hidden="true"></canvas></div>
+  </div>
+</section>
+<button id="sound" type="button" [attr.aria-pressed]="soundOn()" [attr.aria-label]="soundOn() ? 'Som ligado. Clique para silenciar' : 'Som desligado. Clique para ligar'" [class.off]="!soundOn()" (click)="toggleSound()">
+  <svg viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="4" width="3" height="4" fill="currentColor"/><rect x="4" y="3" width="1" height="6" fill="currentColor"/><rect x="5" y="2" width="1" height="8" fill="currentColor"/><g class="waves"><rect x="8" y="4" width="1" height="4" fill="currentColor"/><rect x="10" y="2" width="1" height="8" fill="currentColor"/><rect x="9" y="3" width="1" height="1" fill="currentColor"/><rect x="9" y="8" width="1" height="1" fill="currentColor"/></g><g class="mute"><rect x="7" y="4" width="1" height="1" fill="currentColor"/><rect x="8" y="5" width="1" height="1" fill="currentColor"/><rect x="9" y="6" width="1" height="1" fill="currentColor"/><rect x="10" y="7" width="1" height="1" fill="currentColor"/><rect x="10" y="4" width="1" height="1" fill="currentColor"/><rect x="9" y="5" width="1" height="1" fill="currentColor"/><rect x="8" y="6" width="1" height="1" fill="currentColor"/><rect x="7" y="7" width="1" height="1" fill="currentColor"/></g></svg>
+</button>
+
+<div id="bar-top" class="bar"><div id="tale" #tale aria-hidden="true"></div></div>
+<div id="bar-bottom" class="bar"><div id="hint" #hint [hidden]="hintHidden()"><kbd id="hint-key">{{ isTouch ? 'Segure a tela' : 'Espaço' }}</kbd><span id="hint-text">{{ isTouch ? 'para galopar mais rápido' : 'segure para galopar mais rápido' }}</span></div></div>
+<p id="tale-sr" class="sr-only" #taleSr aria-live="polite"></p>
+
+<div id="hud" [hidden]="hudHidden()">
+  <button id="skip" type="button" [hidden]="skipHidden()" (click)="skip()">Pular</button>
+</div>

@@ -1,6 +1,8 @@
 import { inject, Injectable, isDevMode } from '@angular/core';
+import { IntroService } from './intro.service';
 import { SceneRunner } from '../engine/runtime/scene-runner';
 import { PlatformService } from './platform.service';
+import { cancelRaf, raf } from '../engine/core/browser';
 
 declare global {
   interface Window {
@@ -14,6 +16,7 @@ declare global {
 @Injectable({ providedIn: 'root' })
 export class SceneLoopService {
   private readonly platform = inject(PlatformService);
+  private readonly intro = inject(IntroService);
   private readonly scenes: SceneRunner[] = [];
   private raf = 0;
   private last = 0;
@@ -27,13 +30,18 @@ export class SceneLoopService {
 
   register(scene: SceneRunner): void {
     this.scenes.push(scene);
-    if (!this.raf && this.platform.isBrowser) { this.last = performance.now(); this.raf = requestAnimationFrame(this.loop); }
+    if (!this.raf && this.platform.isBrowser) { this.last = performance.now(); this.raf = raf(this.loop); }
   }
 
   unregister(scene: SceneRunner): void {
     const i = this.scenes.indexOf(scene);
     if (i >= 0) this.scenes.splice(i, 1);
-    if (!this.scenes.length && this.raf) { cancelAnimationFrame(this.raf); this.raf = 0; }
+    if (!this.scenes.length && this.raf) { cancelRaf(this.raf); this.raf = 0; }
+  }
+
+  /** as cenas paradas (fora da tela ou com movimento reduzido) se redesenham no próximo quadro */
+  invalidate(id?: string): void {
+    for (const s of this.scenes) if (!id || s.id === id) s.drawn = false;
   }
 
   find(id: string): SceneRunner | undefined {
@@ -42,11 +50,12 @@ export class SceneLoopService {
 
   private readonly loop = (now: number): void => {
     const dt = Math.min(0.05, (now - this.last) / 1000); this.last = now;
-    for (const s of this.scenes) {
+    // com a tela inicial por cima, o site não anda
+    if (this.intro.siteOn()) for (const s of this.scenes) {
       if (this.platform.reduceMotion && !s.def.acting?.()) { if (!s.drawn) s.paint(2.5, 0); continue; }
       if (s.visible) { s.t += dt; s.paint(s.t, dt); }
       else if (!s.drawn) s.paint(s.t, 0);
     }
-    this.raf = requestAnimationFrame(this.loop);
+    this.raf = raf(this.loop);
   };
 }

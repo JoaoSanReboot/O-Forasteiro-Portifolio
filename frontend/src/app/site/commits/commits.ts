@@ -2,6 +2,7 @@ import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyR
 import { PlatformService } from '../../core/platform.service';
 import { HeatData, HeatDay, snapshotData } from '../../content/heat-snapshot';
 import { SceneCanvas } from '../../shared/scene-canvas';
+import { cancelRaf, raf } from '../../engine/core/browser';
 import { GITHUB_ENDPOINT } from './github-endpoint';
 
 const fmtDay = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -101,7 +102,7 @@ export class Commits {
   // Lê a grade atual a cada quadro: se os dados ao vivo chegarem no meio, ela segue na grade nova, como no legado.
   private animate(): () => void {
     const heat = this.heatRef().nativeElement, count = this.countRef().nativeElement;
-    let visible = false, i = 0, lit = 0, wait = 0, last = performance.now(), raf = 0;
+    let visible = false, i = 0, lit = 0, wait = 0, last = performance.now(), frameId = 0;
     const io = new IntersectionObserver((es) => es.forEach((e) => { visible = e.isIntersecting; }), { threshold: 0.3 });
     io.observe(heat);
     const SPEED = 42; // dias por segundo
@@ -126,9 +127,9 @@ export class Commits {
         }
         if (i >= cells.length) { cells.forEach((c) => c.b.classList.remove('scan')); this.scanDone = true; count.textContent = String(total); io.disconnect(); return; }
       }
-      raf = requestAnimationFrame(tick);
+      frameId = raf(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(raf); io.disconnect(); };
+    frameId = raf(tick);
+    return () => { cancelRaf(frameId); io.disconnect(); };
   }
 }

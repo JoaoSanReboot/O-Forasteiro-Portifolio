@@ -1,4 +1,8 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, input, viewChild } from '@angular/core';
+import { afterNextRender, afterRenderEffect, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, input, viewChild } from '@angular/core';
+import { DuelService } from '../core/duel.service';
+import { HeroService } from '../core/hero.service';
+import { IntroService } from '../core/intro.service';
+import { ProgressService } from '../core/progress.service';
 import { SaloonService } from '../core/saloon.service';
 import { SceneLoopService } from '../core/scene-loop.service';
 import { clamp } from '../engine/core/math';
@@ -23,21 +27,40 @@ export class SceneCanvas {
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly loop = inject(SceneLoopService);
   private readonly saloonState = inject(SaloonService);
+  private readonly duel = inject(DuelService);
+  private readonly heroes = inject(HeroService);
+  private readonly secrets = inject(ProgressService);
+  private readonly intro = inject(IntroService);
   private runner?: SceneRunner;
   private layerEl?: HTMLDivElement;
   private readonly pins: Pin[] = [];
   private readonly ready: (() => void)[] = [];
 
+  private resizeNow?: () => void;
+
   constructor() {
     const destroyRef = inject(DestroyRef);
+    // o site fica escondido atrás da tela inicial: a cena só se mede quando ele aparece
+    afterRenderEffect(() => { if (this.intro.siteOn()) this.resizeNow?.(); });
     afterNextRender(() => {
       const fig = this.host.nativeElement;
       const { piano, saloon } = this.saloonState;
-      const runner = new SceneRunner(this.appScene(), this.canvas().nativeElement, SCENES[this.appScene()]({ piano, saloon }));
+      const id = this.appScene();
+      const deps = { piano, saloon, duel: this.duel.state, hero: this.heroes.current, hasGun: this.secrets.hasGun };
+      const canvas = this.canvas().nativeElement;
+      const runner = new SceneRunner(id, canvas, SCENES[id](deps));
       this.runner = runner;
-      const resize = () => { runner.size(fig.clientWidth); this.placeLayers(); };
+      runner.overlay = this.secrets.overlay(id);
+      const resize = () => { if (!this.intro.siteOn()) return; runner.size(fig.clientWidth); this.placeLayers(); };
       resize();
       window.addEventListener('resize', resize);
+      // as moedas escondidas e o revólver do Xavier: mãozinha por cima e o toque pega
+      canvas.addEventListener('pointermove', (e) => { if (runner.scale) canvas.style.cursor = this.secrets.hover(id, runner.toScene(e.clientX, e.clientY)) ? 'pointer' : ''; });
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!runner.scale || !this.secrets.tap(id, runner.toScene(e.clientX, e.clientY))) return;
+        e.stopPropagation(); canvas.style.cursor = '';
+      });
+      this.resizeNow = resize;
       const visObs = new IntersectionObserver(
         (entries) => entries.forEach((e) => { runner.visible = e.isIntersecting && e.intersectionRatio >= 0.45; }),
         { threshold: [0, 0.45, 0.7, 1] },
