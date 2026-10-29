@@ -1,20 +1,30 @@
 # Em Busca do Forasteiro — portfólio de João Pedro
 
-Portfólio em pixel art com temática de velho oeste/cangaço. HTML, CSS e JavaScript puro, sem frameworks e sem dependências.
+Portfólio em pixel art com temática de velho oeste/cangaço.
 
-## Rodar localmente
+> **Migração em andamento:** o protótipo original (HTML, CSS e JavaScript puro) está em `legacy/` e está sendo levado para
+> `frontend/` (Angular) e `api/` (.NET). Este README descreve o protótipo; a versão nova será documentada ao fim da migração.
+
+## Rodar o protótipo (`legacy/`)
 
 ```bash
-bash build.sh          # gera index.html e forasteiro.html
-# abra index.html no navegador, ou sirva a pasta:
-python3 -m http.server 8000   # http://localhost:8000
+bash legacy/build.sh          # gera legacy/index.html e legacy/forasteiro.html
+# abra legacy/index.html no navegador, ou sirva a pasta:
+python3 -m http.server 8000 -d legacy   # http://localhost:8000
 ```
 
 Requisitos do build: `bash`, `base64` e `python3`. As imagens são embutidas no HTML em base64.
 
+**No Windows**, o Python lê os fontes com a codificação padrão do sistema (cp1252) e o build quebra com `UnicodeDecodeError`.
+Rode com o Python em modo UTF-8:
+
+```bash
+PYTHONUTF8=1 bash legacy/build.sh
+```
+
 ## Estrutura
 
-| Arquivo | O que é |
+| Arquivo (em `legacy/`) | O que é |
 |---|---|
 | `intro.src.html` | Tela inicial (seleção de personagem), cavalgada, elenco (`HEROES`, `drawHero`), motor de áudio (`VilaAudio`) e alto-falante |
 | `site.html` | CSS e marcação das seções do site |
