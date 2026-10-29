@@ -1,0 +1,67 @@
+# Deploy na main: roda o CI e publica o site no Azure Static Web Apps e a API no Azure App Service.
+#
+# Segredos do repositório (Settings → Secrets and variables → Actions → Secrets):
+#   AZURE_STATIC_WEB_APPS_API_TOKEN  token de deploy do Static Web App (portal do Azure → Static Web App → Manage deployment token)
+#   AZURE_WEBAPP_PUBLISH_PROFILE     perfil de publicação do App Service (portal do Azure → App Service → Download publish profile)
+# Variável do repositório (aba Variables):
+#   AZURE_WEBAPP_NAME                nome do App Service da API
+#
+# O GITHUB_TOKEN da placa NÃO passa por aqui: ele fica na configuração do App Service (GitHub__Token).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  frontend:
+    name: Site → Azure Static Web Apps
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npx ng build
+        working-directory: frontend
+      # o build já saiu acima (prerender estático); a action só sobe a pasta pronta
+      - uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: frontend/dist/forasteiro/browser
+          config_file_location: frontend
+          skip_app_build: true
+          skip_api_build: true
+
+  api:
+    name: API → Azure App Service
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet publish api/Forasteiro.Api.csproj -c Release -o ${{ runner.temp }}/api
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ runner.temp }}/api
