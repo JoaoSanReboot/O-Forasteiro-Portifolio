@@ -15,6 +15,8 @@ export class SceneRunner {
   /** ampliação inteira; 0 até a primeira medida */
   scale = 0;
   camX = 0;
+  /** desenhado por cima de tudo a cada quadro: as moedas e o revólver escondidos */
+  overlay: ((g: Ctx, t: number) => void) | null = null;
 
   private readonly ctx: Ctx;
   private readonly bc: HTMLCanvasElement;
@@ -52,6 +54,7 @@ export class SceneRunner {
     this.def.draw(g, t, dt);
     if (this.fc) g.drawImage(this.fc, 0, 0);
     if (this.def.after) this.def.after(g, t, dt);
+    this.overlay?.(g, t);
     this.ctx.drawImage(this.wc, this.camX, 0, this.W, SH, 0, 0, this.W, SH);
     this.drawn = true;
   }

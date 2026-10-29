@@ -1,0 +1,50 @@
+<div class="wrap">
+  <div class="sector-top">
+    <header class="sector-head">
+      <p class="kicker">Fim da linha</p>
+      <h2 id="t-duelo">Duelo.</h2>
+      <p class="lead">Dizem que ele é o dev mais rápido do Oeste. Se quiser descobrir, ele está esperando encostado no mourão.</p>
+    </header>
+    <figure appScene="fimdarua" id="duel-scene" #sceneFig [class.armed]="armed()" (pointerdown)="scenePress($event)">
+      <div class="stamp-slot">
+        <p class="stamp" id="d-stamp" [hidden]="!stamp()" [class.win]="stamp()?.ok">{{ stamp()?.text }}</p>
+      </div>
+      <button type="button" class="say" #invite [hidden]="inviteHidden()" aria-label="O João desafia você para um duelo. Ir para as regras do duelo" (click)="goToRules()">Topa um duelo?</button>
+    </figure>
+  </div>
+  <div class="duel" id="duel" #duel>
+    <div class="duel-intro" id="duel-intro" [hidden]="view() !== 'intro'">
+      <h3>Regras</h3>
+      <p class="duel-weapon" id="d-weapon">{{ weaponLine() }}</p>
+      <ol class="rules" id="d-rules">
+        @for (r of kit().rules; track $index) { <li [innerHTML]="r"></li> }
+      </ol>
+      <p class="rules-note" id="d-bonus">{{ bonus() }}</p>
+      <fieldset class="levels">
+        <legend>Dificuldade</legend>
+        @for (id of levelIds; track id) {
+          <label><input type="radio" name="nivel" [value]="id" [checked]="level() === id" (change)="level.set(id)"><span><b>{{ levels[id].name }}</b></span></label>
+        }
+      </fieldset>
+      <div class="duel-actions">
+        <button type="button" class="s-btn" id="duel-start" #startBtn (click)="start()">Aceitar o duelo</button>
+        <span class="duel-best" id="d-best">{{ best() }}</span>
+      </div>
+    </div>
+    <div class="duel-play" id="duel-play" [hidden]="view() !== 'play'">
+      <div class="duel-score"><span>Rodada <b id="d-round">{{ score().round }}</b> · <span id="d-level">{{ levels[playing].name }}</span></span><span>Você <b id="d-you">{{ score().you }}</b> × <b id="d-joao">{{ score().joao }}</b> João</span></div>
+      <p class="duel-call" [class]="'duel-call' + (call().cls ? ' ' + call().cls : '')" id="d-call" aria-live="assertive">{{ call().text }}</p>
+      <div class="reflex" id="reflex" #bar aria-hidden="true"><div class="r-zones" id="r-zones" #zonesBox></div><span class="r-fill" id="r-fill" #fill></span><span class="r-marker" id="r-marker" #marker></span></div>
+      <div class="fire-row">
+        <button type="button" class="s-btn fire-btn" id="d-fire" [hidden]="fireHidden()" [disabled]="fireDisabled()" (pointerdown)="firePointer($event)" (click)="fireClick($event)">{{ fireLabel() }}</button>
+        <button type="button" class="s-btn" id="d-next" #next [hidden]="nextHidden()" (click)="nextClick()">{{ nextLabel() }}</button>
+      </div>
+      <p class="duel-why" id="d-why" aria-live="polite">{{ why() }}</p>
+    </div>
+    <div class="duel-end" id="duel-end" [hidden]="view() !== 'end'">
+      <h3 id="d-end-title">{{ endTitle() }}</h3>
+      <p id="d-end-text">{{ endText() }}</p>
+      <div class="duel-actions"><button type="button" class="s-btn" id="d-again" #again (click)="backToRules()">Duelar de novo</button></div>
+    </div>
+  </div>
+</div>

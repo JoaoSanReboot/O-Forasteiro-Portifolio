@@ -14,6 +14,8 @@ export function fakeCtx(): FakeCtx {
       // qualquer método vira um registro (fillRect, drawImage, save, clip...)
       return (...args: unknown[]) => {
         ops.push([String(prop), ...(prop === 'fillRect' ? [target['fillStyle'], ...args] : args)]);
+        if (prop === 'createLinearGradient' || prop === 'createRadialGradient') return { addColorStop() {} };
+        if (prop === 'measureText') return { width: 0 };
         return prop === 'createPattern' ? {} : undefined;
       };
     },

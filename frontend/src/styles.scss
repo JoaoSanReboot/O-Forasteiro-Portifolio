@@ -4,6 +4,7 @@
 @use "styles/base";
 @use "styles/tokens";
 @use "styles/globals";
+@use "styles/intro";
 @use "styles/site/base" as site-base;
 @use "styles/site/hero";
 @use "styles/site/mural";
@@ -14,3 +15,5 @@
 @use "styles/site/diplomas";
 @use "styles/site/saloon";
 @use "styles/site/layer";
+@use "styles/site/duel";
+@use "styles/site/hud";

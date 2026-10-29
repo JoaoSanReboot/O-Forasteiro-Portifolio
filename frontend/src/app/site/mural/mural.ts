@@ -1,4 +1,6 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject } from '@angular/core';
+import { afterNextRender, afterRenderEffect, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject } from '@angular/core';
+import { IntroService } from '../../core/intro.service';
+import { raf } from '../../engine/core/browser';
 
 // Procurado: o mural da vila, com o cartaz principal e os bilhetes em volta
 @Component({
@@ -11,7 +13,9 @@ export class Mural {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   constructor() {
-    const destroyRef = inject(DestroyRef);
+    const destroyRef = inject(DestroyRef), intro = inject(IntroService);
+    // escondido atrás da tela inicial o cartaz não tem largura: ajusta de novo quando o site aparece
+    afterRenderEffect(() => { if (intro.siteOn()) raf(() => this.fitPoster()); });
     afterNextRender(() => {
       const fit = () => this.fitPoster();
       fit();

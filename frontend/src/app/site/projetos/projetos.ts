@@ -6,6 +6,7 @@ import { clamp } from '../../engine/core/math';
 import { drawChest } from '../../engine/figures/chest';
 import { R } from '../../engine/draw/primitives';
 import { SceneCanvas } from '../../shared/scene-canvas';
+import { cancelRaf, nextFrame, raf } from '../../engine/core/browser';
 
 interface Spark { x: number; y: number; vx: number; vy: number; life: number }
 
@@ -48,14 +49,14 @@ export class Projetos {
       [cMain, cPrev, cNext].forEach((g) => { g.imageSmoothingEnabled = false; });
       const io = new IntersectionObserver((es) => es.forEach((e) => { this.visible = e.isIntersecting; }), { threshold: 0.1 });
       io.observe(this.mainBtn().nativeElement.closest('.forge')!);
-      let last = performance.now(), raf = 0;
+      let last = performance.now(), frameId = 0;
       const frame = (now: number) => {
         const dt = Math.min(0.05, (now - last) / 1000); last = now;
         if (this.visible || this.t === 0) this.paint(cMain, cPrev, cNext, dt);
-        raf = requestAnimationFrame(frame);
+        frameId = raf(frame);
       };
-      raf = requestAnimationFrame(frame);
-      destroyRef.onDestroy(() => { cancelAnimationFrame(raf); io.disconnect(); });
+      frameId = raf(frame);
+      destroyRef.onDestroy(() => { cancelRaf(frameId); io.disconnect(); });
     });
   }
 
@@ -112,7 +113,7 @@ export class Projetos {
   private lidShut(): Promise<void> {
     return new Promise((res) => {
       const t0 = performance.now();
-      const check = () => { if ((this.openK === 0 && this.opening <= 0) || performance.now() - t0 > 1000) res(); else requestAnimationFrame(check); };
+      const check = () => { if ((this.openK === 0 && this.opening <= 0) || performance.now() - t0 > 1000) res(); else raf(check); };
       check();
     });
   }
@@ -138,7 +139,7 @@ export class Projetos {
       // com o baú fora de cena, troca o projeto: nada de dois projetos ao mesmo tempo
       this.idx.update((i) => (i + d + PROJECTS.length) % PROJECTS.length);
       if (dur) {
-        await new Promise((r) => requestAnimationFrame(r));
+        await nextFrame();
         const back = cv.animate([{ opacity: 0, transform: `translateX(${-dir * 90}px)` }, { opacity: 1, transform: 'none' }], { duration: dur + 80, easing: 'ease-out' });
         const sideIn = sides.map((c) => c.animate([{ opacity: 0, transform: `translateX(${-dir * 28}px)` }, { opacity: 1, transform: 'none' }], { duration: dur + 80, easing: 'ease-out' }));
         outs.forEach((a) => a.cancel());
