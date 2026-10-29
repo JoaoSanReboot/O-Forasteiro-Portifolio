@@ -32,3 +32,10 @@ desktop.ini
 # Temporários
 *.log
 *.tmp
+
+# .NET (api e api.tests)
+bin/
+obj/
+TestResults/
+.vs/
+*.user

@@ -1,0 +1,3 @@
+[*.cs]
+# nomes de teste em frase (Responde_ok) são a convenção aqui
+dotnet_diagnostic.CA1707.severity = none
