@@ -13,7 +13,7 @@ describe('Site', () => {
   }
   const click = async (fixture: { whenStable(): Promise<unknown> }, b: Element | null | undefined) => { (b as HTMLElement).click(); await fixture.whenStable(); };
 
-  it('monta as seções na ordem do legado, cada uma com a sua cena', async () => {
+  it('monta as seções na ordem, cada uma com a sua cena', async () => {
     const { el } = await render();
     expect([...el.querySelectorAll('main > section')].map((s) => s.id)).toEqual(['procurado', 'projetos', 'trabalhos', 'skills', 'commits', 'formacao', 'saloon', 'duelo']);
     expect([...el.querySelectorAll('figure.scene')].map((f) => f.getAttribute('data-scene'))).toEqual(['ferraria', 'delegacia', 'armeiro', 'telegrafo', 'escola', 'saloon', 'fimdarua']);

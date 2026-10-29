@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { PlatformService } from './platform.service';
 
-// as mesmas chaves do legado: quem já jogou não perde nada
+// as chaves do armazenamento do navegador
 export const STORAGE_KEYS = {
   progress: 'vila-progresso',
   hero: 'vila-heroi',
@@ -9,9 +9,6 @@ export const STORAGE_KEYS = {
   duelWins: 'vila-duelo-vitorias',
   /** sessionStorage: quem já chegou nesta visita pula a cavalgada */
   arrived: 'vila-chegou',
-  /** formatos antigos, lidos só para migrar o progresso */
-  legacyCoins: 'vila-moedas',
-  legacyGun: 'vila-revolver',
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

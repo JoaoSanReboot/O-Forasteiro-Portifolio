@@ -68,7 +68,7 @@ export class Commits {
     });
   }
 
-  // como o buildHeat do legado: a grade (re)feita começa apagada, salvo se a varredura já terminou
+  // a grade (re)feita começa apagada, salvo se a varredura já terminou
   private collectCells(): void {
     const days = this.data().days;
     this.heatCells = [...this.heatRef().nativeElement.querySelectorAll<HTMLButtonElement>('button')].map((b, i) => ({ b, l: days[i].level }));
@@ -99,7 +99,7 @@ export class Commits {
   }
 
   // uma varredura percorre o ano devagar; cada dia com commit acende e fica aceso (só na primeira vez).
-  // Lê a grade atual a cada quadro: se os dados ao vivo chegarem no meio, ela segue na grade nova, como no legado.
+  // Lê a grade atual a cada quadro: se os dados ao vivo chegarem no meio, ela segue na grade nova.
   private animate(): () => void {
     const heat = this.heatRef().nativeElement, count = this.countRef().nativeElement;
     let visible = false, i = 0, lit = 0, wait = 0, last = performance.now(), frameId = 0;

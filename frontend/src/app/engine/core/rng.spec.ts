@@ -1,7 +1,7 @@
 import { Rng } from './rng';
 
 describe('Rng', () => {
-  it('segue a mesma sequência do legado', () => {
+  it('segue a sequência Park–Miller', () => {
     const r = new Rng(1);
     expect(r.next()).toBe(16807 / 2147483647);
     expect(r.seed).toBe(16807);

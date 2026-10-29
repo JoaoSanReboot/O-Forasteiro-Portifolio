@@ -9,7 +9,7 @@ export interface Person {
   skinD: string;
   shirt: string;
   hair?: string | null;
-  /** altura do cabelo na testa; 0 vira 3, como no legado */
+  /** altura do cabelo na testa; 0 vira 3 */
   hairH?: number;
   side?: boolean;
   curls?: boolean;

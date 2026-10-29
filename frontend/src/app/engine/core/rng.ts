@@ -1,4 +1,4 @@
-// gerador do legado (Park–Miller): as cenas reiniciam a semente no meio do desenho e
+// gerador Park–Miller: as cenas reiniciam a semente no meio do desenho e
 // dependem da sequência que vem depois, então cada "mundo" usa uma instância compartilhada
 export class Rng {
   constructor(public seed = 1) {}

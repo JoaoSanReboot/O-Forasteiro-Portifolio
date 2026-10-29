@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Forasteiro.Api.Features.GitHub;
 
-// Alimenta a placa do telégrafo com as contribuições reais (era api/github-contributions.js na Vercel)
+// Alimenta a placa do telégrafo com as contribuições reais
 public static class ContributionsEndpoints
 {
     private static readonly TimeSpan CacheFor = TimeSpan.FromHours(1);
@@ -18,7 +18,7 @@ public static class ContributionsEndpoints
             .BindConfiguration(GitHubOptions.Section)
             .PostConfigure<IConfiguration>((o, config) =>
             {
-                // aceita também os nomes do legado (variáveis de ambiente da Vercel)
+                // aceita também as variáveis de ambiente GITHUB_TOKEN e GITHUB_LOGIN
                 if (string.IsNullOrWhiteSpace(o.Token)) o.Token = config["GITHUB_TOKEN"];
                 if (string.IsNullOrWhiteSpace(o.Login)) o.Login = config["GITHUB_LOGIN"];
                 if (string.IsNullOrWhiteSpace(o.Login)) o.Login = GitHubOptions.DefaultLogin;
@@ -82,7 +82,7 @@ public static class ContributionsEndpoints
             cache.Set(key, body, CacheFor);
         }
 
-        // e na borda também, como no legado
+        // e na borda (CDN) também
         response.Headers.CacheControl = "s-maxage=3600, stale-while-revalidate=86400";
         return TypedResults.Ok(body);
     }

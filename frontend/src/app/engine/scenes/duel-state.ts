@@ -1,7 +1,7 @@
 import { Weapon } from '../heroes/heroes';
 
 // Estado do duelo que a cena do fim da rua lê a cada quadro (objeto comum, não Signal).
-// O componente do duelo escreve aqui; os tempos são de performance.now(), como no legado.
+// O componente do duelo escreve aqui; os tempos são de performance.now().
 
 export type DuelPhase = 'idle' | 'wait' | 'draw' | 'you' | 'joao';
 export type DuelAnimMode = 'idle' | 'wait' | 'draw' | 'fire' | 'spin' | 'throw' | 'caught' | 'fall' | 'wind' | 'drop' | 'cock' | 'aim';

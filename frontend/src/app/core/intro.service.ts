@@ -6,7 +6,7 @@ import { STORAGE_KEYS, StorageService } from './storage.service';
 export class IntroService {
   private readonly storage = inject(StorageService);
   private readonly doc = inject(DOCUMENT);
-  /** o site está aberto (o `html.site-on` do legado) */
+  /** o site está aberto (põe `site-on` no `<html>`) */
   readonly siteOn = signal(false);
   /** cada entrada no site (o `vila:enter`), com `quick` quando foi direto, sem cavalgada */
   readonly entered = signal<{ n: number; quick: boolean }>({ n: 0, quick: false });

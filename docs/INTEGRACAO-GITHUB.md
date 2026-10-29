@@ -3,8 +3,7 @@
 O calendário de contribuições só existe na API GraphQL do GitHub, e ela exige um token.
 Por isso a busca acontece na API .NET (`api/Features/GitHub/`), nunca no navegador: o token não sai do servidor.
 
-> No protótipo (`legacy/`) esse papel era do `legacy/api/github-contributions.js` (Vercel), ligado por `window.VILA_GH_ENDPOINT`.
-> Na versão nova o endpoint é `GET /api/github/contributions` e o site o lê de `environment.githubEndpoint`.
+O endpoint é `GET /api/github/contributions`, e o site o lê de `environment.githubEndpoint`.
 
 ## O endpoint
 
@@ -25,11 +24,11 @@ Por isso a busca acontece na API .NET (`api/Features/GitHub/`), nunca no navegad
 | 502 | `network_error` | sem conexão com o GitHub (ou estourou o tempo de 15 s) |
 | 404 | `no_data` | o GitHub não devolveu calendário (ex.: usuário inexistente); `details` traz os erros dele |
 
-Como no legado, o usuário vem só da configuração (não há `?login=` na URL).
+O usuário vem só da configuração (não há `?login=` na URL).
 
 ## Configuração da API
 
-| Chave | Alternativa (nome do legado) | Obrigatória | Padrão |
+| Chave | Alternativa (variável de ambiente) | Obrigatória | Padrão |
 |---|---|---|---|
 | `GitHub:Token` | `GITHUB_TOKEN` | sim | — |
 | `GitHub:Login` | `GITHUB_LOGIN` | não | `JoaoSanReboot` |
@@ -62,8 +61,7 @@ Em App Service → Settings → Environment variables (App settings), crie:
 ## Ligar o site ao endpoint
 
 - Desenvolvimento: `environment.development.ts` já aponta para `http://localhost:5080/api/github/contributions`.
-- Produção: `environment.ts` sai com `githubEndpoint: null` (a placa mostra o registro guardado, como o protótipo sem
-  `VILA_GH_ENDPOINT`). Depois de publicar a API, troque por `https://<app>.azurewebsites.net/api/github/contributions`
+- Produção: `environment.ts` sai com `githubEndpoint: null` (a placa mostra o registro guardado). Depois de publicar a API, troque por `https://<app>.azurewebsites.net/api/github/contributions`
   e faça o deploy de novo. A URL não é segredo; o token continua só no App Service.
 - Nos testes (`ng test`) a placa fica desligada por `src/testing/providers.ts`; `commits.spec.ts` liga com um `fetch` falso.
 
