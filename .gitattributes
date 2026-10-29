@@ -1,0 +1,3 @@
+* text=auto
+# o build do legado roda no bash: sem CRLF
+*.sh text eol=lf
