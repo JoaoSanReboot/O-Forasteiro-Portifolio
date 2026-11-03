@@ -7,10 +7,9 @@ import { GuideService } from '../guide/guide.service';
 import { HeroService } from '../heroes/hero.service';
 import { SceneLoopService } from '../../core/scene/scene-loop.service';
 import { STORAGE_KEYS, StorageService } from '../../core/storage/storage.service';
+import { SECRETS_LINES as LINES } from './secrets-lines';
 
 export interface Progress { coins: CoinId[]; gun: boolean; piano: boolean; hero?: string | null }
-
-const FULL_POCKETS = 'Ora, ora... Parece que seus bolsos tão cheios agora! Acho que já dá pra comprar um revórvi com o Xavier, não?';
 
 // as moedas, o revólver do Xavier e o segredo do Saloon; o progresso fica no navegador (vila-progresso)
 @Injectable({ providedIn: 'root' })
@@ -69,9 +68,9 @@ export class SecretsService {
 
   // o contador não dá dicas: quem fala é o xerife
   talk(): void {
-    if (this.done()) this.guide.say('Achou tudo que tinha escondido por aqui? Tá mais esperto que eu, sô!');
-    else if (this.allCoins() && !this.progress.gun) this.guide.say(FULL_POCKETS);
-    else this.guide.say('Tá procurando os segredos da região, é? Fique de olho... Às vezes as coisas mais estranhas tão bem debaixo do nosso nariz!');
+    if (this.done()) this.guide.say(LINES.allFound);
+    else if (this.allCoins() && !this.progress.gun) this.guide.say(LINES.fullPockets);
+    else this.guide.say(LINES.keepLooking);
   }
 
   private coinOn(id: string): id is CoinId {
@@ -97,32 +96,31 @@ export class SecretsService {
     if (!this.coinOn(id) || !nearCoin(id, at)) return false;
     this.progress.coins.push(id);
     this.gain(); this.loop.invalidate(id);
-    if (this.allCoins() && !this.progress.gun) this.guide.say(FULL_POCKETS);
+    if (this.allCoins() && !this.progress.gun) this.guide.say(LINES.fullPockets);
     return true;
   }
 
   private buyGun(): void {
     if (!this.allCoins()) {
-      const falta = GUN_PRICE - this.coinCount();
-      this.guide.say(`Esse aí é o revórvi aprimorado do Xavier. Custa ${GUN_PRICE} moedas de ouro, e ainda falta${falta > 1 ? 'm' : ''} ${falta}. Procura mais, sô!`);
+      this.guide.say(LINES.gunPrice(GUN_PRICE, GUN_PRICE - this.coinCount()));
       return;
     }
     this.progress.gun = true; this.gain(); this.loop.invalidate('armeiro');
-    this.guide.say('Negócio fechado! Com esse revórvi, as faixas vermelhas do duelo também valem. Agora sim, hein?');
+    this.guide.say(LINES.gunBought);
   }
 
   // fim da sequência da vela: conta o segredo uma vez só
   pianoDone(): void {
     if (this.progress.piano) return;
     this.progress.piano = true; this.gain();
-    this.guide.say('Eita! O Tião já trocou o cartaz... Mas essa arte eu vi, viu? Tá anotada!');
+    this.guide.say(LINES.pianoFound);
   }
 
   // reset controlado: esconde tudo de novo (moedas, revólver e segredos)
   askReset(): void {
-    this.guide.ask('Quer que eu esconda tudo de novo? As moedas, o revórvi do Xavier e os segredos voltam pro lugar.', 'Sim, esconder tudo', () => {
+    this.guide.ask(LINES.resetAsk, LINES.resetYes, () => {
       this.reset();
-      this.guide.say('Pronto! Escondi tudo de novo. Boa caçada, forasteiro!');
+      this.guide.say(LINES.resetDone);
     });
   }
 

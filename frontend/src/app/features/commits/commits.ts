@@ -1,21 +1,15 @@
 import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, Injector, PendingTasks, signal, viewChild } from '@angular/core';
 import { PlatformService } from '../../core/platform/platform.service';
-import { HeatData, HeatDay, snapshotData } from '../../content/heat-snapshot';
+import { HeatData, snapshotData } from '../../content/heat-snapshot';
 import { SceneCanvas } from '../../shared/scene-canvas/scene-canvas';
 import { cancelRaf, raf } from '../../engine/core/browser';
 import { GITHUB_ENDPOINT } from './github-endpoint';
+import { fetchLiveHeat } from './github-heat.source';
 
 const fmtDay = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 const fmtMonth = new Intl.DateTimeFormat('pt-BR', { month: 'short' });
 const at = (iso: string) => new Date(iso + 'T12:00:00');
 const SNAPSHOT_LABEL = 'registro de outubro de 2026';
-
-/** o que a API (GET /api/github/contributions) responde */
-interface LiveResponse {
-  total: number;
-  days: HeatDay[];
-  fetchedAt?: string;
-}
 
 interface Cell { b: HTMLButtonElement; l: number }
 
@@ -80,18 +74,16 @@ export class Commits {
     this.countRef().nativeElement.textContent = String(this.data().total);
   }
 
-  // integração ao vivo: o token fica na API, nunca aqui; em qualquer falha a placa segue com o registro guardado
+  // integração ao vivo (github-heat.source.ts): em qualquer falha a placa segue com o registro guardado
   private liveHeat(endpoint: string): () => void {
     const ctrl = new AbortController();
     const done = this.pendingTasks.add();
-    fetch(endpoint, { headers: { Accept: 'application/json' }, signal: ctrl.signal })
-      .then((r) => (r.ok ? (r.json() as Promise<Partial<LiveResponse> | null>) : Promise.reject(new Error('http ' + r.status))))
-      .then((data) => {
-        if (!data || !Array.isArray(data.days) || !data.days.length) { this.status.set(`O GitHub não mandou dados agora: mostrando o ${SNAPSHOT_LABEL}.`); return; }
-        this.data.set({ total: data.total ?? 0, days: data.days, live: true });
+    fetchLiveHeat(endpoint, ctrl.signal)
+      .then((live) => {
+        if (!live) { this.status.set(`O GitHub não mandou dados agora: mostrando o ${SNAPSHOT_LABEL}.`); return; }
+        this.data.set(live.data);
         afterNextRender(() => this.collectCells(), { injector: this.injector });
-        const when = data.fetchedAt ? new Date(data.fetchedAt) : new Date();
-        this.status.set(`Ao vivo do GitHub · atualizado em ${when.toLocaleDateString('pt-BR')}.`);
+        this.status.set(`Ao vivo do GitHub · atualizado em ${live.fetchedAt.toLocaleDateString('pt-BR')}.`);
       })
       .catch(() => { if (!ctrl.signal.aborted) this.status.set(`Sem sinal do GitHub agora: mostrando o ${SNAPSHOT_LABEL}.`); })
       .finally(done);
