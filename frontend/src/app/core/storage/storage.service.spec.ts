@@ -13,8 +13,8 @@ describe('StorageService', () => {
   it('usa as chaves vila-*', () => {
     storage.set(STORAGE_KEYS.hero, 'cangaceiro');
     expect(localStorage.getItem('vila-heroi')).toBe('cangaceiro');
-    storage.set(STORAGE_KEYS.arrived, '1', 'session');
-    expect(sessionStorage.getItem('vila-chegou')).toBe('1');
+    storage.set(STORAGE_KEYS.sound, 'off', 'session');
+    expect(sessionStorage.getItem('vila-som')).toBe('off');
   });
 
   it('lê e grava JSON, com valor padrão quando falta ou está corrompido', () => {

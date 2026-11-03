@@ -1,10 +1,8 @@
 import { DOCUMENT, inject, Injectable, signal } from '@angular/core';
-import { STORAGE_KEYS, StorageService } from '../../core/storage/storage.service';
 
-// abertura → site: quem já chegou nesta visita vai direto para o mural; "Rever a chegada" volta para a tela inicial
+// abertura → site: a página sempre abre na tela inicial; "Rever a chegada" volta para ela
 @Injectable({ providedIn: 'root' })
 export class IntroService {
-  private readonly storage = inject(StorageService);
   private readonly doc = inject(DOCUMENT);
   /** o site está aberto (põe `site-on` no `<html>`) */
   readonly siteOn = signal(false);
@@ -13,11 +11,8 @@ export class IntroService {
   /** cada "Rever a chegada" (o `vila:replay`) */
   readonly replays = signal(0);
 
-  get arrivedBefore(): boolean { return this.storage.get(STORAGE_KEYS.arrived, 'session') === '1'; }
-
   enter(quick = false): void {
     if (this.siteOn()) return;
-    this.storage.set(STORAGE_KEYS.arrived, '1', 'session');
     this.doc.documentElement.classList.add('site-on');
     this.siteOn.set(true);
     this.entered.update((e) => ({ n: e.n + 1, quick }));

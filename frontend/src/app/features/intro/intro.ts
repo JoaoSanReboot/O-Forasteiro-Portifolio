@@ -67,8 +67,8 @@ export class Intro {
       ride.riderImg.onload = () => { ride.rebuild(); ride.redrawGate(); this.gate().refreshSprites(); };
       ride.redrawGate();
       this.showGate();
-      // quem já chegou nesta visita (ou o build de desenvolvimento) não precisa cavalgar de novo: vai direto para o mural
-      if (this.intro.arrivedBefore || environment.skipIntro) {
+      // toda abertura da página começa na tela inicial; só environment.skipIntro (atalho de desenvolvimento) vai direto para o mural
+      if (environment.skipIntro) {
         this.hideGate(); this.skipping = true; ride.skip(); this.skipping = false; this.intro.enter(true);
       }
       destroyRef.onDestroy(() => { window.removeEventListener('resize', onResize); ride.destroy(); });

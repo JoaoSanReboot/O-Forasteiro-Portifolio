@@ -7,8 +7,6 @@ export const STORAGE_KEYS = {
   hero: 'vila-heroi',
   sound: 'vila-som',
   duelWins: 'vila-duelo-vitorias',
-  /** sessionStorage: quem já chegou nesta visita pula a cavalgada */
-  arrived: 'vila-chegou',
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
