@@ -1,8 +1,10 @@
 using Forasteiro.Api.Features.GitHub;
 using Forasteiro.Api.Features.Health;
 using Forasteiro.Api.Infrastructure.Cors;
+using Forasteiro.Api.Infrastructure.DotEnv;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddDotEnv(builder.Environment);
 
 builder.Services.AddFrontendCors(builder.Configuration);
 builder.Services.AddGitHubContributions();
