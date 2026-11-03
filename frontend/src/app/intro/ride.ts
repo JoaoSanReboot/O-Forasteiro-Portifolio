@@ -4,7 +4,8 @@ import { shadeHex } from '../engine/core/color';
 import { clamp, easeIn, easeOut, lerp, prog, smooth } from '../engine/core/math';
 import { Rng } from '../engine/core/rng';
 import { ditherFill as dither, ditherPattern } from '../engine/draw/dither';
-import { drawHero, Hero } from '../engine/heroes/heroes';
+import { drawHero } from '../engine/heroes/hero-sprite';
+import { Hero } from '../engine/heroes/heroes';
 import { gateText } from '../engine/text/pixel-font';
 import { cancelRaf, raf } from '../engine/core/browser';
 

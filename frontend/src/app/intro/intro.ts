@@ -4,7 +4,8 @@ import { AudioService } from '../core/audio.service';
 import { HeroService } from '../core/hero.service';
 import { IntroService } from '../core/intro.service';
 import { PlatformService } from '../core/platform.service';
-import { drawHero, Hero, HEROES, HeroId } from '../engine/heroes/heroes';
+import { drawHero } from '../engine/heroes/hero-sprite';
+import { Hero, HEROES, HeroId } from '../engine/heroes/heroes';
 import { createRide, Ride } from './ride';
 import { cancelRaf, raf } from '../engine/core/browser';
 

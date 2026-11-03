@@ -5,7 +5,7 @@ import { HeroService } from '../../core/hero.service';
 import { PlatformService } from '../../core/platform.service';
 import { ProgressService } from '../../core/progress.service';
 import { STORAGE_KEYS, StorageService } from '../../core/storage.service';
-import { duelHero } from '../../engine/scenes/fimdarua';
+import { duelHero } from '../../engine/figures/duelist';
 import { DuelAnimMode } from '../../engine/scenes/duel-state';
 import { SceneCanvas } from '../../shared/scene-canvas';
 import { BLUFFS, judge, KIT, LEVEL_IDS, LevelId, LEVELS, makeZone, Zone } from './kit';
