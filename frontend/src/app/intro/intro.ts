@@ -6,7 +6,7 @@ import { IntroService } from '../core/intro.service';
 import { PlatformService } from '../core/platform.service';
 import { drawHero } from '../engine/heroes/hero-sprite';
 import { Hero, HEROES, HeroId } from '../engine/heroes/heroes';
-import { createRide, Ride } from './ride';
+import { createRide, Ride } from './ride/ride';
 import { cancelRaf, raf } from '../engine/core/browser';
 
 // A abertura: tela inicial com a escolha do personagem, a cavalgada até a vila e o alto-falante, sempre à mão.
