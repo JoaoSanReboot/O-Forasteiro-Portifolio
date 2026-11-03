@@ -5,7 +5,7 @@ Complementa o `CLAUDE.md` (como rodar, convenções) e o `docs/ARQUITETURA.md` (
 ## Projeto
 - Portfólio de João Pedro em pixel art (velho oeste/cangaço).
 - **Site:** Angular 22 (standalone, zoneless, Signals, SSG).
-- **API:** .NET 10 Minimal API, que serve a placa do GitHub.
+- **Backend:** .NET 10 Minimal API em `backend/`, que serve a placa do GitHub.
 - **Deploy:** Azure Static Web Apps (site) e App Service (API).
 - O protótipo antigo em HTML/JS (`legacy/`) foi migrado e apagado; continua no histórico do git.
 
@@ -21,7 +21,7 @@ Complementa o `CLAUDE.md` (como rodar, convenções) e o `docs/ARQUITETURA.md` (
   - som sintetizado, a placa do GitHub (ao vivo pela API ou com o registro guardado) e o SSR/prerender.
 - **Testes:**
   - Site: 62 testes (Vitest), `npm run test:ssr` e `npm run lint:arch`.
-  - API: 26 testes (xUnit).
+  - Backend: sem testes (removidos na limpeza `feature/cleaning-backend`); o CI só faz o build.
   - O CI roda tudo isso em todo PR.
 
 ## Arquitetura (resumo)
@@ -31,7 +31,7 @@ Complementa o `CLAUDE.md` (como rodar, convenções) e o `docs/ARQUITETURA.md` (
   - as seções `mural`, `projetos`, `trabalhos`, `skills`, `commits`, `formacao`, `saloon` e `duelo`;
   - as regras puras do duelo ficam em `duelo/rules/`.
 - **Contratos das cenas:** as cenas só conhecem `SCENES_ACTIVE`/`SCENE_HOST` (`core/scene/scene-host.ts`), implementados em `features/site/scene-host.ts` e registrados em `app.config.ts` e em `src/testing/providers.ts`.
-- **API:** `Features/GitHub/` contém `ContributionsService` (a regra, sem HTTP), `ContributionsEndpoints` (a tradução para HTTP), o registro de DI e o cliente GraphQL. O CORS fica em `Infrastructure/Cors/`.
+- **Backend (`backend/`):** só `Program.cs` (`.env`, CORS) e `GitHubContributions.cs` (a placa do GitHub, única integração).
 
 ## Decisões a manter
 - **Comportamento e visual:** devem continuar idênticos ao atual, salvo pedido explícito do usuário.
@@ -40,7 +40,7 @@ Complementa o `CLAUDE.md` (como rodar, convenções) e o `docs/ARQUITETURA.md` (
 - **Componentes:** usam seletor de atributo (`section[appX]`, `div[appX]`) para manter o HTML e o CSS. As pastas das seções têm o id da âncora (em português); o resto do código é em inglês; os comentários e os textos da interface são em pt-BR.
 - **CSS:** global em `src/styles/`, com os seletores herdados do protótipo.
 - **Fluxo de trabalho:** o Claude faz build e testes; **o usuário faz todos os commits, PRs e merges**. No fim de cada conversa o Claude sugere o nome do commit e do PR.
-- **Token do GitHub:** nunca pedir nem imprimir. Localmente fica no `.env` da raiz (no `.gitignore`; modelo em `.env.example`), lido pela API só em Development (`api/Infrastructure/DotEnv/`). Em produção: `GitHub__Token` no App Service.
+- **Token do GitHub:** nunca pedir nem imprimir. Localmente fica no `.env` da raiz (no `.gitignore`), lido pelo backend só em Development (`backend/Program.cs`). Em produção: `GitHub__Token` no App Service.
 - **Áudio:** a ordem de criação dos nós e de uso do `Math.random` é compartilhada entre os módulos de áudio e da cavalgada. Reordenar muda o resultado.
 
 ## Pendências

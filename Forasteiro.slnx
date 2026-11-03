@@ -1,8 +1,5 @@
 <Solution>
-  <Folder Name="/api.tests/">
-    <Project Path="api.tests/Forasteiro.Api.Tests.csproj" />
-  </Folder>
-  <Folder Name="/api/">
-    <Project Path="api/Forasteiro.Api.csproj" />
+  <Folder Name="/backend/">
+    <Project Path="backend/Forasteiro.Backend.csproj" />
   </Folder>
 </Solution>

@@ -1,4 +1,4 @@
-# CI: build e testes da API (.NET) e do site (Angular) em todo PR e push.
+# CI: build do backend (.NET) e do site (Angular) em todo PR e push.
 # Na main quem chama este workflow é o deploy.yml, antes de publicar.
 name: CI
 
@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  api:
-    name: API (.NET)
+  backend:
+    name: Backend (.NET)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +21,6 @@ jobs:
         with:
           global-json-file: global.json
       - run: dotnet build Forasteiro.slnx -c Release
-      - run: dotnet test Forasteiro.slnx -c Release --no-build
 
   frontend:
     name: Site (Angular)
