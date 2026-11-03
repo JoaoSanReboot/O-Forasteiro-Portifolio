@@ -1,15 +1,4 @@
-import { Weapon } from '../../engine/heroes/heroes';
-
-export type LevelId = 'facil' | 'normal' | 'dificil';
-export interface Level { name: string; wins: number; period: number; zone: number; perfect: number; speedUp: number; mashNeed: number; mashTime: number }
-
-// tempo do marcador (ms), faixa vermelha e amarela (% da barra), rodadas para vencer e o fôlego da raiva (rolo)
-export const LEVELS: Record<LevelId, Level> = {
-  facil: { name: 'Fácil', wins: 2, period: 1700, zone: 28, perfect: 12, speedUp: 0.97, mashNeed: 8, mashTime: 2700 },
-  normal: { name: 'Normal', wins: 3, period: 1250, zone: 20, perfect: 8, speedUp: 0.95, mashNeed: 11, mashTime: 2200 },
-  dificil: { name: 'Difícil', wins: 4, period: 900, zone: 13, perfect: 5, speedUp: 0.94, mashNeed: 14, mashTime: 1800 },
-};
-export const LEVEL_IDS = Object.keys(LEVELS) as LevelId[];
+import { Weapon } from '../../../engine/heroes/heroes';
 
 type Line = readonly [call: string, stamp: string, why: string];
 export interface Kit {
@@ -53,19 +42,5 @@ export const KIT: Record<Weapon, Kit> = {
     win: 'Tiro de rifle que ecoou no sertão inteiro.', flawless: 'O cangaço mandou lembrança: nenhum tiro de volta.', lose: 'O João segue invicto. O sertão espera a revanche.', unit: 'Disparos certeiros' },
 };
 
+// o que o João faz para tentar enganar o visitante antes do sino
 export const BLUFFS = ['O João mexeu os dedos perto do coldre...', 'Um carcará piou lá no alto...', 'Uma bola de feno passou rolando...', 'O João estalou o pescoço...'];
-
-export interface Zone { s: number; w: number; p: number; mid: number; hit: boolean; yellow: boolean }
-
-export function makeZone(L: Level, lo: number, hi: number, rand = Math.random): Zone {
-  const w = L.zone, p = L.perfect, s = lo + rand() * (hi - lo - w);
-  return { s, w, p, mid: s + w / 2, hit: false, yellow: false };
-}
-
-/** onde caiu o disparo: na faixa amarela, na vermelha (só com o revólver aprimorado) ou fora */
-export function judge(a: number, z: Zone, hasGun: boolean): 'yellow' | 'red' | null {
-  const g = 0.8;
-  if (Math.abs(a - z.mid) <= z.p / 2 + g) return 'yellow';
-  if (hasGun && a >= z.s - g && a <= z.s + z.w + g) return 'red';
-  return null;
-}

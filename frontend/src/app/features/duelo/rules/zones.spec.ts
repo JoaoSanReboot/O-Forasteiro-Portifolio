@@ -1,4 +1,5 @@
-import { judge, LEVELS, makeZone } from './kit';
+import { LEVELS } from './levels';
+import { judge, makeZone } from './zones';
 
 describe('duelo: faixas da barra', () => {
   const z = makeZone(LEVELS.normal, 30, 94, () => 0.5);
