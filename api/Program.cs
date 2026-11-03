@@ -1,18 +1,15 @@
 using Forasteiro.Api.Features.GitHub;
 using Forasteiro.Api.Features.Health;
+using Forasteiro.Api.Infrastructure.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CORS só para a origem do frontend (Azure Static Web Apps em produção, ng serve em desenvolvimento)
-const string FrontendCors = "frontend";
-var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
-builder.Services.AddCors(options => options.AddPolicy(FrontendCors, policy =>
-    policy.WithOrigins(origins).WithMethods("GET").AllowAnyHeader()));
+builder.Services.AddFrontendCors(builder.Configuration);
 builder.Services.AddGitHubContributions();
 
 var app = builder.Build();
 
-app.UseCors(FrontendCors);
+app.UseFrontendCors();
 app.MapHealth();
 app.MapGitHubContributions();
 
