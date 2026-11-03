@@ -38,6 +38,8 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm test
+      # a direção das dependências entre as camadas (docs/ARQUITETURA.md)
+      - run: npm run lint:arch
       # sobe o ng serve e confere que o SSR renderiza e destrói o app sem erro (o prerender engole erros do destroy)
       - run: npm run test:ssr
       - run: npx ng build

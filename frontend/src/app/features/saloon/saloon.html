@@ -1,0 +1,16 @@
+<div class="wrap">
+  <div class="sector-top">
+    <header class="sector-head">
+      <p class="kicker">Saloon</p>
+      <h2 id="t-saloon">Contatos.</h2>
+      <p class="lead">Puxa uma cadeira, forasteiro. Cada conversa pode abrir novos caminhos e render boas conexões.</p>
+    </header>
+    <figure appScene="saloon" #scene>
+      <div class="scene-panel velha-panel" id="velha-panel" #panel role="dialog" aria-modal="false" aria-labelledby="velha-title" [hidden]="!open()" [class.inline]="narrow()" (keydown.escape)="close($event)">
+        <div class="sp-card velha-card" appTicTacToe (closed)="close()"></div>
+      </div>
+      <button type="button" class="say" #invite [hidden]="open() || inviteHidden()" aria-label="O bartender convida você para um jogo da velha. Abrir o jogo" (click)="openGame()">Jogo da velha?</button>
+    </figure>
+  </div>
+  <div class="menu-board" appDrinksMenu></div>
+</div>

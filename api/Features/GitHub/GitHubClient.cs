@@ -34,13 +34,3 @@ public sealed class GitHubClient(HttpClient http)
         return await response.Content.ReadFromJsonAsync<GraphQlResponse>(ct) ?? new GraphQlResponse(null, null);
     }
 }
-
-// só os campos que a consulta pede
-public sealed record GraphQlResponse(GraphQlData? Data, IReadOnlyList<GraphQlError>? Errors);
-public sealed record GraphQlError(string? Message);
-public sealed record GraphQlData(GraphQlUser? User);
-public sealed record GraphQlUser(GraphQlContributions? ContributionsCollection);
-public sealed record GraphQlContributions(GraphQlCalendar? ContributionCalendar);
-public sealed record GraphQlCalendar(int TotalContributions, IReadOnlyList<GraphQlWeek> Weeks);
-public sealed record GraphQlWeek(IReadOnlyList<GraphQlDay> ContributionDays);
-public sealed record GraphQlDay(string Date, int ContributionCount, string? ContributionLevel);

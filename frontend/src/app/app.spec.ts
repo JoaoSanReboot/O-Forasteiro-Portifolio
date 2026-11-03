@@ -8,16 +8,17 @@ describe('App', () => {
     await TestBed.configureTestingModule({ imports: [App] }).compileComponents();
   });
 
-  it('com skipIntro (build de desenvolvimento) pula a abertura e entra no site', async () => {
+  it('a página abre na tela inicial (seleção de personagem), com o site ainda fechado', async () => {
+    sessionStorage.setItem('vila-chegou', '1'); // a marca antiga de "já chegou" não pula mais a abertura
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
-    expect(document.documentElement.classList.contains('site-on')).toBe(true);
-    expect(el.querySelector<HTMLElement>('#site')?.hidden).toBe(false);
-    expect(el.querySelector<HTMLElement>('#gate')?.hidden).toBe(true);
-    expect(sessionStorage.getItem('vila-chegou')).toBe('1');
+    expect(document.documentElement.classList.contains('site-on')).toBe(false);
+    expect(el.querySelector<HTMLElement>('#gate')?.hidden).toBe(false);
+    expect(el.querySelector<HTMLElement>('#site')?.hidden).toBe(true);
     expect(el.querySelector('#site > .hero#inicio h1')?.textContent).toContain('João Pedro');
     expect(el.querySelectorAll('.shelf li')).toHaveLength(28);
+    sessionStorage.clear();
   });
 
   it('a tela inicial mostra os cinco personagens, e escolher um fica lembrado', async () => {

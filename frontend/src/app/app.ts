@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Intro } from './intro/intro';
-import { Site } from './site/site';
+import { Intro } from './features/intro/intro';
+import { Site } from './features/site/site';
 
 // Casca do portfólio: a abertura (tela inicial, cavalgada e alto-falante) e, depois da chegada, o site.
 // Quem já chegou nesta visita, ou o build de desenvolvimento (environment.skipIntro), entra direto no mural.
