@@ -15,25 +15,29 @@ dotnet run --project api                # http://localhost:5080 (placa do GitHub
 ```bash
 cd frontend && npm test                 # Vitest (jsdom)
 cd frontend && npm run test:ssr         # sobe o ng serve e confere que o SSR não quebra
+cd frontend && npm run lint:arch        # a direção das dependências entre as camadas
 cd frontend && npx ng build             # prerender em frontend/dist/forasteiro/browser
 dotnet build Forasteiro.slnx && dotnet test Forasteiro.slnx
 ```
 
 ## Estrutura
 
+O mapa completo (camadas, onde cada funcionalidade mora, padrões) está em `docs/ARQUITETURA.md`.
+
 | Caminho | O que é |
 |---|---|
-| `frontend/src/app/engine/` | Pixel art em TS puro: canvas, primitivas, figuras, cenas, elenco (`HEROES`, `drawHero`), áudio (`createVilaAudio`), segredos, jogo da velha |
-| `frontend/src/app/core/` | Serviços: plataforma, armazenamento, progresso/segredos, abertura, áudio, herói, duelo, guia, laço das cenas |
-| `frontend/src/app/intro/` | Tela inicial, cavalgada (`ride.ts`) e alto-falante |
-| `frontend/src/app/site/` | As seções (mural, skills, projetos, trabalhos, commits, formação, saloon, duelo) e o xerife guia |
-| `frontend/src/app/shared/scene-canvas.ts` | Componente que monta uma cena do engine num `<canvas>` |
+| `frontend/src/app/engine/` | Pixel art em TS puro, sem Angular: canvas, primitivas, figuras, cenas, elenco e sprite (`heroes/`), áudio (`audio/`), segredos, jogo da velha |
+| `frontend/src/app/core/` | Infraestrutura: plataforma, armazenamento, áudio e o laço das cenas com os contratos `SCENES_ACTIVE`/`SCENE_HOST` |
+| `frontend/src/app/shared/` | `scene-canvas`: o componente que monta uma cena do engine num `<canvas>` |
+| `frontend/src/app/features/` | Uma pasta por funcionalidade: `intro` (abertura, `gate`, `ride/`), `site`, `secrets`, `guide`, `heroes` e as seções `mural`, `projetos`, `trabalhos`, `skills`, `commits`, `formacao`, `saloon`, `duelo` (regras em `duelo/rules/`) |
 | `frontend/src/app/content/` | Textos e dados (projetos, skills, registro guardado da placa) |
 | `frontend/src/styles/` | CSS global, por seção |
 | `frontend/src/environments/` | `githubEndpoint`, `duelMusicUrl`, `skipIntro` |
-| `api/Features/GitHub/` | `GET /api/github/contributions` (GraphQL do GitHub, cache de 1 h) |
+| `api/` | `Program.cs` compõe; `Infrastructure/` (CORS); `Features/GitHub/` (`GET /api/github/contributions`: serviço, endpoint, cliente GraphQL) e `Features/Health/` |
 | `.github/workflows/` | CI em PR; deploy na main (Static Web Apps + App Service) |
-| `docs/` | Integração com o GitHub e origem/licença das trilhas |
+| `docs/` | Arquitetura, integração com o GitHub e origem/licença das trilhas |
+
+Dependências só num sentido: `features → shared → core → engine` (`content` é só dado). `npm run lint:arch` confere.
 
 ## Convenções
 

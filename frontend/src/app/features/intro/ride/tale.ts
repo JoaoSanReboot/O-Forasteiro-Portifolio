@@ -2,7 +2,7 @@ import { TIMELINE as P } from './timeline';
 
 // A narração na faixa de cima: cada frase fica parada no lugar e as palavras vão acendendo no ritmo da história
 
-export const TALE: readonly { at: number; text: string; big?: boolean }[] = [
+const TALE: readonly { at: number; text: string; big?: boolean }[] = [
   { at: 2.0, text: 'Contam as lendas que, numa vila simples do sertão, surgiu um grande programador.' },
   { at: 7.6, text: 'Um dos mais rápidos do oeste.' },
   { at: 11.6, text: 'Nunca perdeu um duelo.' },

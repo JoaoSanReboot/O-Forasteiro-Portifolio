@@ -24,8 +24,13 @@ Testes e build:
 
 ```bash
 dotnet build Forasteiro.slnx && dotnet test Forasteiro.slnx   # na raiz
-cd frontend && npm test && npm run test:ssr && npx ng build    # site estático em frontend/dist/forasteiro/browser
+cd frontend && npm test && npm run lint:arch && npm run test:ssr && npx ng build    # site estático em frontend/dist/forasteiro/browser
 ```
+
+### Arquitetura
+
+O site é dividido em camadas (`features → shared → core → engine`) e a API em fatias por funcionalidade.
+O mapa de onde cada coisa mora, as regras de dependência e os padrões estão em `docs/ARQUITETURA.md`.
 
 ### CI e deploy (GitHub Actions)
 

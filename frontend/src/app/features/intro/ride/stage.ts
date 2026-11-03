@@ -4,7 +4,7 @@ import { Ctx } from '../../../engine/core/canvas';
 
 /** distância focal e altura da câmera, em pixels da arte */
 export const FOCAL = 60;
-export const CAM_H = 30;
+const CAM_H = 30;
 
 /** o tamanho do palco muda com a janela (resize): quem desenha lê sempre daqui */
 export interface RideView {

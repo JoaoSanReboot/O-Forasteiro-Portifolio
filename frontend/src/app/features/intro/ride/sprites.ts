@@ -32,7 +32,7 @@ export function buildSprites(pal: Palette, rider: HTMLCanvasElement | null, rng:
 
 // ---------- Cavalo e cavaleiro, vistos de trás ----------
 // 4 quadros de galope. Ordem: 0 apoio, 1 perna esquerda no ar, 2 suspensão, 3 perna direita no ar
-export function drawMountFrame(pal: Palette, rider: HTMLCanvasElement | null, f: number): HTMLCanvasElement {
+function drawMountFrame(pal: Palette, rider: HTMLCanvasElement | null, f: number): HTMLCanvasElement {
   const FW = 60, FH = 78;
   const [c, g] = makeCanvas(FW, FH);
   const cx = 30;
@@ -153,7 +153,7 @@ export function drawMountFrame(pal: Palette, rider: HTMLCanvasElement | null, f:
 }
 
 // ---------- Outros sprites ----------
-export function drawCactus(pal: Palette, variant: number): HTMLCanvasElement {
+function drawCactus(pal: Palette, variant: number): HTMLCanvasElement {
   const [c, g] = makeCanvas(18, 30);
   const stem = (x: number, y0: number, y1: number, w: number) => {
     g.fillStyle = pal.k; g.fillRect(x - 1, y0 - 1, w + 2, y1 - y0 + 2);
@@ -169,7 +169,7 @@ export function drawCactus(pal: Palette, variant: number): HTMLCanvasElement {
   return c;
 }
 
-export function drawWeed(pal: Palette, rng: Rng): HTMLCanvasElement {
+function drawWeed(pal: Palette, rng: Rng): HTMLCanvasElement {
   const [c, g] = makeCanvas(14, 14);
   const rnd = () => rng.next();
   rng.seed = 99;
@@ -186,7 +186,7 @@ export function drawWeed(pal: Palette, rng: Rng): HTMLCanvasElement {
   return c;
 }
 
-export function drawTown(pal: Palette): HTMLCanvasElement {
+function drawTown(pal: Palette): HTMLCanvasElement {
   const [c, g] = makeCanvas(120, 40);
   const box = (x: number, y: number, w: number, h: number, wall: string, roof: string | null) => {
     g.fillStyle = pal.k; g.fillRect(x - 1, y - 1, w + 2, h + 1);
@@ -214,7 +214,7 @@ export function drawTown(pal: Palette): HTMLCanvasElement {
 }
 
 // árvore seca da caatinga: 22 x 30
-export function drawDeadTree(pal: Palette): HTMLCanvasElement {
+function drawDeadTree(pal: Palette): HTMLCanvasElement {
   const [c, g] = makeCanvas(22, 30);
   const br = (x0: number, y0: number, x1: number, y1: number) => {
     const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
@@ -230,7 +230,7 @@ export function drawDeadTree(pal: Palette): HTMLCanvasElement {
   return c;
 }
 // pedra grande: 26 x 16
-export function drawBoulder(pal: Palette): HTMLCanvasElement {
+function drawBoulder(pal: Palette): HTMLCanvasElement {
   const [c, g] = makeCanvas(26, 16);
   for (let y = 0; y < 16; y++) {
     const w = Math.round(12 * Math.sqrt(1 - Math.pow((y - 10) / 10, 2)) || 0);
@@ -243,7 +243,7 @@ export function drawBoulder(pal: Palette): HTMLCanvasElement {
   return c;
 }
 // cerca de varas quebrada: 28 x 12
-export function drawFence(pal: Palette): HTMLCanvasElement {
+function drawFence(pal: Palette): HTMLCanvasElement {
   const [c, g] = makeCanvas(28, 12);
   [1, 12, 24].forEach((x, i) => {
     g.fillStyle = pal.k; g.fillRect(x - 1, i === 1 ? 3 : 0, 4, 12);
@@ -254,7 +254,7 @@ export function drawFence(pal: Palette): HTMLCanvasElement {
   return c;
 }
 
-export function drawSkull(pal: Palette): HTMLCanvasElement {
+function drawSkull(pal: Palette): HTMLCanvasElement {
   const [c, g] = makeCanvas(12, 6);
   g.fillStyle = '#efe4cc';
   g.fillRect(4, 1, 4, 4); g.fillRect(0, 0, 3, 1); g.fillRect(9, 0, 3, 1); g.fillRect(2, 1, 2, 1); g.fillRect(8, 1, 2, 1);
