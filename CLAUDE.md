@@ -1,13 +1,13 @@
-# Contexto do projeto para o Claude Code
+# Contexto do Projeto
 
-Portfólio em pixel art com temática de velho oeste/cangaço.
+Um Portfólio com estilo de pixel art com temática de velho oeste/cangaço.
 Site em Angular 22 (`frontend/`, standalone, zoneless, Signals, TS strict, prerender estático) e API .NET 10 (`api/`, Minimal API).
 
 ## Rodar localmente
 
 ```bash
-cd frontend && npm ci && npm start      # http://localhost:4200 (em desenvolvimento a abertura é pulada: skipIntro)
-dotnet run --project api                # http://localhost:5080 (placa do GitHub; token nos user-secrets em GitHub:Token)
+cd frontend && npm ci && npm start      # http://localhost:4200
+dotnet run --project api                # http://localhost:5080
 ```
 
 ## Testes e build

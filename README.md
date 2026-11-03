@@ -57,12 +57,12 @@ Em `frontend/src/environments/` (`environment.ts` em produção, `environment.de
 |---|---|
 | `githubEndpoint` | URL da API da placa do GitHub; `null` mostra o registro guardado |
 | `duelMusicUrl` | faixa licenciada para o duelo; `null` mantém a trilha sintetizada (veja `docs/AUDIO-LICENCAS.md`) |
-| `skipIntro` | pula a abertura e entra direto no mural (ligado só em desenvolvimento) |
+| `skipIntro` | pula a abertura e entra direto no mural (atalho de desenvolvimento; desligado por padrão) |
 
 ## Persistência
 
 Moedas, revólver, segredo do Saloon, personagem escolhido, som e recordes do duelo ficam no `localStorage`
-(chaves `vila-*`); quem já chegou na visita fica no `sessionStorage` (`vila-chegou`) e pula a cavalgada.
+(chaves `vila-*`). A abertura não é lembrada: toda visita começa na tela inicial.
 
 ## Ganchos de depuração (build de desenvolvimento)
 

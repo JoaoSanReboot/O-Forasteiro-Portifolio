@@ -1,7 +1,7 @@
 namespace Forasteiro.Api.Features.GitHub;
 
 // Configuração da placa do GitHub. O token NUNCA vai para o navegador: fica só aqui no servidor.
-//   GitHub:Token (ou GITHUB_TOKEN)  token fine-grained só de leitura; em desenvolvimento via dotnet user-secrets,
+//   GitHub:Token (ou GITHUB_TOKEN)  token fine-grained só de leitura; em desenvolvimento no .env da raiz (ou user-secrets),
 //                                   no Azure App Service como configuração do app
 //   GitHub:Login (ou GITHUB_LOGIN)  usuário do GitHub; padrão "JoaoSanReboot"
 public sealed class GitHubOptions
