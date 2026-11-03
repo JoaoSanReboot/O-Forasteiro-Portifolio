@@ -50,8 +50,8 @@ jobs:
           skip_app_build: true
           skip_api_build: true
 
-  api:
-    name: API → Azure App Service
+  backend:
+    name: Backend → Azure App Service
     needs: ci
     runs-on: ubuntu-latest
     steps:
@@ -59,9 +59,9 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - run: dotnet publish api/Forasteiro.Api.csproj -c Release -o ${{ runner.temp }}/api
+      - run: dotnet publish backend/Forasteiro.Backend.csproj -c Release -o ${{ runner.temp }}/backend
       - uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ runner.temp }}/api
+          package: ${{ runner.temp }}/backend

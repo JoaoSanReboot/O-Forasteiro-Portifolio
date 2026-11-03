@@ -54,17 +54,11 @@ features  →  shared  →  core  →  engine
 3. Coloque a seção em `features/site/site.ts`, na ordem certa, e o CSS em `src/styles/site/`.
 4. Rode `npm test`, `npm run lint:arch` e `npm run test:ssr`.
 
-## API (`api/`)
+## Backend (`backend/`)
 
-Fatias verticais por funcionalidade (`Features/<Nome>/`) e infraestrutura compartilhada em `Infrastructure/`.
+Uma única integração, a placa do GitHub, em dois arquivos.
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `Program.cs` | Só compõe: CORS, serviços e rotas |
-| `Infrastructure/Cors/FrontendCors.cs` | CORS liberado só para o frontend |
-| `Features/Health/HealthEndpoints.cs` | `GET /api/health` |
-| `Features/GitHub/GitHubServiceCollectionExtensions.cs` | Registro de DI da placa |
-| `Features/GitHub/ContributionsService.cs` | A regra: token, cache de 1 h, chamada ao GitHub e conversão dos dias; devolve um `ContributionsOutcome`, sem HTTP |
-| `Features/GitHub/ContributionsEndpoints.cs` | Traduz o resultado para status e corpo HTTP |
-| `Features/GitHub/GitHubClient.cs` + `GraphQlModels.cs` | Acesso à API GraphQL do GitHub |
-| `Features/GitHub/ContributionsContracts.cs`, `ContributionLevels.cs`, `GitHubOptions.cs` | Contratos de resposta, tons da placa e configuração |
+| `Program.cs` | Lê o `.env` em desenvolvimento, configura o CORS (só o frontend) e registra a placa |
+| `GitHubContributions.cs` | `GET /api/github/contributions`: token, cache de 1 h, consulta GraphQL ao GitHub, conversão dos dias e os erros |

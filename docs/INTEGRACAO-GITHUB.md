@@ -1,7 +1,7 @@
 # Placa do telégrafo: contribuições ao vivo do GitHub
 
 O calendário de contribuições só existe na API GraphQL do GitHub, e ela exige um token.
-Por isso a busca acontece na API .NET (`api/Features/GitHub/`), nunca no navegador: o token não sai do servidor.
+Por isso a busca acontece na API .NET (`backend/GitHubContributions.cs`), nunca no navegador: o token não sai do servidor.
 
 O endpoint é `GET /api/github/contributions`, e o site o lê de `environment.githubEndpoint`.
 
@@ -39,16 +39,15 @@ a repositórios públicos; nenhuma permissão extra é necessária para ler o ca
 
 **Nunca grave o token em arquivo versionado** (`appsettings*.json`, `environment*.ts`, workflows).
 
-### Desenvolvimento: user-secrets
+### Desenvolvimento: `.env`
 
-O projeto `api/` já tem `UserSecretsId` (`forasteiro-api`). Na raiz do repositório:
+Crie um `.env` na raiz do repositório (ele está no `.gitignore` e nunca vai para o git):
 
 ```bash
-dotnet user-secrets set "GitHub:Token" "<seu token>" --project api
-dotnet user-secrets list --project api     # confere (mostra o valor só na sua máquina)
+GITHUB_TOKEN=<seu token>
 ```
 
-Os user-secrets só são lidos no ambiente `Development` (o perfil `http` do `launchSettings.json`).
+O `.env` só é lido no ambiente `Development` (o perfil `http` do `backend/Properties/launchSettings.json`).
 
 ### Produção: Azure App Service
 

@@ -1,5 +1,5 @@
 <Project>
-  <!-- vale para api e api.tests -->
+  <!-- vale para o backend -->
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

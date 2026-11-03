@@ -2,14 +2,14 @@
 
 Portfólio em pixel art com temática de velho oeste/cangaço.
 
-## Stack: `frontend/` (Angular 22) e `api/` (.NET 10)
+## Stack: `frontend/` (Angular 22) e `backend/` (.NET 10)
 
 Requisitos: .NET SDK 10 (veja `global.json`) e Node 22.22+ ou 24.15+.
 
 ```bash
-# API em http://localhost:5080 (serve a placa do GitHub em /api/github/contributions)
-dotnet user-secrets set "GitHub:Token" "<seu token>" --project api   # uma vez; sem token a placa responde 503
-dotnet run --project api
+# backend em http://localhost:5080 (serve a placa do GitHub em /api/github/contributions)
+# antes, crie um .env na raiz com GITHUB_TOKEN=<seu token>; sem token a placa responde 503
+dotnet run --project backend
 
 # site em http://localhost:4200 (em desenvolvimento a placa já aponta para a API local)
 cd frontend
@@ -17,13 +17,13 @@ npm ci
 npm start
 ```
 
-O token **não** fica em nenhum arquivo do repositório: em desenvolvimento vai nos user-secrets (`UserSecretsId` = `forasteiro-api`),
+O token **não** fica em nenhum arquivo versionado: em desenvolvimento vai no `.env` da raiz (está no `.gitignore`),
 em produção na configuração do App Service. Detalhes do endpoint, das chaves e do comportamento da placa em `docs/INTEGRACAO-GITHUB.md`.
 
 Testes e build:
 
 ```bash
-dotnet build Forasteiro.slnx && dotnet test Forasteiro.slnx   # na raiz
+dotnet build Forasteiro.slnx   # na raiz
 cd frontend && npm test && npm run lint:arch && npm run test:ssr && npx ng build    # site estático em frontend/dist/forasteiro/browser
 ```
 
