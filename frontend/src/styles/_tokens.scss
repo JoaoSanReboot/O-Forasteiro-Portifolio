@@ -1,14 +1,44 @@
-/* :root da abertura */
+/* Tokens do design: "noite no deserto". Fundo escuro e quente, texto areia, um acento de pôr do sol.
+   O pixel fica como assinatura (cenas, ícones, rótulos e o marcador das seções), não no layout. */
 :root {
+  /* paleta da abertura (as cenas e a cavalgada também usam) */
   --tição: #1b120d;
   --couro: #3a2418;
   --areia: #f3dfb4;
   --poente: #f2a65a;
   --vinho: #8e2a20;
   --poeira: #d9b88a;
+
+  /* superfícies e texto do site */
+  --bg: #0e0c0a;
+  --bg-2: #13100d;
+  --surface: #191512;
+  --surface-2: #211c18;
+  --surface-3: #2a241f;
+  --line: rgba(237, 226, 206, 0.09);
+  --line-strong: rgba(237, 226, 206, 0.18);
+  --text: #efe7d8;
+  --muted: #b0a593;
+  --subtle: #857a6c;
+  --accent: #f0904c;
+  --accent-hi: #f6a76c;
+  --accent-ink: #1c0f07;
+  --accent-soft: rgba(240, 144, 76, 0.12);
+  --gold: #e3b45c;
+  --sage: #9bc26b;
+  --rust: #d0623f;
+
+  /* tipografia: Space Grotesk nos títulos, IBM Plex no texto e nos rótulos, Pixelify só como acento */
   --font-title: "Pixelify Sans", "Courier New", monospace;
   --font-tale: "Pixelify Sans", "Courier New", monospace;
   --font-tale-sc: "Pixelify Sans", "Courier New", monospace;
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-ui: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* profundidade: sombras macias no lugar das sombras duras de jogo */
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 30px -18px rgba(0, 0, 0, 0.7);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 30px 60px -30px rgba(0, 0, 0, 0.85);
+  --nav-h: 64px;
   color-scheme: dark;
 }

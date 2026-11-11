@@ -1,28 +1,19 @@
-/* Skills: as prateleiras do armeiro */
-.shelves {
-  background:
-    repeating-linear-gradient(90deg, transparent 0 46px, rgba(40, 20, 10, 0.35) 46px 48px),
-    #7a5236;
-  border: 4px solid var(--tição); box-shadow: 8px 8px 0 var(--tição);
-  padding: 30px clamp(16px, 3vw, 34px) 12px;
-  display: grid; gap: 34px;
-}
-.shelf { position: relative; display: grid; grid-template-columns: 190px minmax(0, 1fr); align-items: end; gap: 18px; padding-bottom: 15px; }
-.shelf::after {
-  content: ""; position: absolute; left: -10px; right: -10px; bottom: 0; height: 9px;
-  background: #b07a48; border: 3px solid var(--tição); box-shadow: 0 7px 0 rgba(27, 18, 13, 0.35);
+/* Skills: as prateleiras do armeiro viram uma grade de categorias; a cor da "tampa" ficou como faixa no topo */
+.shelves { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.shelf {
+  position: relative; display: grid; align-content: start; gap: 16px;
+  padding: 22px 22px 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1);
+  border-top: 3px solid var(--lid, var(--rust));
 }
 .shelf-label {
-  justify-self: start; margin-bottom: 6px;
-  font-family: var(--f-pixel); font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase;
-  background: #d8b060; color: var(--tinta); border: 3px solid var(--tição); padding: 6px 10px;
+  font-family: var(--f-code); font-size: 12.5px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
 }
-.shelf ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.shelf ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .shelf li {
-  font-family: var(--f-pixel); font-size: 16px; background: var(--papel); color: var(--tinta);
-  border: 3px solid var(--tição); border-top-width: 7px; border-top-color: var(--lid, #8e2a20);
-  padding: 7px 12px 8px; box-shadow: 4px 0 0 rgba(27, 18, 13, 0.35);
+  font-family: var(--f-display); font-weight: 500; font-size: 15px; line-height: 1;
+  padding: 9px 12px; color: var(--text); background: var(--surface-2); border: 1px solid var(--line);
+  transition: border-color 160ms ease, background-color 160ms ease;
 }
-.shelf:nth-child(2) li { --lid: #3a6a8a; } .shelf:nth-child(3) li { --lid: #5e7d4a; }
-.shelf:nth-child(4) li { --lid: #c0902a; } .shelf:nth-child(5) li { --lid: #5a4a42; }
-@media (max-width: 640px) { .shelf { grid-template-columns: 1fr; gap: 10px; } }
+.shelf li:hover { border-color: var(--lid, var(--rust)); background: var(--surface-3); }
+.shelf:nth-child(1) { --lid: #d0623f; } .shelf:nth-child(2) { --lid: #5b9bc4; } .shelf:nth-child(3) { --lid: #8fb862; }
+.shelf:nth-child(4) { --lid: #e3b45c; } .shelf:nth-child(5) { --lid: #a08c80; }

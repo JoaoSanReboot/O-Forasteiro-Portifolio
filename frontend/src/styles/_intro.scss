@@ -27,19 +27,20 @@ canvas.full {
   text-wrap: balance;
 }
 .kicker {
+  font-family: var(--font-ui);
   font-size: 12px;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--poente);
   margin: 0;
 }
 .sub {
-  font-size: 14px;
+  font-size: 16px;
   max-width: 46ch;
   line-height: 1.6;
   margin: 0;
   color: var(--areia);
-  text-shadow: 2px 2px 0 var(--tição);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 /* tela inicial: cena da estrada ao fundo, elenco à esquerda, o escolhido girando à direita */
 #gate {
@@ -53,18 +54,20 @@ canvas.full {
 .cast { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; width: 100%; }
 .cast-card {
   display: grid; justify-items: center; gap: 6px; padding: 10px 4px 8px; min-height: 0;
-  font-family: var(--font-title); font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--areia);
-  background: rgba(243, 223, 180, 0.07); border: 3px solid rgba(243, 223, 180, 0.22); box-shadow: none;
+  font-family: var(--font-ui); font-size: 12px; font-weight: 500; letter-spacing: 0.02em; color: var(--areia);
+  background: rgba(243, 223, 180, 0.05); border: 1px solid rgba(243, 223, 180, 0.18); box-shadow: none;
+  transition: background-color 160ms ease, border-color 160ms ease;
 }
 .cast-card canvas { width: 48px; height: 72px; image-rendering: pixelated; image-rendering: crisp-edges; }
 .cast-card:hover { background: rgba(243, 223, 180, 0.14); }
-.cast-card[aria-checked="true"] { background: rgba(242, 166, 90, 0.24); border-color: var(--poente); box-shadow: 4px 4px 0 var(--tição); color: #fff4dc; }
+.cast-card[aria-checked="true"] { background: rgba(242, 166, 90, 0.16); border-color: var(--poente); box-shadow: inset 0 -3px 0 var(--poente); color: #fff4dc; }
 .cast-card:active { transform: none; }
 .hero-info { min-height: 64px; }
-.hero-name { margin: 0 0 4px; font-family: var(--font-title); font-weight: 700; font-size: 24px; color: #fff4dc; text-shadow: 2px 2px 0 var(--tição); }
-.hero-tag { margin: 0; font-size: 14px; line-height: 1.5; max-width: 46ch; text-shadow: 2px 2px 0 var(--tição); }
-#start { font-size: 20px; padding: 14px 28px; }
-.gate-hint { margin: 0; font-size: 12px; color: rgba(243, 223, 180, 0.75); }
+.hero-name { margin: 0 0 4px; font-family: var(--font-display); font-weight: 600; font-size: 22px; letter-spacing: -0.01em; color: #fff4dc; }
+.hero-tag { margin: 0; font-size: 15px; line-height: 1.55; max-width: 46ch; color: rgba(243, 223, 180, 0.85); }
+#start { font-size: 17px; padding: 14px 28px; }
+#start::after { content: " →"; }
+.gate-hint { margin: 0; font-family: var(--font-ui); font-size: 12px; color: rgba(243, 223, 180, 0.6); }
 .gate-right { display: grid; justify-items: center; }
 #hero-view { width: 340px; height: 340px; image-rendering: pixelated; image-rendering: crisp-edges; background: radial-gradient(circle at 50% 62%, rgba(242,166,90,0.32), transparent 62%); }
 @media (max-width: 860px) {
@@ -82,10 +85,15 @@ canvas.full {
 /* alto-falante: canto discreto, acompanha a página toda */
 #sound {
   position: fixed; z-index: 60; top: max(12px, env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px));
-  width: 44px; height: 44px; min-height: 0; padding: 0; display: grid; place-items: center;
-  background: rgba(27, 18, 13, 0.82); color: var(--areia); border: 2px solid rgba(243, 223, 180, 0.4); box-shadow: 3px 3px 0 var(--tição);
+  width: 40px; height: 40px; min-height: 0; padding: 0; display: grid; place-items: center;
+  background: rgba(14, 12, 10, 0.72); color: var(--areia); border: 1px solid rgba(243, 223, 180, 0.22); box-shadow: none;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
 }
-#sound svg { width: 24px; height: 24px; }
+#sound:hover { background: rgba(33, 28, 24, 0.9); }
+#sound svg { width: 20px; height: 20px; }
+/* no site, o alto-falante entra no canto direito da barra de navegação */
+html.site-on #sound { top: calc((var(--nav-h) - 40px) / 2); left: auto; right: max(16px, env(safe-area-inset-right, 0px)); z-index: 61; background: transparent; border-color: var(--line-strong); }
+html.site-on #sound:hover { background: var(--surface-2); }
 #sound .mute { display: none; }
 #sound.off { color: #b8a888; }
 #sound.off .waves { display: none; } #sound.off .mute { display: inline; }
@@ -95,7 +103,8 @@ canvas.full {
   right: max(12px, env(safe-area-inset-right, 0px));
   display: flex; gap: 10px;
 }
-#hud button { font-size: 14px; padding: 8px 14px; min-height: 40px; }
+#hud button { font-size: 14px; padding: 8px 16px; min-height: 40px; background: rgba(14, 12, 10, 0.72); color: var(--areia); border: 1px solid rgba(243, 223, 180, 0.25); box-shadow: none; }
+#hud button:hover { background: rgba(33, 28, 24, 0.9); }
 
 /* faixas de cinema: a narração mora na faixa de cima, a dica na de baixo */
 .bar {
@@ -145,19 +154,19 @@ canvas.full {
   position: absolute; inset: 0;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   display: flex; justify-content: center; align-items: center; gap: 10px;
-  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
-  color: #fff4dc; text-shadow: 2px 2px 0 var(--tição);
+  font-family: var(--font-ui); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: #fff4dc;
   pointer-events: none;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   transition: opacity 500ms ease;
 }
 #hint kbd {
-  font-family: var(--font-title); font-size: 13px; letter-spacing: 0.08em;
-  padding: 4px 12px; border: 2px solid var(--tição); background: var(--areia); color: var(--tição);
-  box-shadow: 3px 3px 0 var(--tição);
+  font-family: var(--font-ui); font-size: 12px; letter-spacing: 0.08em;
+  padding: 4px 10px; border: 1px solid rgba(243, 223, 180, 0.4); background: rgba(243, 223, 180, 0.1); color: #fff4dc;
+  box-shadow: inset 0 -2px 0 rgba(243, 223, 180, 0.25);
 }
-#hint.boost kbd { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--tição); background: var(--poente); }
+#hint.boost kbd { transform: translateY(1px); box-shadow: none; background: var(--poente); color: var(--tição); }
 
 html.site-on #hud, html.site-on #gate { display: none !important; }
 @media (max-width: 900px) {
