@@ -28,7 +28,7 @@ features  →  shared  →  core  →  engine
 | Abertura | `features/intro/` | `intro.ts` (orquestra), `intro.service.ts` (site aberto, chegada, "Rever a chegada"), `gate/` (tela inicial e escolha do personagem), `ride/` (cavalgada) |
 | Cavalgada | `features/intro/ride/` | `ride.ts` (laço e fases), `timeline.ts`, `tale.ts` (narração), `palette.ts`, `sprites.ts`, `stage.ts` (palco e projeção), `landscape.ts`, `roadside.ts`, `particles.ts`, `arrival.ts` (porteira), `poster.ts` (cartaz) |
 | Personagem escolhido | `features/heroes/` | `hero.service.ts`; o elenco e o desenho ficam em `engine/heroes/` |
-| Site (casca) | `features/site/` | `site.ts` (ordem das seções e chegada no mural), `site-footer/`, `scene-host.ts` (liga as cenas ao resto) |
+| Site (casca) | `features/site/` | `site.ts` (ordem das seções e chegada no mural), `site-nav/` (barra do topo e menu do celular), `site-footer/`, `scene-host.ts` (liga as cenas ao resto) |
 | Segredos | `features/secrets/` | `secrets.service.ts` (moedas, revólver, segredo do Saloon, progresso no navegador), `secrets-lines.ts` (falas), `secrets-hud/` (contador) |
 | Xerife | `features/guide/` | `guide.service.ts` (o balão), `guide.ts` (botão e área atual), `guide-tips.ts` (falas por área); o desenho em `engine/figures/sheriff.ts` |
 | Mural, Projetos, Trabalhos, Skills, Formação | `features/<seção>/` | um componente cada (a pasta tem o id da seção) |
@@ -45,13 +45,14 @@ features  →  shared  →  core  →  engine
 - **As cenas não conhecem as features.** O `SceneCanvas` e o `SceneLoopService` dependem só dos contratos `SCENES_ACTIVE` e `SCENE_HOST` (`core/scene/scene-host.ts`); quem os implementa é o site (`features/site/scene-host.ts`, registrado em `app.config.ts` e nos provedores dos testes).
 - **Regras sem DOM.** As regras do duelo falam com a tela, a cena e o som por uma porta (`DuelPort`); cada arma é uma estratégia (`Mechanic`). Isso deixa as regras testáveis sem navegador.
 - **O código também roda no Node** (prerender e SSR do `ng serve`): nada de `window`, `document`, armazenamento, áudio ou canvas fora do navegador. Animações começam em `afterNextRender`; quadros usam `raf`/`cancelRaf` de `engine/core/browser.ts`.
+- **Sistema visual ("noite no deserto").** As cores, fontes e sombras ficam em `src/styles/_tokens.scss` (`--bg`, `--surface`, `--text`, `--muted`, `--accent`...). Títulos em Space Grotesk, texto e rótulos em IBM Plex, e Pixelify Sans só como acento. O pixel aparece nas cenas, nos ícones, no marcador numerado das seções e na faixa pontilhada entre elas. O cartaz de procurado e os balões das cenas mantêm o visual de época.
 - **Componentes pelo atributo.** As seções usam seletores de atributo (`section[appDuelo]`, `div[appTicTacToe]`) para manter o HTML e o CSS de sempre.
 
 ### Nova seção, passo a passo
 
 1. Crie `features/<id>/<id>.ts` (e `.html`) com o seletor `section[app<Nome>]` e o `id` da seção no `host`.
 2. Se tiver cena, crie `engine/scenes/<id>.ts` e registre em `engine/scenes/index.ts`; use `<figure appScene="<id>">` no template.
-3. Coloque a seção em `features/site/site.ts`, na ordem certa, e o CSS em `src/styles/site/`.
+3. Coloque a seção em `features/site/site.ts`, na ordem certa (e o link em `features/site/site-nav/`), e o CSS em `src/styles/site/`.
 4. Rode `npm test`, `npm run lint:arch` e `npm run test:ssr`.
 
 ## API (`api/`)

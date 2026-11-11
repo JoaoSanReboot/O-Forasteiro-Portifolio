@@ -1,44 +1,58 @@
 /* contador de segredos, xerife guia e rodapé */
-/* Contador de segredos */
-#site .coin-hud button svg { width: 18px; height: 18px; }
-#site .coin-hud button b { color: #f6d870; font-weight: 700; }
-.coin-hud.done button { border-color: #e8b030; }
 
-/* Xerife guia */
-.guide { position: fixed; right: max(14px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); z-index: 41; display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
+/* Moedas escondidas: um selo discreto no canto */
+.coin-hud { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); z-index: 40; display: grid; gap: 8px; justify-items: start; }
+#site .coin-hud button {
+  all: unset; cursor: pointer; display: flex; align-items: center; gap: 9px; padding: 8px 12px 8px 10px;
+  background: rgba(14, 12, 10, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  color: var(--muted); border: 1px solid var(--line-strong); font-family: var(--f-code); font-size: 12.5px;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+#site .coin-hud button:hover { color: var(--text); border-color: rgba(227, 180, 92, 0.5); }
+#site .coin-hud button:focus-visible { outline: 2px solid var(--accent); }
+#site .coin-hud button svg { width: 16px; height: 16px; }
+#site .coin-hud button b { color: var(--gold); font-weight: 500; font-variant-numeric: tabular-nums; }
+.coin-hud.done button { color: var(--gold) !important; border-color: rgba(227, 180, 92, 0.6) !important; }
+@media (prefers-reduced-motion: no-preference) { .coin-hud.got button { animation: coinpop 500ms ease; } @keyframes coinpop { 40% { transform: scale(1.08); } } }
+
+/* Xerife guia: o personagem em pixel e um balão no estilo de notificação */
+.guide { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); z-index: 41; display: flex; align-items: flex-end; gap: 10px; pointer-events: none; }
 .guide > * { pointer-events: auto; }
-#site .guide-btn { all: unset; cursor: pointer; display: block; width: 56px; height: 80px; pointer-events: auto; }
-#site .guide-btn:focus-visible { outline: 3px solid var(--poente); outline-offset: 2px; }
+#site .guide-btn { all: unset; cursor: pointer; display: block; width: 56px; height: 80px; pointer-events: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5)); }
+#site .guide-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .guide-btn canvas { width: 56px; height: 80px; image-rendering: pixelated; display: block; }
 .guide-say {
-  position: relative; width: min(300px, calc(100vw - 104px)); margin-bottom: 30px; padding: 12px 14px; background: #fff6e2; color: var(--tinta);
-  border: 3px solid var(--tição); box-shadow: 4px 4px 0 var(--tição); font-size: 14px; line-height: 1.45;
+  position: relative; width: min(320px, calc(100vw - 108px)); margin-bottom: 28px; padding: 16px 16px 14px;
+  background: rgba(25, 21, 18, 0.94); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  color: var(--text); border: 1px solid var(--line-strong); border-top: 2px solid var(--accent);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.8); font-size: 14px; line-height: 1.55;
 }
 .guide-say[hidden] { display: none; }
-.guide-say::after { content: ""; position: absolute; right: -11px; bottom: 16px; border: 8px solid transparent; border-left-color: var(--tição); border-right: 0; }
-.guide-say p { margin: 0; }
-.guide-say p b { font-family: var(--f-pixel); }
-.guide-actions { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 10px; }
+.guide-say::after { content: ""; position: absolute; right: -7px; bottom: 18px; width: 12px; height: 12px; background: inherit; border-right: 1px solid var(--line-strong); border-top: 1px solid var(--line-strong); transform: rotate(45deg); }
+.guide-say p { margin: 0; color: var(--muted); }
+.guide-say p b { font-family: var(--f-display); font-weight: 600; color: var(--text); }
+.guide-actions { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 12px; }
 .guide-actions:empty { display: none; }
-#site .guide-actions .s-btn { padding: 5px 12px; font-size: 13px; }
-.guide-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+#site .guide-actions .s-btn { height: 34px; min-height: 34px !important; padding: 0 14px !important; font-size: 13.5px !important; }
+.guide-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }
 .guide-menu[hidden] { display: none; }
-#site .guide-menu a { font-family: var(--f-pixel); font-weight: 700; font-size: 13px; color: var(--tinta); text-decoration: none; border: 2px solid var(--tição); padding: 5px 8px; background: #f2e2bc; }
-#site .guide-menu a:hover, #site .guide-menu a:focus-visible { background: #f2c27a; }
-@media (max-width: 560px) { .coin-hud { bottom: max(14px, env(safe-area-inset-bottom, 0px)); } #site .guide-btn, .guide-btn canvas { width: 42px; height: 60px; } .guide-say { margin-bottom: 18px; font-size: 13px; } }
+#site .guide-menu a { font-family: var(--f-display); font-weight: 500; font-size: 13.5px; color: var(--text); text-decoration: none; border: 1px solid var(--line-strong); padding: 7px 10px; background: var(--surface-2); }
+#site .guide-menu a:hover, #site .guide-menu a:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+@media (max-width: 560px) { #site .guide-btn, .guide-btn canvas { width: 42px; height: 60px; } .guide-say { margin-bottom: 18px; font-size: 13px; } #site .coin-hud button span { display: none; } }
 
-/* Moedas escondidas */
-.coin-hud { position: fixed; left: max(14px, env(safe-area-inset-left, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); z-index: 40; display: grid; gap: 8px; justify-items: start; }
-#site .coin-hud button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 8px; background: var(--tição); color: #f3e3c3; border: 2px solid #6a4a30; font-family: var(--f-pixel); font-size: 14px; }
-#site .coin-hud button:focus-visible { outline: 3px solid var(--poente); }
-.coin-hud svg { width: 20px; height: 20px; }
-.coin-hud.done button { color: #f6d870; border-color: #e8b030; }
-@media (prefers-reduced-motion: no-preference) { .coin-hud.got button { animation: coinpop 500ms ease; } @keyframes coinpop { 40% { transform: scale(1.15); } } }
-
+/* Rodapé */
 .foot {
-  position: relative; z-index: 2; background: var(--tição); color: #d8c8a8;
-  padding: 34px max(20px, env(safe-area-inset-right, 0px)) max(34px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+  position: relative; z-index: 2; background: var(--bg); color: var(--muted); border-top: 1px solid var(--line);
+  padding: 56px max(20px, env(safe-area-inset-right, 0px)) max(96px, calc(env(safe-area-inset-bottom, 0px) + 96px)) max(20px, env(safe-area-inset-left, 0px));
 }
-.foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
-.foot p { margin: 0; font-family: var(--f-pixel); font-size: 15px; }
-.foot-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.foot .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px 48px; align-items: start; }
+.foot-brand { display: grid; gap: 8px; }
+.foot-name { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 22px; letter-spacing: -0.02em; color: var(--text); }
+.foot-role { margin: 0; font-size: 15px; }
+.foot-made { margin: 10px 0 0; font-family: var(--f-code); font-size: 12px; color: var(--subtle); }
+.foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; margin: 4px 0 0; padding: 0; }
+#site .foot-links a { font-size: 14.5px; color: var(--muted); text-decoration: none; }
+#site .foot-links a:hover { color: var(--accent); }
+.foot-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+#site .foot-actions .s-btn { height: 38px; min-height: 38px !important; font-size: 13.5px !important; padding: 0 14px !important; }
+@media (max-width: 760px) { .foot .wrap { grid-template-columns: 1fr; } .foot-actions { justify-content: flex-start; } }

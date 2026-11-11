@@ -13,15 +13,17 @@ import { SecretsHud } from '../secrets/secrets-hud/secrets-hud';
 import { Skills } from '../skills/skills';
 import { Trabalhos } from '../trabalhos/trabalhos';
 import { SiteFooter } from './site-footer/site-footer';
+import { SiteNav } from './site-nav/site-nav';
 
-// O site: o portfólio por dentro das casas, na ordem das seções; o contador de segredos, o xerife e o rodapé por cima.
+// O site: a barra de navegação, o portfólio por dentro das casas, na ordem das seções; o contador de segredos, o xerife e o rodapé por cima.
 // O topo fica vazio para a cena do portão (fixa, atrás, desenhada pela abertura) aparecer.
 @Component({
   selector: 'div[appSite]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Mural, Projetos, Trabalhos, Skills, Commits, Formacao, Saloon, Duelo, SecretsHud, Guide, SiteFooter],
+  imports: [Mural, Projetos, Trabalhos, Skills, Commits, Formacao, Saloon, Duelo, SecretsHud, Guide, SiteFooter, SiteNav],
   host: { id: 'site', '[hidden]': '!siteOn()' },
   template: `
+    <nav appSiteNav></nav>
     <section class="hero" id="inicio" aria-labelledby="hero-title">
       <h1 id="hero-title" class="sr-only" tabindex="-1">João Pedro, desenvolvedor Backend .NET: portfólio</h1>
     </section>

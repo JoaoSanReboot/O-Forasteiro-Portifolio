@@ -3,25 +3,30 @@ html, body { height: 100%; }
 body {
   background: var(--tição);
   color: var(--areia);
-  font-family: var(--font-ui);
+  font-family: var(--font-body);
   overflow: hidden;
   -webkit-user-select: none; user-select: none;
   touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
 }
+::selection { background: var(--accent); color: var(--accent-ink); }
+/* botão principal: bloco sólido com um degrau de pixel embaixo */
 button {
-  font-family: var(--font-title);
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: 0.04em;
-  padding: 12px 20px;
-  border: 3px solid var(--tição);
-  background: var(--poente);
-  color: var(--tição);
-  box-shadow: 4px 4px 0 var(--tição);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0;
+  padding: 12px 22px;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22);
   cursor: pointer;
   min-height: 48px;
+  transition: background-color 160ms ease, transform 80ms ease;
 }
+button:hover { background: var(--accent-hi); }
 button.secondary { background: var(--areia); }
-button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--tição); }
-button:focus-visible { outline: 3px solid var(--areia); outline-offset: 3px; }
+button:active { transform: translateY(1px); box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.22); }
+button:focus-visible { outline: 2px solid var(--areia); outline-offset: 3px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

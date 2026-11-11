@@ -21,6 +21,20 @@ describe('Site', () => {
     expect(el.querySelector<HTMLImageElement>('.p-photo img')?.getAttribute('src')).toBe('assets/retrato-cartaz.png');
   });
 
+  it('a barra de navegação aponta para as seções e o menu do celular abre e fecha', async () => {
+    const { fixture, el } = await render();
+    const ids = [...el.querySelectorAll<HTMLAnchorElement>('.nav-links a')].map((a) => a.getAttribute('href'));
+    expect(ids).toEqual(['#procurado', '#projetos', '#trabalhos', '#skills', '#commits', '#formacao', '#duelo', '#saloon']);
+    for (const id of ids) expect(el.querySelector(id!)).not.toBeNull();
+    const menu = el.querySelector('.nav-menu')!;
+    expect(menu.getAttribute('aria-expanded')).toBe('false');
+    await click(fixture, menu);
+    expect(menu.getAttribute('aria-expanded')).toBe('true');
+    expect(el.querySelector('.nav-links')?.classList.contains('open')).toBe(true);
+    await click(fixture, el.querySelector('.nav-links a'));
+    expect(menu.getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('baús: abre, mostra o projeto e troca com as setas', async () => {
     const { fixture, el } = await render();
     const main = el.querySelector('#chest-main')!;
