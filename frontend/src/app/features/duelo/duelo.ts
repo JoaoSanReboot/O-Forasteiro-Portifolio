@@ -1,292 +1,249 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, Injector, signal, untracked, viewChild } from '@angular/core';
-import { AudioService } from '../../core/audio/audio.service';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { BANDITS } from '../../content/jogos';
 import { PlatformService } from '../../core/platform/platform.service';
-import { DuelFx } from '../../engine/audio/vila-audio';
 import { cancelRaf, raf } from '../../engine/core/browser';
-import { duelHero } from '../../engine/figures/duelist';
-import { DuelAnimMode } from '../../engine/scenes/duel-state';
-import { SceneCanvas } from '../../shared/scene-canvas/scene-canvas';
-import { HeroService } from '../heroes/hero.service';
-import { SecretsService } from '../secrets/secrets.service';
-import { DuelRecordsService } from './duel-records.service';
-import { DuelService } from './duel.service';
-import { BLUFFS, KIT } from './rules/kit';
-import { LEVEL_IDS, LevelId, LEVELS } from './rules/levels';
-import { DuelMatch, planRound } from './rules/match';
+import { COIN_IDS, SecretsService } from '../secrets/secrets.service';
+import { BLUFFS, KIT, Weapon } from './rules/kit';
+import { LEVEL } from './rules/levels';
+import { Hunt, planRound } from './rules/match';
 import { createMechanic, DuelPort, LoseKind, Mechanic } from './rules/mechanics';
+import { Zone } from './rules/zones';
 
-type Phase = 'idle' | 'wait' | 'draw' | 'result';
-const pick = <T,>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)];
+type Phase = 'menu' | 'waiting' | 'draw' | 'result' | 'end';
+/** o que aconteceu na rodada: quem atirou e de quem o chapéu voou */
+type Outcome = 'you' | 'bandit' | null;
 
-// ================= VII · Duelo ao pôr do sol: espere o sino e acerte o tempo da agulha =================
-// As regras (placar, faixas, a mecânica de cada arma) moram em rules/; este componente liga as regras
-// à interface (Signals), à cena (o objeto do DuelService, lido a cada quadro), ao som e ao relógio.
-// Barra, faixas e marcador mudam a cada quadro e são escritos direto no DOM.
+const WEAPONS = (Object.keys(KIT) as Weapon[]).map((id) => ({ id, label: KIT[id].label }));
+
+// O duelo ao meio-dia, dentro da Experiência: cada problema que eu já resolvi virou um bandido de
+// cartaz ("Sessenta Segundos", o grid de contratos lento). Espere o sino, acerte a faixa da barra e o
+// bandido vai preso, mostrando o antes e o depois de verdade. Errou, ele foge e você perde um chapéu.
+// As regras de cada arma e da caçada ficam em rules/; aqui é só o palco.
+// O marcador e a raiva mudam a cada quadro: vão direto no estilo, fora dos Signals.
 @Component({
-  selector: 'section[appDuelo]',
+  selector: 'article[appDuelo]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SceneCanvas],
-  host: { class: 'sector', id: 'duelo', 'aria-labelledby': 't-duelo', '(window:keydown)': 'onKey($event, true)', '(window:keyup)': 'onKey($event, false)', '(window:pointerup)': 'release()', '(window:pointercancel)': 'release()' },
+  host: { class: 'game duelo', id: 'duelo', 'aria-labelledby': 'duelo-t' },
   templateUrl: './duelo.html',
 })
-export class Duelo {
-  private readonly DUEL = inject(DuelService).state;
-  private readonly heroes = inject(HeroService);
-  private readonly secrets = inject(SecretsService);
-  private readonly audio = inject(AudioService);
+export class Duelo implements DuelPort {
   private readonly platform = inject(PlatformService);
-  private readonly reduceMotion = this.platform.reduceMotion;
-  private readonly injector = inject(Injector);
+  protected readonly secrets = inject(SecretsService);
+  protected readonly coins = COIN_IDS;
+  protected readonly weapons = WEAPONS;
+  protected readonly bandits = BANDITS;
 
-  private readonly scene = viewChild.required(SceneCanvas);
-  private readonly sceneFig = viewChild.required('sceneFig', { read: ElementRef<HTMLElement> });
-  private readonly invite = viewChild.required<ElementRef<HTMLButtonElement>>('invite');
-  private readonly duelBox = viewChild.required<ElementRef<HTMLElement>>('duel');
-  private readonly startBtn = viewChild.required<ElementRef<HTMLButtonElement>>('startBtn');
-  private readonly againBtn = viewChild.required<ElementRef<HTMLButtonElement>>('again');
-  private readonly nextBtn = viewChild.required<ElementRef<HTMLButtonElement>>('next');
-  private readonly bar = viewChild.required<ElementRef<HTMLElement>>('bar');
-  private readonly zonesBox = viewChild.required<ElementRef<HTMLElement>>('zonesBox');
-  private readonly fill = viewChild.required<ElementRef<HTMLElement>>('fill');
-  private readonly marker = viewChild.required<ElementRef<HTMLElement>>('marker');
-
-  protected readonly levels = LEVELS;
-  protected readonly levelIds = LEVEL_IDS;
-  protected readonly level = signal<LevelId>('normal');
-  /** regras, botão e arma mudam com o personagem escolhido (mas não no meio de um duelo) */
-  private readonly kitHero = signal(this.heroes.id());
-  private readonly kitPerson = computed(() => { this.kitHero(); return this.heroes.current(); });
-  private readonly weapon = computed(() => duelHero(this.kitPerson()).weapon!);
+  protected readonly weapon = signal<Weapon>('revolver');
   protected readonly kit = computed(() => KIT[this.weapon()]);
-  protected readonly weaponLine = computed(() => `${this.kitPerson().name} · arma: ${this.kit().arma}`);
-  protected readonly bonus = computed(() => this.weapon() === 'pin' ? 'Com o revólver aprimorado do Xavier, a raiva enche mais rápido.' : 'Com o revólver aprimorado do Xavier, as faixas vermelhas ao lado da amarela também valem.');
+  protected readonly phase = signal<Phase>('menu');
+  protected readonly caught = signal(0);
+  protected readonly lives = signal(3);
+  /** o bandido da vez */
+  protected readonly current = computed(() => this.bandits[Math.min(this.caught(), this.bandits.length - 1)]);
+  protected readonly zones = signal<Zone[]>([]);
+  protected readonly markerOn = signal(false);
+  protected readonly meter = signal(false);
+  protected readonly isCocked = signal(false);
+  protected readonly spinning = signal(false);
+  protected readonly bluff = signal('');
+  protected readonly ringing = signal(false);
+  protected readonly outcome = signal<Outcome>(null);
+  protected readonly stamp = signal<{ title: string; why: string; good: boolean } | null>(null);
+  protected readonly end = signal<{ won: boolean; summary: string } | null>(null);
+  protected readonly playing = computed(() => this.phase() === 'waiting' || this.phase() === 'draw');
+  protected readonly actionLabel = computed(() => {
+    const k = this.kit();
+    if (this.phase() === 'waiting') return 'Espere o sino...';
+    return this.isCocked() && k.btn2 ? k.btn2 : k.btn;
+  });
+  protected readonly hint = computed(() => {
+    const k = this.kit();
+    if (this.phase() === 'waiting') return 'Mão parada até o sino tocar.';
+    return this.isCocked() && k.aim2 ? k.aim2 : k.aim;
+  });
 
-  protected readonly view = signal<'intro' | 'play' | 'end'>('intro');
-  protected readonly armed = signal(false);
-  protected readonly inviteHidden = signal(false);
-  protected readonly score = signal({ round: 1, you: 0, joao: 0 });
-  protected readonly call = signal<{ text: string; cls: string }>({ text: 'Preparar...', cls: '' });
-  protected readonly why = signal('');
-  protected readonly stamp = signal<{ text: string; ok: boolean } | null>(null);
-  protected readonly fireLabel = signal('Atirar');
-  protected readonly fireHidden = signal(false);
-  protected readonly fireDisabled = signal(false);
-  protected readonly nextHidden = signal(true);
-  protected readonly nextLabel = signal('Próxima rodada');
-  protected readonly endTitle = signal('');
-  protected readonly endText = signal('');
-  private readonly records = inject(DuelRecordsService);
-  protected readonly best = this.records.summary;
-  protected playing: LevelId = 'normal';
+  private readonly markerEl = viewChild<ElementRef<HTMLElement>>('marker');
+  private readonly barEl = viewChild<ElementRef<HTMLElement>>('bar');
+  private readonly stageEl = viewChild<ElementRef<HTMLElement>>('stage');
 
-  private phase: Phase = 'idle';
-  private match = new DuelMatch('normal', LEVELS.normal);
-  /** a mecânica da arma na rodada (criada no sino) */
+  private hunt: Hunt | null = null;
   private mech: Mechanic | null = null;
   private timers: ReturnType<typeof setTimeout>[] = [];
-  private frameId = 0;
-  private lastTick = 0;
-  private spinSfx: ReturnType<typeof setInterval> | undefined;
+  private frame = 0;
+  private last = 0;
+  private held = false;
 
   constructor() {
-    effect(() => { this.heroes.id(); untracked(() => { if (this.phase === 'idle') this.applyKit(); }); });
-    afterNextRender(() => this.scene().whenReady(() => this.scene().pin(this.invite().nativeElement, 196, 50)));
-    // timers e quadros só existem no navegador; no SSR (prerender e ng serve) não há o que limpar
-    if (this.platform.isBrowser) inject(DestroyRef).onDestroy(() => this.clear());
-  }
-
-  // ---------- o que as mecânicas pedem para a tela, a cena e o som ----------
-  private readonly port: DuelPort = {
-    anim: (mode) => this.anim(mode),
-    ensureAnim: (mode) => { if (this.DUEL.anim.mode !== mode) this.anim(mode); },
-    animCharge: (k) => { this.DUEL.anim.charge = k; },
-    twinShot: (at) => { this.DUEL.anim.shots.push({ side: this.DUEL.anim.shots.length ? 'L' : 'R', at }); },
-    sfx: (name) => this.sfx(name),
-    marker: (pct) => { this.marker().nativeElement.style.left = pct + '%'; },
-    showMarker: () => { this.marker().nativeElement.hidden = false; },
-    fill: (k) => { this.fill().nativeElement.style.width = k * 100 + '%'; },
-    zonesChanged: () => this.renderZones(),
-    cocked: () => { this.fireLabel.set(this.kit().btn2!); this.why.set(this.kit().aim2!); },
-    spin: (on) => { if (on) this.spinSfx = setInterval(() => this.sfx('whoosh'), 320); else clearInterval(this.spinSfx); },
-    knock: (target, delay = 0) => this.knock(target, delay),
-    shake: () => this.shake(),
-    later: (fn, ms) => this.later(fn, ms),
-    drawing: () => this.phase === 'draw',
-    win: (yellow) => this.win(yellow),
-    lose: (kind) => this.lose(kind),
-  };
-
-  private hasGun = () => this.secrets.hasGun();
-  private sfx = (name: DuelFx) => this.audio.fx(name);
-  private later(fn: () => void, ms: number): void { this.timers.push(setTimeout(fn, ms)); }
-  private clear(): void { this.timers.forEach(clearTimeout); this.timers = []; cancelRaf(this.frameId); clearInterval(this.spinSfx); }
-  private focusLater(el: () => ElementRef<HTMLElement>): void { afterNextRender(() => el().nativeElement.focus({ preventScroll: true }), { injector: this.injector }); }
-
-  private applyKit(): void { this.kitHero.set(this.heroes.id()); this.fireLabel.set(this.kit().btn); this.DUEL.anim.weapon = this.weapon(); }
-  private setScore(): void { this.score.set({ round: this.match.round, you: this.match.you, joao: this.match.joao }); }
-  private setCall(text: string, cls = ''): void { this.call.set({ text, cls }); }
-  private shake(): void { const f = this.sceneFig().nativeElement; f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); }
-  private anim(mode: DuelAnimMode): void { this.DUEL.anim.mode = mode; this.DUEL.anim.at = performance.now(); }
-
-  // o João, encostado no mourão, chama para o duelo
-  protected goToRules(): void {
-    this.duelBox().nativeElement.scrollIntoView({ behavior: this.reduceMotion ? 'auto' : 'smooth', block: 'center' });
-    this.startBtn().nativeElement.focus({ preventScroll: true });
-  }
-
-  protected start(): void {
-    this.clear(); this.applyKit();
-    this.playing = this.level();
-    this.match = new DuelMatch(this.playing, LEVELS[this.playing]);
-    this.view.set('play'); this.stamp.set(null); this.inviteHidden.set(true);
-    this.DUEL.on = true; this.armed.set(true);
-    this.audio.cue('duel');
-    this.sceneFig().nativeElement.scrollIntoView({ behavior: this.reduceMotion ? 'auto' : 'smooth', block: 'start' });
-    this.nextRound();
-  }
-
-  private nextRound(): void {
-    this.clear(); this.match.nextRound(); this.setScore();
-    const D = this.DUEL;
-    D.hat = { you: true, joao: true }; D.flying = []; D.phase = 'wait'; this.phase = 'wait';
-    D.anim.shots = []; D.anim.charge = 0; this.anim('wait');
-    this.mech = null;
-    this.bar().nativeElement.className = 'reflex off'; this.zonesBox().nativeElement.innerHTML = ''; this.fill().nativeElement.style.width = '0%'; this.stamp.set(null);
-    this.nextHidden.set(true); this.fireHidden.set(false); this.fireDisabled.set(false); this.fireLabel.set(this.kit().btn);
-    this.setCall('Preparar...');
-    this.why.set('Mão longe da arma. Espere o sino.');
-    const { wait, bluffs } = planRound(this.match.round);
-    for (const at of bluffs) {
-      this.later(() => {
-        if (this.phase !== 'wait') return;
-        const b = pick(BLUFFS);
-        if (b.startsWith('O João mexeu')) D.twitchAt = performance.now();
-        this.why.set(b);
-      }, at);
-    }
-    this.later(() => this.bell(), wait);
-  }
-
-  private renderZones(): void {
-    const box = this.zonesBox().nativeElement;
-    box.innerHTML = '';
-    (this.mech?.zones ?? []).forEach((z) => {
-      const red = document.createElement('span'); red.className = 'r-zone'; red.style.left = z.s + '%'; red.style.width = z.w + '%'; red.hidden = !this.hasGun();
-      const yel = document.createElement('span'); yel.className = 'r-perfect'; yel.style.left = z.mid - z.p / 2 + '%'; yel.style.width = z.p + '%';
-      if (z.hit) { yel.classList.add('done'); red.classList.add('done'); }
-      box.append(red, yel);
-    });
-  }
-
-  private bell(): void {
-    if (this.phase !== 'wait') return;
-    this.phase = 'draw'; this.DUEL.phase = 'draw'; this.DUEL.bellAt = performance.now(); this.anim('draw');
-    this.sfx('bell');
-    this.setCall(this.kit().call, 'draw'); this.why.set(this.kit().aim);
-    const mech = this.mech = createMechanic(this.weapon(), this.port, this.match.level, this.match.round);
-    mech.arm(performance.now());
-    this.bar().nativeElement.className = 'reflex' + (mech.meter ? ' meter' : '');
-    this.renderZones();
-    const marker = this.marker().nativeElement;
-    marker.style.left = '0%';
-    marker.hidden = mech.markerHidden;
-    this.lastTick = mech.t0; this.frameId = raf(this.tick);
-  }
-
-  private readonly tick = (now: number): void => {
-    const mech = this.mech;
-    if (this.phase !== 'draw' || !mech) return;
-    const dt = Math.min(0.05, (now - this.lastTick) / 1000); this.lastTick = now;
-    if (!mech.step(now, dt)) return;
-    if (now - mech.t0 >= mech.deadline) { this.lose('slow'); return; }
-    this.frameId = raf(this.tick);
-  };
-
-  // apertou (ou tocou): antes do sino perde a rodada; depois, depende da arma
-  private press(): void {
-    if (this.phase === 'wait') { this.early(); return; }
-    if (this.phase !== 'draw' || !this.mech) return;
-    this.mech.press(performance.now(), this.hasGun());
-  }
-
-  // soltou: só o laço usa (é aí que ele voa)
-  protected release(): void {
-    if (this.phase !== 'draw' || !this.mech) return;
-    this.mech.release(performance.now(), this.hasGun());
-  }
-
-  // quem leva o tiro (ou o laço, ou o rolo) perde o chapéu, às vezes com um atraso para a arma chegar
-  private knock(target: 'you' | 'joao', delay = 0): void {
-    const go = () => {
-      this.DUEL.hat[target] = false;
-      const fly = target === 'joao' ? '#9a6a3c' : duelHero(this.heroes.current()).flyHat;
-      if (fly) this.DUEL.flying.push(target === 'joao' ? { x: 214, y: 58, vx: 1.3, vy: -2.4, r: 0, col: fly, ground: 112 } : { x: 110, y: 58, vx: -1.3, vy: -2.4, r: 0, col: fly, ground: 112 });
+    const destroyRef = inject(DestroyRef);
+    destroyRef.onDestroy(() => this.clear());
+    if (!this.platform.isBrowser) return;
+    // Espaço também vale, mas só com a partida rolando (fora dela a página rola como sempre;
+    // durante o carimbo do resultado ele não faz nada, para quem aperta repetido não perder a tela)
+    const key = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' || this.phase() === 'menu' || this.phase() === 'end') return;
+      e.preventDefault();
+      if (e.repeat || !this.playing()) return;
+      if (e.type === 'keydown') this.down(); else this.up();
     };
-    if (delay) this.later(go, delay); else go();
+    document.addEventListener('keydown', key);
+    document.addEventListener('keyup', key);
+    destroyRef.onDestroy(() => { document.removeEventListener('keydown', key); document.removeEventListener('keyup', key); });
   }
-  private joaoFires(): void { const D = this.DUEL; D.shotBy = 'joao'; D.shotAt = performance.now(); D.phase = 'joao'; this.sfx('shot'); this.knock('you'); }
+
+  // ---------------- o menu ----------------
+  protected start(): void {
+    this.clear();
+    this.hunt = new Hunt(this.bandits.length);
+    this.caught.set(0);
+    this.lives.set(this.hunt.lives);
+    this.end.set(null);
+    this.nextRound();
+    // o menu encolhe ao começar: se o palco ficou fora da tela, traz de volta (instantâneo, para não brigar com a inércia)
+    const stage = this.stageEl()?.nativeElement;
+    if (stage && stage.getBoundingClientRect().top < 0) stage.scrollIntoView?.({ block: 'start', behavior: 'instant' });
+  }
+
+  protected quit(): void {
+    this.clear();
+    this.phase.set('menu');
+    this.reset();
+  }
+
+  // ---------------- as rodadas ----------------
+  private nextRound(): void {
+    const h = this.hunt!;
+    h.nextRound();
+    this.reset();
+    this.phase.set('waiting');
+    const plan = planRound(h.round);
+    for (const at of plan.bluffs) this.later(() => this.bluff.set(BLUFFS[Math.floor(Math.random() * BLUFFS.length)]), at);
+    this.later(() => this.ring(), plan.wait);
+  }
+
+  private reset(): void {
+    this.mech = null;
+    this.zones.set([]);
+    this.markerOn.set(false);
+    this.meter.set(false);
+    this.isCocked.set(false);
+    this.spinning.set(false);
+    this.bluff.set('');
+    this.ringing.set(false);
+    this.outcome.set(null);
+    this.stamp.set(null);
+    this.held = false;
+    this.stageEl()?.nativeElement.classList.remove('twin-shot', 'shake');
+    this.markerEl()?.nativeElement.style.setProperty('--at', '0%');
+    this.charge(0);
+  }
+
+  /** o sino: a barra se arma e a rodada fica aberta */
+  private ring(): void {
+    this.bluff.set('');
+    this.ringing.set(true);
+    this.phase.set('draw');
+    // cada bandido preso deixa o próximo mais rápido
+    const mech = createMechanic(this.weapon(), this, LEVEL, this.hunt!.caught + 1);
+    mech.arm(performance.now());
+    this.mech = mech;
+    this.zones.set(mech.zones.map((z) => ({ ...z })));
+    this.meter.set(mech.meter);
+    this.markerOn.set(!mech.markerHidden);
+    this.last = performance.now();
+    const tick = (now: number) => {
+      if (this.phase() !== 'draw' || this.mech !== mech) return;
+      const dt = (now - this.last) / 1000;
+      this.last = now;
+      if (mech.step(now, dt)) this.frame = raf(tick);
+    };
+    this.frame = raf(tick);
+  }
+
+  // ---------------- o gatilho ----------------
+  protected down(): void {
+    if (this.phase() === 'waiting') { this.early(); return; }
+    if (this.phase() !== 'draw' || !this.mech) return;
+    this.held = true;
+    this.mech.press(performance.now(), this.secrets.gun());
+  }
+
+  protected up(): void {
+    if (!this.held) return;
+    this.held = false;
+    if (this.phase() === 'draw' && this.mech) this.mech.release(performance.now(), this.secrets.gun());
+  }
 
   private early(): void {
-    this.clear(); this.phase = 'result'; this.match.joaoWins(); this.setScore();
-    this.joaoFires();
-    this.setCall('Desclassificado!');
-    this.why.set('Você se mexeu antes do sino. Rodada para o João.');
-    this.stamp.set({ text: 'Antes do sino!', ok: false });
-    this.after();
+    this.clear();
+    this.hunt!.escape();
+    this.finish('bandit', 'Oxente, cedo!', `Sacou antes do sino e ${this.current().alias} fugiu.`, false);
   }
 
-  private win(yellow: boolean): void {
-    this.clear(); this.phase = 'result'; this.match.youWin(yellow); this.setScore();
-    this.bar().nativeElement.classList.add('hit');
-    const D = this.DUEL;
-    D.shotBy = 'you'; D.shotAt = performance.now(); D.phase = 'you';
-    this.mech!.winEffects();
-    const [call, st, why] = yellow ? this.kit().yellow : this.kit().red;
-    this.setCall(call, yellow ? 'perfect' : 'draw');
-    this.why.set(why);
-    this.stamp.set({ text: st, ok: true });
-    this.after();
+  // ---------------- a DuelPort (o que a mecânica pede) ----------------
+  marker(pct: number): void { this.markerEl()?.nativeElement.style.setProperty('--at', `${pct}%`); }
+  showMarker(): void { this.markerOn.set(true); }
+  charge(k: number): void {
+    const v = k.toFixed(3);
+    this.barEl()?.nativeElement.style.setProperty('--charge', v);
+    this.stageEl()?.nativeElement.style.setProperty('--charge', v);
+  }
+  zonesChanged(): void { this.zones.set(this.mech ? this.mech.zones.map((z) => ({ ...z })) : []); }
+  shot(): void { this.flash(); }
+  cocked(): void { this.isCocked.set(true); }
+  spin(on: boolean): void { this.spinning.set(on); }
+
+  win(yellow: boolean): void {
+    const [title] = yellow ? this.kit().yellow : this.kit().red;
+    const b = this.current();
+    this.hunt!.capture(yellow);
+    this.finish('you', title, `${b.alias} preso: ${b.before} → ${b.after}.`, true);
   }
 
-  private lose(kind: LoseKind): void {
-    this.clear(); this.phase = 'result'; this.match.joaoWins(); this.setScore();
-    this.bar().nativeElement.classList.add('miss');
-    this.mech?.loseAnim(kind);
-    this.joaoFires();
-    const [call, st, why] = kind === 'slow' ? this.kit().slow : this.kit().miss;
-    this.setCall(call); this.why.set(why); this.stamp.set({ text: st, ok: false });
-    this.after();
+  lose(kind: LoseKind): void {
+    const [title, why] = kind === 'slow' ? this.kit().slow : this.kit().miss;
+    this.hunt!.escape();
+    this.finish('bandit', title, `${why} ${this.current().alias} fugiu.`, false);
   }
 
-  private after(): void {
-    this.fireDisabled.set(true);
-    this.nextLabel.set(this.match.over ? 'Ver o resultado' : 'Próxima rodada');
-    this.later(() => { this.fireHidden.set(true); this.nextHidden.set(false); this.focusLater(() => this.nextBtn()); }, 900);
+  private finish(who: 'you' | 'bandit', title: string, why: string, good: boolean): void {
+    cancelRaf(this.frame);
+    this.spinning.set(false);
+    this.phase.set('result');
+    this.outcome.set(who);
+    this.stamp.set({ title, why, good });
+    const h = this.hunt!;
+    this.caught.set(h.caught);
+    this.lives.set(h.livesLeft);
+    this.shake();
+    this.later(() => {
+      if (!h.over) { this.nextRound(); return; }
+      this.stamp.set(null);
+      this.phase.set('end');
+      this.end.set({ won: h.won, summary: h.summary() });
+    }, 2300);
   }
 
-  private finish(): void {
-    this.clear(); this.phase = 'idle'; this.view.set('end');
-    this.DUEL.phase = 'idle';
-    this.audio.cue('village');
-    const m = this.match, kit = this.kit();
-    if (m.won) this.records.addWin(m.levelId);
-    this.stamp.set({ text: m.won ? 'Vitória!' : 'Derrota', ok: m.won });
-    this.later(() => { this.stamp.set(null); this.DUEL.on = false; this.DUEL.flying = []; this.anim('wait'); this.armed.set(false); this.inviteHidden.set(false); this.applyKit(); }, 3200);
-    this.endTitle.set(m.title(kit));
-    this.endText.set(m.summary(kit));
-    this.focusLater(() => this.againBtn());
+  private flash(): void {
+    const el = this.stageEl()?.nativeElement;
+    if (!el) return;
+    el.classList.remove('twin-shot');
+    void el.offsetWidth;
+    el.classList.add('twin-shot');
   }
 
-  protected backToRules(): void { this.view.set('intro'); this.applyKit(); this.focusLater(() => this.startBtn()); }
-  protected nextClick(): void { if (this.match.over) this.finish(); else this.nextRound(); }
-  protected firePointer(e: PointerEvent): void { e.preventDefault(); this.press(); }
-  protected fireClick(e: MouseEvent): void { if (e.detail === 0) { this.press(); this.release(); } }
-  protected scenePress(e: PointerEvent): void { if (this.DUEL.on && !(e.target as Element).closest('.say')) this.press(); }
+  private shake(): void {
+    const el = this.stageEl()?.nativeElement;
+    if (!el || this.platform.reduceMotion) return;
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+  }
 
-  protected onKey(e: KeyboardEvent, down: boolean): void {
-    if (e.key !== ' ' && e.key !== 'Enter') return;
-    if (!down) { this.release(); return; }
-    if (this.view() !== 'play' || (this.phase !== 'wait' && this.phase !== 'draw')) return;
-    e.preventDefault(); if (!e.repeat) this.press();
+  private later(fn: () => void, ms: number): void { this.timers.push(setTimeout(fn, ms)); }
+
+  private clear(): void {
+    this.timers.forEach(clearTimeout);
+    this.timers = [];
+    cancelRaf(this.frame);
   }
 }

@@ -19,5 +19,5 @@ if (!('IntersectionObserver' in window)) {
   (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = NoopIntersectionObserver;
 }
 
-// nem scrollIntoView (a chegada rola até o mural; o duelo, até a cena)
+// nem scrollIntoView
 if (!Element.prototype.scrollIntoView) Element.prototype.scrollIntoView = function () {};

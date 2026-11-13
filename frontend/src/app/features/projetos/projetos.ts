@@ -1,151 +1,77 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { PlatformService } from '../../core/platform/platform.service';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { PROJECTS } from '../../content/projects';
-import { Ctx } from '../../engine/core/canvas';
-import { clamp } from '../../engine/core/math';
-import { drawChest } from '../../engine/figures/chest';
-import { R } from '../../engine/draw/primitives';
-import { SceneCanvas } from '../../shared/scene-canvas/scene-canvas';
-import { cancelRaf, nextFrame, raf } from '../../engine/core/browser';
+import { PlatformService } from '../../core/platform/platform.service';
+import { cancelRaf, raf } from '../../engine/core/browser';
+import { lerp } from '../../engine/core/math';
+import { Reveal } from '../../shared/reveal/reveal';
+import { SectionHead } from '../../shared/section-head/section-head';
 
-interface Spark { x: number; y: number; vx: number; vy: number; life: number }
-
-// I · Projetos: a ferraria e os baús em carrossel (fechar → deslizar para o lado → abrir)
+// 02 · Projetos: um índice em linhas grandes. Passando o mouse, a linha se pinta de tinta
+// e a imagem do projeto acompanha o cursor com um atraso macio. No toque, a imagem vem na própria linha.
 @Component({
   selector: 'section[appProjetos]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SceneCanvas],
-  host: { class: 'sector', id: 'projetos', 'aria-labelledby': 't-projetos' },
-  templateUrl: './projetos.html',
+  imports: [SectionHead, Reveal],
+  host: { class: 'sec projetos', id: 'projetos', 'aria-labelledby': 't-projetos' },
+  template: `
+    <div class="wrap">
+      <header appSectionHead num="02" label="Projetos" title="Feitos a" accent="ferro e fogo." [aside]="count" emblem="ferro" titleId="t-projetos"></header>
+      <ol class="works" #list (pointermove)="move($event)" (pointerleave)="hover.set(-1)">
+        @for (w of projects; track w.name; let i = $index) {
+          <li class="work" appReveal [revealDelay]="i">
+            <a class="work-link" [href]="w.href" target="_blank" rel="noopener" (pointerenter)="hover.set(i)" (focus)="hover.set(i)" (blur)="hover.set(-1)">
+              <span class="work-num">{{ w.num }}</span>
+              <span class="work-thumb"><img [src]="w.img" [alt]="w.alt" loading="lazy"></span>
+              <span class="work-main">
+                <span class="work-name">{{ w.name }}</span>
+                <span class="work-title">{{ w.title }}@if (w.wip) { <i class="tag">Em desenvolvimento</i> }</span>
+              </span>
+              <span class="work-desc">{{ w.desc }}</span>
+              <span class="work-side">
+                <span class="work-chips">{{ w.chips.join(' · ') }}</span>
+                <span class="work-go">{{ w.action }}<span class="go-arrow" aria-hidden="true">↗</span><span class="sr-only"> (abre em outra aba)</span></span>
+              </span>
+            </a>
+          </li>
+        }
+      </ol>
+    </div>
+    <div class="work-preview" #preview aria-hidden="true" [class.on]="hover() >= 0">
+      @for (w of projects; track w.name; let i = $index) { <img [src]="w.img" alt="" [class.on]="hover() === i" loading="lazy"> }
+    </div>
+  `,
 })
 export class Projetos {
-  private readonly reduceMotion = inject(PlatformService).reduceMotion;
-  private readonly mainBtn = viewChild.required<ElementRef<HTMLButtonElement>>('mainBtn');
-  private readonly mainCv = viewChild.required<ElementRef<HTMLCanvasElement>>('mainCv');
-  private readonly prevCv = viewChild.required<ElementRef<HTMLCanvasElement>>('prevCv');
-  private readonly nextCv = viewChild.required<ElementRef<HTMLCanvasElement>>('nextCv');
-  private readonly panelRef = viewChild.required<ElementRef<HTMLElement>>('panel');
-
-  private readonly idx = signal(0);
-  protected readonly isOpen = signal(false);
-  protected readonly project = computed(() => PROJECTS[this.idx()]);
-  /** o painel mostra o projeto de quando o baú foi aberto */
-  protected readonly shown = signal(PROJECTS[0]);
-
-  // estado quadro a quadro (fora dos Signals)
-  private openK = 0;
-  private opening = 0;
-  private t = 0;
-  private sparks: Spark[] = [];
-  private visible = false;
-  private turning = false;
-  private closing: Promise<void> = Promise.resolve();
-  private swipeX: number | null = null;
+  protected readonly projects = PROJECTS;
+  protected readonly count = `${String(PROJECTS.length).padStart(2, '0')} obras`;
+  protected readonly hover = signal(-1);
+  private readonly preview = viewChild.required<ElementRef<HTMLElement>>('preview');
+  private target = { x: 0, y: 0 };
+  /** só ganha corpo com mouse (no toque a imagem já está na linha) */
+  protected move: (e: PointerEvent) => void = () => {};
 
   constructor() {
-    const destroyRef = inject(DestroyRef);
+    const destroyRef = inject(DestroyRef), platform = inject(PlatformService);
     afterNextRender(() => {
-      const [cMain, cPrev, cNext] = [this.mainCv(), this.prevCv(), this.nextCv()].map((r) => r.nativeElement.getContext('2d')!);
-      [cMain, cPrev, cNext].forEach((g) => { g.imageSmoothingEnabled = false; });
-      const io = new IntersectionObserver((es) => es.forEach((e) => { this.visible = e.isIntersecting; }), { threshold: 0.1 });
-      io.observe(this.mainBtn().nativeElement.closest('.forge')!);
-      let last = performance.now(), frameId = 0;
-      const frame = (now: number) => {
-        const dt = Math.min(0.05, (now - last) / 1000); last = now;
-        if (this.visible || this.t === 0) this.paint(cMain, cPrev, cNext, dt);
-        frameId = raf(frame);
+      if (!platform.finePointer) return;
+      const el = this.preview().nativeElement;
+      const pos = { x: 0, y: 0 };
+      let frame = 0, first = true;
+      // a imagem persegue o cursor (lerp) e inclina de leve na direção em que ele corre
+      const tick = () => {
+        const dx = this.target.x - pos.x;
+        pos.x = lerp(pos.x, this.target.x, 0.14); pos.y = lerp(pos.y, this.target.y, 0.14);
+        const tilt = Math.max(-8, Math.min(8, dx * 0.04));
+        el.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0) rotate(${tilt.toFixed(2)}deg)`;
+        frame = Math.abs(dx) > 0.3 || Math.abs(this.target.y - pos.y) > 0.3 ? raf(tick) : 0;
       };
-      frameId = raf(frame);
-      destroyRef.onDestroy(() => { cancelRaf(frameId); io.disconnect(); });
+      this.move = (e: PointerEvent) => {
+        if (e.pointerType !== 'mouse') return;
+        this.target = { x: e.clientX, y: e.clientY };
+        if (first) { pos.x = e.clientX; pos.y = e.clientY; first = false; }
+        if (!frame) frame = raf(tick);
+      };
+      destroyRef.onDestroy(() => cancelRaf(frame));
     });
-  }
-
-  private paint(cMain: Ctx, cPrev: Ctx, cNext: Ctx, dt: number): void {
-    this.t += dt;
-    if (this.opening) { this.openK = clamp(this.openK + this.opening * dt * (this.reduceMotion ? 99 : 2.6)); if (this.openK === 0 || this.openK === 1) this.opening = 0; }
-    const tt = this.reduceMotion ? 1 : this.t, i = this.idx(), n = PROJECTS.length;
-    drawChest(cMain, PROJECTS[i], this.openK, tt);
-    this.sparks = this.sparks.filter((s) => (s.life += dt) < 1);
-    for (const s of this.sparks) { s.x += s.vx; s.y += s.vy; s.vy += 0.02; R(cMain, s.x, s.y - this.openK * 6, 1, 1, s.life < 0.5 ? '#fff0b0' : '#e8b040'); }
-    drawChest(cPrev, PROJECTS[(i + n - 1) % n], 0, tt);
-    drawChest(cNext, PROJECTS[(i + 1) % n], 0, tt);
-  }
-
-  protected toggle(): void { if (!this.turning) this.setOpen(!this.isOpen()); }
-
-  protected closeButton(): void { if (!this.turning) { this.setOpen(false); this.mainBtn().nativeElement.focus(); } }
-
-  protected onKey(e: KeyboardEvent): void {
-    if (e.key === 'ArrowLeft') { e.preventDefault(); void this.go(-1); }
-    if (e.key === 'ArrowRight') { e.preventDefault(); void this.go(1); }
-    if (e.key === 'Escape' && !this.panelRef().nativeElement.hidden) { this.setOpen(false); this.mainBtn().nativeElement.focus(); }
-  }
-
-  protected swipeStart(e: PointerEvent): void { this.swipeX = e.clientX; }
-  protected swipeEnd(e: PointerEvent): void {
-    if (this.swipeX !== null && Math.abs(e.clientX - this.swipeX) > 50) void this.go(e.clientX < this.swipeX ? 1 : -1);
-    this.swipeX = null;
-  }
-
-  private setOpen(on: boolean, keepSpace = false): void {
-    const panel = this.panelRef().nativeElement;
-    this.opening = on ? 1 : -1; this.isOpen.set(on);
-    if (on) {
-      this.shown.set(this.project());
-      for (let i = 0; i < 18; i++) this.sparks.push({ x: 32 + (Math.random() - 0.5) * 30, y: 22, vx: (Math.random() - 0.5) * 0.8, vy: -0.6 - Math.random() * 1.2, life: 0 });
-      setTimeout(() => {
-        if (this.opening >= 0) { panel.hidden = false; panel.style.visibility = ''; panel.classList.remove('in'); void panel.offsetWidth; panel.classList.add('in'); }
-      }, this.reduceMotion ? 0 : 380);
-    } else this.closing = this.closePanel(keepSpace);
-  }
-
-  // o painel recolhe junto com a tampa, em vez de sumir de uma vez
-  private closePanel(keepSpace: boolean): Promise<void> {
-    const panel = this.panelRef().nativeElement;
-    if (panel.hidden) return Promise.resolve();
-    panel.classList.remove('in');
-    const done = () => { if (this.isOpen()) return; if (keepSpace) panel.style.visibility = 'hidden'; else { panel.hidden = true; panel.style.visibility = ''; } };
-    if (this.reduceMotion || !panel.animate) { done(); return Promise.resolve(); }
-    const a = panel.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-34px) scale(0.9)' }], { duration: 360, easing: 'cubic-bezier(.5, 0, .75, 0)' });
-    return a.finished.then(done).catch(done);
-  }
-
-  private lidShut(): Promise<void> {
-    return new Promise((res) => {
-      const t0 = performance.now();
-      const check = () => { if ((this.openK === 0 && this.opening <= 0) || performance.now() - t0 > 1000) res(); else raf(check); };
-      check();
-    });
-  }
-
-  // fechar → deslizar para o lado → abrir: cada etapa espera a anterior terminar
-  protected async go(d: number): Promise<void> {
-    if (this.turning) return;
-    this.turning = true;
-    try {
-      const wasOpen = this.isOpen() || this.opening > 0;
-      if (wasOpen) { this.setOpen(false, true); await Promise.all([this.closing, this.lidShut()]); }
-      const cv = this.mainCv().nativeElement;
-      const sides = [this.prevCv().nativeElement, this.nextCv().nativeElement];
-      const dir = d > 0 ? -1 : 1;
-      const dur = this.reduceMotion || !cv.animate ? 0 : 300;
-      let outs: Animation[] = [];
-      if (dur) {
-        outs = sides.map((c) => c.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${dir * 28}px)` }], { duration: dur, easing: 'ease-in', fill: 'forwards' }));
-        const half = cv.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${dir * 90}px)` }], { duration: dur, easing: 'ease-in', fill: 'forwards' });
-        outs.push(half);
-        await half.finished;
-      }
-      // com o baú fora de cena, troca o projeto: nada de dois projetos ao mesmo tempo
-      this.idx.update((i) => (i + d + PROJECTS.length) % PROJECTS.length);
-      if (dur) {
-        await nextFrame();
-        const back = cv.animate([{ opacity: 0, transform: `translateX(${-dir * 90}px)` }, { opacity: 1, transform: 'none' }], { duration: dur + 80, easing: 'ease-out' });
-        const sideIn = sides.map((c) => c.animate([{ opacity: 0, transform: `translateX(${-dir * 28}px)` }, { opacity: 1, transform: 'none' }], { duration: dur + 80, easing: 'ease-out' }));
-        outs.forEach((a) => a.cancel());
-        await Promise.all([back.finished, ...sideIn.map((a) => a.finished)]);
-      }
-      if (wasOpen) { await new Promise((r) => setTimeout(r, this.reduceMotion ? 0 : 140)); this.setOpen(true); }
-    } finally { this.turning = false; }
   }
 }

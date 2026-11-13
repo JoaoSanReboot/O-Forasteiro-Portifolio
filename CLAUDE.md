@@ -1,6 +1,6 @@
 # Contexto do Projeto
 
-Um Portfólio com estilo de pixel art com temática de velho oeste/cangaço.
+Um portfólio com a temática do velho oeste brasileiro (sertão e cangaço) num design editorial moderno, sem pixel art.
 Site em Angular 22 (`frontend/`, standalone, zoneless, Signals, TS strict, prerender estático) e API .NET 10 (`api/`, Minimal API).
 
 ## Rodar localmente
@@ -26,29 +26,26 @@ O mapa completo (camadas, onde cada funcionalidade mora, padrões) está em `doc
 
 | Caminho | O que é |
 |---|---|
-| `frontend/src/app/engine/` | Pixel art em TS puro, sem Angular: canvas, primitivas, figuras, cenas, elenco e sprite (`heroes/`), áudio (`audio/`), segredos, jogo da velha |
-| `frontend/src/app/core/` | Infraestrutura: plataforma, armazenamento, áudio e o laço das cenas com os contratos `SCENES_ACTIVE`/`SCENE_HOST` |
-| `frontend/src/app/shared/` | `scene-canvas`: o componente que monta uma cena do engine num `<canvas>` |
-| `frontend/src/app/features/` | Uma pasta por funcionalidade: `intro` (abertura, `gate`, `ride/`), `site`, `secrets`, `guide`, `heroes` e as seções `mural`, `projetos`, `trabalhos`, `skills`, `commits`, `formacao`, `saloon`, `duelo` (regras em `duelo/rules/`) |
-| `frontend/src/app/content/` | Textos e dados (projetos, skills, registro guardado da placa) |
-| `frontend/src/styles/` | CSS global, por seção |
-| `frontend/src/environments/` | `githubEndpoint`, `duelMusicUrl`, `skipIntro` |
+| `frontend/src/app/engine/` | TypeScript puro, sem Angular: quadros seguros para SSR (`raf`/`cancelRaf`), matemática e as regras do jogo da memória |
+| `frontend/src/app/core/` | Infraestrutura: plataforma e o estado da rolagem (`ScrollState`) |
+| `frontend/src/app/shared/` | `reveal` (entrada ao rolar), `section-head`, `split` (letras), `ornaments` (SVGs do sertão) e `emblems` (o desenho animado de cada título) |
+| `frontend/src/app/features/` | `intro` (abertura), `site` (casca, barra, rodapé, Lenis), `hero` e as seções `sobre`, `projetos`, `experiencia`, `skills`, `commits` (GitHub), `formacao`, `contato`; os jogos moram dentro das seções: `duelo` (na Experiência), `memoria` (nas Skills) e as moedas de `secrets` |
+| `frontend/src/app/content/` | Textos e dados (perfil, experiência, formação, contatos, projetos, skills, jogos, registro guardado do GitHub) |
+| `frontend/src/styles/` | Tokens, base, movimento e uma parte por seção |
+| `frontend/src/environments/` | `githubEndpoint`, `skipIntro` |
 | `api/` | `Program.cs` compõe; `Infrastructure/` (CORS); `Features/GitHub/` (`GET /api/github/contributions`: serviço, endpoint, cliente GraphQL) e `Features/Health/` |
 | `.github/workflows/` | CI em PR; deploy na main (Static Web Apps + App Service) |
-| `docs/` | Arquitetura, integração com o GitHub e origem/licença das trilhas |
+| `docs/` | Arquitetura e integração com o GitHub |
 
 Dependências só num sentido: `features → shared → core → engine` (`content` é só dado). `npm run lint:arch` confere.
 
 ## Convenções
 
 - Textos da interface e comentários em português do Brasil.
-- Pixel art desenhada em código: cenas em canvas 320 × 150 (`SW`/`SH`), ampliadas em escala inteira; helpers `R`, `O`, `disc`, `limb`, `head`, `torso`, `pixelText`, `tinyText`.
-- Estado que muda a cada quadro fica em objetos comuns; Signals só para o que a interface mostra.
-- O código também roda no Node (prerender e SSR do `ng serve`): nada de `window`, `document`, armazenamento, áudio ou canvas fora do navegador.
-  Animações começam em `afterNextRender`; quadros usam `raf`/`cancelRaf` de `engine/core/browser.ts`; cleanups no construtor só com `PlatformService.isBrowser`.
-- Respeitar `prefers-reduced-motion` e manter foco visível nos controles.
+- Visual "caatinga ao meio-dia": cores, fontes e curvas só pelos tokens de `src/styles/_tokens.scss`. Títulos de seção com `<header appSectionHead>`: tipo de madeira (Ultra) com a tinta da prensa (`filter: url(#tinta)`), o fim em itálico serifado e um `emblem` que desenha o título; ornamentos do sertão por `shared/ornaments`. Rye só em rótulos curtos. Nada de pixel art.
+- Movimento: entradas com `appReveal` (+ `revealDelay`), o topo espera `html.ready`, efeitos de rolagem leem `--sy`/`--progress` ou usam `animation-timeline: view()`. Sempre respeitar "reduzir movimento" e deixar o conteúdo visível sem JavaScript (o que esconde para animar depende de `html.js`).
+- Estado que muda a cada quadro fica fora dos Signals (estilo ou variável CSS direto no elemento); Signals só para o que a interface mostra.
+- O código também roda no Node (prerender e SSR do `ng serve`): nada de `window`, `document` ou armazenamento fora do navegador.
+  Animações começam em `afterNextRender`; quadros usam `raf`/`cancelRaf` de `engine/core/browser.ts`; cleanups com `DestroyRef`.
+- Manter foco visível nos controles; links externos com `target="_blank" rel="noopener"` e o aviso "(abre em outra aba)".
 - Segredos (token do GitHub) nunca no repositório: user-secrets em desenvolvimento, configuração do App Service em produção.
-
-## Ganchos de depuração (build de desenvolvimento)
-
-`vilaSeek(cena, t)`, `vilaTime(cena)` e `VilaAudio.state` no console.

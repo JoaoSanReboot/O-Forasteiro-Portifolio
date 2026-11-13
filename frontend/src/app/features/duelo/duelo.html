@@ -1,50 +1,179 @@
-<div class="wrap">
-  <div class="sector-top">
-    <header class="sector-head">
-      <p class="kicker">Fim da linha</p>
-      <h2 id="t-duelo">Duelo<span class="dot">.</span></h2>
-      <p class="lead">Dizem que ele é o dev mais rápido do Oeste. Se quiser descobrir, ele está esperando encostado no mourão.</p>
-    </header>
-    <figure appScene="fimdarua" id="duel-scene" #sceneFig [class.armed]="armed()" (pointerdown)="scenePress($event)">
-      <div class="stamp-slot">
-        <p class="stamp" id="d-stamp" [hidden]="!stamp()" [class.win]="stamp()?.ok">{{ stamp()?.text }}</p>
-      </div>
-      <button type="button" class="say" #invite [hidden]="inviteHidden()" aria-label="O João desafia você para um duelo. Ir para as regras do duelo" (click)="goToRules()">Topa um duelo?</button>
-    </figure>
-  </div>
-  <div class="duel" id="duel" #duel>
-    <div class="duel-intro" id="duel-intro" [hidden]="view() !== 'intro'">
-      <h3>Regras</h3>
-      <p class="duel-weapon" id="d-weapon">{{ weaponLine() }}</p>
-      <ol class="rules" id="d-rules">
-        @for (r of kit().rules; track $index) { <li [innerHTML]="r"></li> }
-      </ol>
-      <p class="rules-note" id="d-bonus">{{ bonus() }}</p>
-      <fieldset class="levels">
-        <legend>Dificuldade</legend>
-        @for (id of levelIds; track id) {
-          <label><input type="radio" name="nivel" [value]="id" [checked]="level() === id" (change)="level.set(id)"><span><b>{{ levels[id].name }}</b></span></label>
-        }
-      </fieldset>
-      <div class="duel-actions">
-        <button type="button" class="s-btn" id="duel-start" #startBtn (click)="start()">Aceitar o duelo</button>
-        <span class="duel-best" id="d-best">{{ best() }}</span>
-      </div>
-    </div>
-    <div class="duel-play" id="duel-play" [hidden]="view() !== 'play'">
-      <div class="duel-score"><span>Rodada <b id="d-round">{{ score().round }}</b> · <span id="d-level">{{ levels[playing].name }}</span></span><span>Você <b id="d-you">{{ score().you }}</b> × <b id="d-joao">{{ score().joao }}</b> João</span></div>
-      <p class="duel-call" [class]="'duel-call' + (call().cls ? ' ' + call().cls : '')" id="d-call" aria-live="assertive">{{ call().text }}</p>
-      <div class="reflex" id="reflex" #bar aria-hidden="true"><div class="r-zones" id="r-zones" #zonesBox></div><span class="r-fill" id="r-fill" #fill></span><span class="r-marker" id="r-marker" #marker></span></div>
-      <div class="fire-row">
-        <button type="button" class="s-btn fire-btn" id="d-fire" [hidden]="fireHidden()" [disabled]="fireDisabled()" (pointerdown)="firePointer($event)" (click)="fireClick($event)">{{ fireLabel() }}</button>
-        <button type="button" class="s-btn" id="d-next" #next [hidden]="nextHidden()" (click)="nextClick()">{{ nextLabel() }}</button>
-      </div>
-      <p class="duel-why" id="d-why" aria-live="polite">{{ why() }}</p>
-    </div>
-    <div class="duel-end" id="duel-end" [hidden]="view() !== 'end'">
-      <h3 id="d-end-title">{{ endTitle() }}</h3>
-      <p id="d-end-text">{{ endText() }}</p>
-      <div class="duel-actions"><button type="button" class="s-btn" id="d-again" #again (click)="backToRules()">Duelar de novo</button></div>
-    </div>
+<header class="game-head">
+  <p class="game-kicker">Jogo · os problemas que eu já resolvi</p>
+  <h3 class="game-title" id="duelo-t">Duelo <em>ao meio-dia</em></h3>
+  <p class="game-score" aria-live="polite">
+    @if (phase() !== 'menu') { Presos <b>{{ caught() }}</b> de {{ bandits.length }} · Chapéus <b>{{ lives() }}</b> }
+    @else { Cada um virou bandido de cartaz. Prenda os {{ bandits.length }}. }
+  </p>
+</header>
+
+<!-- os cartazes: o problema de verdade; preso, ganha o carimbo com o depois e como foi -->
+<ol class="wanted" aria-label="Bandidos procurados">
+  @for (b of bandits; track b.alias; let i = $index) {
+    <li class="wanted-card" [class.caught]="i < caught()" [class.now]="playing() && i === caught()">
+      <span class="wc-head">Procura-se</span>
+      <b class="wc-alias">{{ b.alias }}</b>
+      <span class="wc-crime">{{ b.crime }} · <s>{{ b.before }}</s></span>
+      @if (i < caught()) {
+        <span class="wc-stamp">Preso · {{ b.after }}</span>
+        <span class="wc-how">{{ b.how }} <i>{{ b.org }}</i></span>
+      }
+    </li>
+  }
+</ol>
+
+<!-- o palco: clicar (ou tocar) nele também saca -->
+<div class="duel-stage" #stage
+  [class]="'duel-stage ph-' + phase() + ' w-' + weapon() + (outcome() ? ' out-' + outcome() : '')"
+  [class.ring]="ringing()" [class.spin]="spinning()" [class.cocked]="isCocked()"
+  (pointerdown)="playing() && down(); $event.button === 0 && playing() && $event.preventDefault()"
+  (pointerup)="up()" (pointerleave)="up()" (pointercancel)="up()">
+  <svg class="duel-scene" viewBox="0 0 800 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="duel-sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f3e2bd" /><stop offset="1" stop-color="#e8b765" />
+      </linearGradient>
+    </defs>
+    <rect width="800" height="300" fill="url(#duel-sky)" />
+    <circle cx="400" cy="180" r="96" class="ds-sun" />
+
+    <!-- o fundo do terreiro: a capela caiada, a casa de taipa e o xique-xique -->
+    <g class="ds-far">
+      <path d="M150 266 V196 L178 172 L206 196 V266 Z M170 266 V232 Q178 222 186 232 V266" />
+      <path d="M178 172 V150 M171 158 H185" class="ds-far-line" />
+      <path d="M604 266 V214 H672 V266 Z M596 216 L638 194 L680 216" />
+      <path d="M622 266 V238 H638 V266" class="ds-door" />
+    </g>
+    <g class="ds-cactus" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M92 266 V178 M89 220 H78 Q72 220 72 214 V196 M95 206 H106 Q112 206 112 200 V186" stroke-width="11" />
+      <path d="M722 266 V204 M719 236 H710 Q705 236 705 231 V218 M725 226 H734 Q739 226 739 221 V212" stroke-width="9" />
+      <path d="M248 266 v-14 m-7 14 v-9 m14 9 v-11 M560 266 v-12 m-6 12 v-8 m12 8 v-10" stroke-width="5" />
+    </g>
+
+    <!-- o sino, no meio da rua -->
+    <path d="M400 266 V62 M378 62 H422" class="ds-post" />
+    <g transform="translate(400 66)">
+      <g class="bell">
+        <path d="M-15 28 Q-15 3 0 0 Q15 3 15 28 Z" />
+        <circle cx="0" cy="31" r="4" />
+      </g>
+      <g class="bell-waves"><path d="M-26 6 Q-34 18 -26 30 M26 6 Q34 18 26 30 M-36 0 Q-46 18 -36 36 M36 0 Q46 18 36 36" /></g>
+    </g>
+    <path d="M0 266 H800 V300 H0 Z" class="ds-ground" />
+    <!-- o chão rachado da seca -->
+    <path d="M40 278 l22 6 l14 -4 l18 9 M160 284 l20 -5 l12 8 M300 280 l16 7 l20 -3 M470 286 l18 -6 l16 5 l12 -7 M620 280 l20 8 l18 -5 M720 288 l24 -6" class="ds-cracks" />
+
+    <!-- o laço voando e o rolo atirado -->
+    <path class="rope" d="M276 104 Q400 50 542 150" pathLength="100" />
+    <g transform="translate(276 110)"><g class="pin-fly"><rect x="-16" y="-4" width="32" height="8" rx="4" /><path d="M-22 0 H-16 M16 0 H22" /></g></g>
+
+    <!-- você, de chapéu de vaqueiro -->
+    <g class="duelist you" transform="translate(250 0)">
+      <ellipse cx="0" cy="266" rx="34" ry="5" class="d-shadow" />
+      <path d="M-10 264 L-6 206 M12 264 L8 206" class="d-limb" stroke-width="11" />
+      <path d="M-22 210 L-18 150 Q0 138 18 150 L22 210 Z" class="d-ink" />
+      <rect x="-21" y="196" width="42" height="6" class="d-belt" />
+      <path d="M-9 142 L9 142 L0 154 Z" class="d-scarf" />
+      <circle cx="0" cy="126" r="14" class="d-ink" />
+      <g transform="translate(-14 152)"><g class="arm arm-2">
+        <path d="M0 0 L12 44" class="d-limb" stroke-width="9" />
+        <path d="M12 44 L17 62" class="d-gun" /><circle cx="12.5" cy="50" r="3.6" class="d-ink" />
+        <circle cx="18" cy="66" r="8" class="flash" />
+      </g></g>
+      <g transform="translate(14 152)"><g class="arm arm-1">
+        <path d="M0 0 L12 44" class="d-limb" stroke-width="9" />
+        <g class="g-revolver"><path d="M12 44 L17 62" class="d-gun" /><circle cx="12.5" cy="50" r="3.6" class="d-ink" /></g>
+        <g class="g-rifle"><path d="M6 22 L22 84" class="d-gun" stroke-width="5" /><path d="M6 22 L2 12" class="d-wood" stroke-width="8" /></g>
+        <g class="g-pin"><path d="M2 47 L24 41" class="d-wood" stroke-width="8" /><path d="M-3 48 L2 47 M24 41 L29 40" class="d-limb" stroke-width="3" /></g>
+        <g class="g-lasso" transform="translate(12 46)"><g class="loop"><ellipse rx="20" ry="7" class="d-rope" /></g></g>
+        <circle cx="18" cy="66" r="8" class="flash" />
+      </g></g>
+      <g transform="translate(0 110)"><g class="hat">
+        <ellipse cx="0" cy="4" rx="27" ry="5" class="d-ink" />
+        <path d="M-12 4 Q-13 -14 0 -14 Q13 -14 12 4 Z" class="d-couro" />
+        <rect x="-12" y="-2" width="24" height="3" class="d-ink" />
+      </g></g>
+    </g>
+
+    <!-- o bandido, de frente para você: cangaceiro de chapéu meia-lua -->
+    <g class="duelist bandit" transform="translate(550 0) scale(-1 1)">
+      <ellipse cx="0" cy="266" rx="34" ry="5" class="d-shadow" />
+      <path d="M-10 264 L-6 206 M12 264 L8 206" class="d-limb" stroke-width="11" />
+      <path d="M-22 210 L-18 150 Q0 138 18 150 L22 210 Z" class="d-ink" />
+      <path d="M-21 168 L21 196 M-21 196 L21 168" class="d-strap" />
+      <rect x="-21" y="196" width="42" height="6" class="d-belt" />
+      <circle cx="0" cy="126" r="14" class="d-ink" />
+      <path d="M-16 152 L-24 196" class="d-limb" stroke-width="9" />
+      <g transform="translate(14 152)"><g class="arm arm-1">
+        <path d="M0 0 L12 44" class="d-limb" stroke-width="9" />
+        <path d="M12 44 L17 62" class="d-gun" /><circle cx="12.5" cy="50" r="3.6" class="d-ink" />
+        <circle cx="18" cy="66" r="8" class="flash" />
+      </g></g>
+      <g transform="translate(0 108)"><g class="hat">
+        <path d="M-15 0 C-15 -12 -9 -18 0 -18 C9 -18 15 -12 15 0 Z" class="d-couro" />
+        <path d="M-28 -12 C-18 10 18 10 28 -12 C18 14 -18 14 -28 -12 Z" class="d-ink" />
+        <path d="M-24 -20 C-16 8 16 8 24 -20 C18 2 -18 2 -24 -20 Z" class="d-ink" />
+        <polygon points="0,-13 1.8,-8.6 6.4,-8.6 2.7,-5.8 4.1,-1.3 0,-4 -4.1,-1.3 -2.7,-5.8 -6.4,-8.6 -1.8,-8.6" class="d-star" />
+      </g></g>
+    </g>
+  </svg>
+
+  <div class="duel-hud">
+    @switch (phase()) {
+      @case ('menu') { <p class="duel-call duel-call-sm"><b>{{ current().alias }}</b> te espera no terreiro.</p> }
+      @case ('waiting') { <p class="duel-call duel-call-sm"><b>{{ current().alias }}</b> encara. Espere o sino...</p> }
+      @case ('draw') { <p class="duel-call">{{ kit().call }}</p> }
+      @case ('end') {
+        @if (end(); as e) { <p class="duel-stamp" [class.bad]="!e.won"><b>{{ e.won ? 'Sertão em paz' : 'Fugiram' }}</b><span>{{ e.summary }}</span></p> }
+      }
+    }
+    @if (stamp(); as s) { <p class="duel-stamp" [class.bad]="!s.good"><b>{{ s.title }}</b><span>{{ s.why }}</span></p> }
+    @if (bluff()) { <p class="duel-bluff">{{ bluff() }}</p> }
   </div>
 </div>
+
+@if (phase() === 'menu' || phase() === 'end') {
+  <div class="duel-setup">
+    <fieldset class="pick">
+      <legend>Arma</legend>
+      <div class="pick-row">
+        @for (w of weapons; track w.id) {
+          <label class="pick-chip"><input type="radio" name="duel-weapon" [value]="w.id" [checked]="weapon() === w.id" (change)="weapon.set(w.id)"><span>{{ w.label }}</span></label>
+        }
+      </div>
+    </fieldset>
+    <p class="duel-how">Espere o sino. {{ kit().aim }}</p>
+    <div class="duel-foot">
+      <button type="button" class="btn" (click)="start()">{{ end() ? 'Revanche' : 'Começar o duelo' }} <span class="btn-arrow" aria-hidden="true">→</span></button>
+      <p class="duel-gun" [class.on]="secrets.gun()">
+        <span class="purse" aria-hidden="true">
+          @for (c of coins; track c; let i = $index) {
+            <svg viewBox="0 0 40 40" [class.got]="i < secrets.count()" focusable="false"><circle cx="20" cy="20" r="18" class="coin-edge" /><circle cx="20" cy="20" r="14.5" class="coin-face" /></svg>
+          }
+        </span>
+        @if (secrets.gun()) { <span><b>Revólver aprimorado no coldre:</b> a faixa vermelha também vale.</span> }
+        @else { <span>{{ secrets.count() }} de {{ secrets.total }} moedas escondidas pelo site. Todas liberam o <b>revólver aprimorado</b>.</span> }
+        @if (secrets.count() > 0) { <button type="button" class="link-btn" (click)="secrets.reset()">esconder de novo</button> }
+      </p>
+    </div>
+  </div>
+} @else {
+  <div class="duel-play">
+    <div class="duel-bar" #bar [class.meter]="meter()" aria-hidden="true">
+      @for (z of zones(); track $index) {
+        <span class="zone" [class.hit]="z.hit" [class.gun]="secrets.gun()" [style.left.%]="z.s" [style.width.%]="z.w">
+          <i [style.left.%]="(z.w - z.p) / 2 / z.w * 100" [style.width.%]="z.p / z.w * 100"></i>
+        </span>
+      }
+      <span class="fill"></span>
+      <span class="mark" #marker [class.on]="markerOn()"></span>
+    </div>
+    <div class="duel-controls">
+      <button type="button" class="btn duel-action" [class.armed]="phase() === 'draw'" [disabled]="phase() === 'result'"
+        (pointerdown)="down(); $event.preventDefault()" (pointerup)="up()" (pointerleave)="up()" (pointercancel)="up()"
+        (keydown.enter)="down()" (keyup.enter)="up()" (keydown.space)="$event.preventDefault()" (keyup.space)="$event.preventDefault()">{{ actionLabel() }}</button>
+      <p class="duel-hint">{{ hint() }} <kbd>Espaço</kbd> também vale.</p>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="quit()">Desistir</button>
+    </div>
+  </div>
+}

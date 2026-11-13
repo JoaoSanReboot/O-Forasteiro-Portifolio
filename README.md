@@ -1,24 +1,24 @@
 # Em Busca do Forasteiro — portfólio de João Pedro
 
-Portfólio em pixel art com temática de velho oeste/cangaço.
+Portfólio com a alma do velho oeste brasileiro (sertão e cangaço) num design editorial moderno.
 
 ## Stack: `frontend/` (Angular 22) e `api/` (.NET 10)
 
 Requisitos: .NET SDK 10 (veja `global.json`) e Node 22.22+ ou 24.15+.
 
 ```bash
-# API em http://localhost:5080 (serve a placa do GitHub em /api/github/contributions)
-dotnet user-secrets set "GitHub:Token" "<seu token>" --project api   # uma vez; sem token a placa responde 503
+# API em http://localhost:5080 (serve a seção GitHub em /api/github/contributions)
+dotnet user-secrets set "GitHub:Token" "<seu token>" --project api   # uma vez; sem token a API responde 503
 dotnet run --project api
 
-# site em http://localhost:4200 (em desenvolvimento a placa já aponta para a API local)
+# site em http://localhost:4200 (em desenvolvimento a seção GitHub já aponta para a API local)
 cd frontend
 npm ci
 npm start
 ```
 
 O token **não** fica em nenhum arquivo do repositório: em desenvolvimento vai nos user-secrets (`UserSecretsId` = `forasteiro-api`),
-em produção na configuração do App Service. Detalhes do endpoint, das chaves e do comportamento da placa em `docs/INTEGRACAO-GITHUB.md`.
+em produção na configuração do App Service. Detalhes do endpoint, das chaves e do comportamento da seção GitHub em `docs/INTEGRACAO-GITHUB.md`.
 
 Testes e build:
 
@@ -47,7 +47,7 @@ O que configurar no GitHub (Settings → Secrets and variables → Actions):
 | Variable | `AZURE_WEBAPP_NAME` | nome do App Service da API |
 
 E no App Service (Environment variables): `GitHub__Token`, `Cors__AllowedOrigins__0` (URL do site) e, se quiser, `GitHub__Login`.
-Para a placa usar a API publicada, troque `githubEndpoint` em `frontend/src/environments/environment.ts` pela URL dela.
+Para a seção GitHub usar a API publicada, troque `githubEndpoint` em `frontend/src/environments/environment.ts` pela URL dela.
 
 ## Configuração do site
 
@@ -55,15 +55,20 @@ Em `frontend/src/environments/` (`environment.ts` em produção, `environment.de
 
 | Campo | O que faz |
 |---|---|
-| `githubEndpoint` | URL da API da placa do GitHub; `null` mostra o registro guardado |
-| `duelMusicUrl` | faixa licenciada para o duelo; `null` mantém a trilha sintetizada (veja `docs/AUDIO-LICENCAS.md`) |
-| `skipIntro` | pula a abertura e entra direto no mural (atalho de desenvolvimento; desligado por padrão) |
+| `githubEndpoint` | URL da API da seção GitHub; `null` mostra o registro guardado |
+| `skipIntro` | pula a abertura e entra direto no site (atalho de desenvolvimento; desligado por padrão) |
 
-## Persistência
+## Abertura e movimento
 
-Moedas, revólver, segredo do Saloon, personagem escolhido, som e recordes do duelo ficam no `localStorage`
-(chaves `vila-*`). A abertura não é lembrada: toda visita começa na tela inicial.
+Toda visita começa na abertura (uns 3 segundos; dá para pular com um clique, Enter ou Esc). "Rever a abertura" fica no rodapé.
+Com "reduzir movimento" ligado no sistema, a abertura é pulada e as animações ficam paradas.
 
-## Ganchos de depuração (build de desenvolvimento)
+## Jogos dentro das seções
 
-`vilaSeek(cena, t)`, `vilaTime(cena)` e `VilaAudio.state` no console.
+Os jogos contam o próprio portfólio (dados em `src/app/content/jogos.ts`):
+
+- **Duelo ao meio-dia** (fim da Experiência): cada problema que resolvi virou um bandido de cartaz ("Sessenta Segundos", o grid de contratos lento).
+  Espere o sino e acerte a faixa da barra (cinco armas; `Espaço` também saca): o bandido vai preso e o cartaz mostra o antes, o depois e como foi. Errou, ele foge e você perde um dos três chapéus.
+- **Cordel da memória** (fim das Skills): cada par junta uma ferramenta ao lugar onde ela trabalhou de verdade.
+- **Moedas escondidas** pelas seções: cada uma conta um causo meu e, juntas, liberam o revólver aprimorado no duelo.
+  O site só guarda no navegador as moedas achadas (`localStorage`, chave `forasteiro-moedas`); "esconder de novo" zera.

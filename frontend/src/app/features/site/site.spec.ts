@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { installFakeCanvas } from '../../../testing/fake-canvas';
+import { CONTACTS, EMAIL, JOBS } from '../../content/profile';
+import { PROJECTS } from '../../content/projects';
+import { SKILL_SHELVES } from '../../content/skills';
+import { words } from '../sobre/sobre';
 import { Site } from './site';
 
 describe('Site', () => {
-  beforeAll(installFakeCanvas);
-
   async function render() {
     await TestBed.configureTestingModule({ imports: [Site] }).compileComponents();
     const fixture = TestBed.createComponent(Site);
@@ -13,18 +14,37 @@ describe('Site', () => {
   }
   const click = async (fixture: { whenStable(): Promise<unknown> }, b: Element | null | undefined) => { (b as HTMLElement).click(); await fixture.whenStable(); };
 
-  it('monta as seções na ordem, cada uma com a sua cena', async () => {
+  it('monta o topo e as seções na ordem, sem nenhum canvas de pixel art', async () => {
     const { el } = await render();
-    expect([...el.querySelectorAll('main > section')].map((s) => s.id)).toEqual(['procurado', 'projetos', 'trabalhos', 'skills', 'commits', 'formacao', 'saloon', 'duelo']);
-    expect([...el.querySelectorAll('figure.scene')].map((f) => f.getAttribute('data-scene'))).toEqual(['ferraria', 'delegacia', 'armeiro', 'telegrafo', 'escola', 'saloon', 'fimdarua']);
-    expect(el.querySelectorAll('.flyer')).toHaveLength(6);
-    expect(el.querySelector<HTMLImageElement>('.p-photo img')?.getAttribute('src')).toBe('assets/retrato-cartaz.png');
+    expect([...el.querySelectorAll('main > section')].map((s) => s.id)).toEqual(['inicio', 'sobre', 'projetos', 'experiencia', 'skills', 'github', 'formacao', 'contato']);
+    expect(el.querySelectorAll('canvas')).toHaveLength(0);
+    expect(el.querySelector('#hero-title')?.textContent).toContain('João');
+    expect(el.querySelector('.poster img')?.getAttribute('src')).toBe('assets/retrato-cartaz.png');
+    expect(el.querySelector('.poster-head')?.textContent).toBe('Procura-se');
+    // as faixas com as ferramentas saíram do topo
+    expect(el.querySelector('.bands, .band')).toBeNull();
   });
 
-  it('a barra de navegação aponta para as seções e o menu do celular abre e fecha', async () => {
+  it('os jogos moram dentro das seções: o duelo na Experiência e a memória nas Skills', async () => {
+    const { el } = await render();
+    expect(el.querySelector('#experiencia #duelo')).not.toBeNull();
+    expect(el.querySelector('#skills #memoria')).not.toBeNull();
+    expect(el.querySelector('#saloon')).toBeNull();
+  });
+
+  it('cada título tem o emblema que o desenha e a tinta da prensa existe', async () => {
+    const { el } = await render();
+    const emblems = [...el.querySelectorAll('main > section')].slice(1).map((s) => s.querySelector('.sh-emblem')?.getAttribute('data-em'));
+    expect(emblems).toEqual(['chapeu', 'ferro', 'rastros', 'peixeiras', 'telegrafo', 'candeeiro', 'fogueira']);
+    for (const e of el.querySelectorAll('.sh-emblem')) expect(e.getAttribute('aria-hidden')).toBe('true');
+    expect(el.querySelector('filter#tinta')).not.toBeNull();
+    expect(el.querySelector('#t-experiencia')?.textContent).toContain('Rastros pelo');
+  });
+
+  it('a barra aponta para seções que existem e o menu do celular abre e fecha', async () => {
     const { fixture, el } = await render();
     const ids = [...el.querySelectorAll<HTMLAnchorElement>('.nav-links a')].map((a) => a.getAttribute('href'));
-    expect(ids).toEqual(['#procurado', '#projetos', '#trabalhos', '#skills', '#commits', '#formacao', '#duelo', '#saloon']);
+    expect(ids).toEqual(['#sobre', '#projetos', '#experiencia', '#skills', '#github', '#formacao', '#contato']);
     for (const id of ids) expect(el.querySelector(id!)).not.toBeNull();
     const menu = el.querySelector('.nav-menu')!;
     expect(menu.getAttribute('aria-expanded')).toBe('false');
@@ -35,73 +55,43 @@ describe('Site', () => {
     expect(menu.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('baús: abre, mostra o projeto e troca com as setas', async () => {
-    const { fixture, el } = await render();
-    const main = el.querySelector('#chest-main')!;
-    expect(el.querySelector('#chest-name')?.textContent).toBe('Ukra');
-    expect(main.getAttribute('aria-label')).toBe('Abrir o baú: Ukra');
-    await click(fixture, main);
-    expect(main.getAttribute('aria-expanded')).toBe('true');
-    expect(el.querySelector('#cp-title')?.textContent).toBe('Totem e Gestão de Pedidos');
-    expect(el.querySelector('#chest-hint')?.textContent).toBe('Toque de novo para fechar');
-    await click(fixture, el.querySelector('#chest-prev'));
-    await new Promise((r) => setTimeout(r, 50));
-    await fixture.whenStable();
-    expect(el.querySelector('#chest-name')?.textContent).toBe('José, o Jogo');
+  it('a frase do Sobre vira palavras, com os trechos marcados em itálico', () => {
+    const w = words('Sou dev no *.NET*. Trabalho *do banco à tela*: APIs.');
+    expect(w.map((x) => x.parts.map((p) => p.t).join(''))).toEqual(['Sou', 'dev', 'no', '.NET.', 'Trabalho', 'do', 'banco', 'à', 'tela:', 'APIs.']);
+    expect(w[3].parts).toEqual([{ t: '.NET', em: true }, { t: '.', em: false }]);
+    expect(w.slice(5, 9).every((x) => x.parts[0].em)).toBe(true);
+    expect(w[8].parts[1]).toEqual({ t: ':', em: false });
   });
 
-  it('fichas: só uma aberta por vez', async () => {
+  it('projetos: uma linha por projeto, cada uma levando ao projeto em outra aba', async () => {
     const { el } = await render();
-    const [a, b] = [...el.querySelectorAll<HTMLDetailsElement>('#trabalhos details')];
-    a.open = true; a.dispatchEvent(new Event('toggle'));
-    b.open = true; b.dispatchEvent(new Event('toggle'));
-    expect([a.open, b.open]).toEqual([false, true]);
+    const links = [...el.querySelectorAll<HTMLAnchorElement>('.work-link')];
+    expect(links.map((a) => a.querySelector('.work-name')?.textContent)).toEqual(PROJECTS.map((p) => p.name));
+    expect(links.map((a) => a.getAttribute('href'))).toEqual(PROJECTS.map((p) => p.href));
+    expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
+    expect(el.querySelector('.work .tag')?.textContent).toBe('Em desenvolvimento');
   });
 
-  it('placa: um botão por dia do registro e a legenda do período', async () => {
+  it('experiência, skills e formação trazem todo o conteúdo', async () => {
     const { el } = await render();
-    expect(el.querySelectorAll('#heat button')).toHaveLength(366);
-    expect(el.querySelectorAll('#heat button.l1, #heat button.l2, #heat button.l3')).toHaveLength(15);
-    expect([...el.querySelectorAll('.heat-legend span')].map((s) => s.textContent?.trim())).toEqual(['out 2025', 'out 2026']);
-    expect(el.querySelector('#heat-status')?.textContent).toContain('ainda não configurada');
+    expect([...el.querySelectorAll('.job-org')].map((o) => o.textContent)).toEqual(JOBS.map((j) => `${j.org} · ${j.mode}`));
+    expect(el.querySelectorAll('.job-bullets li')).toHaveLength(JOBS.reduce((n, j) => n + j.bullets.length, 0));
+    expect([...el.querySelectorAll('.job-bullets strong')].map((s) => s.textContent)).toContain('60 s para 4 s');
+    expect(el.querySelectorAll('.kit-list li')).toHaveLength(SKILL_SHELVES.reduce((n, s) => n + s.items.length, 0));
+    expect([...el.querySelectorAll('.course h3')].map((h) => h.textContent)).toEqual(['Bacharelado em Engenharia de Software', 'Técnico em Desenvolvimento de Sistemas', 'Inglês intermediário']);
+    expect(el.querySelector('.course-inst')?.textContent).toContain('fev 2024 — abr 2028 (previsão)');
   });
 
-  it('jogo da velha: abre pelo convite, joga e conta o placar', async () => {
+  it('contato: copia o e-mail e lista os perfis', async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     const { fixture, el } = await render();
-    const panel = el.querySelector<HTMLElement>('#velha-panel')!;
-    expect(panel.hidden).toBe(true);
-    await click(fixture, el.querySelector('.say'));
-    expect(panel.hidden).toBe(false);
-    const cells = () => [...el.querySelectorAll<HTMLButtonElement>('#velha button')];
-    await click(fixture, cells()[0]);
-    expect(cells()[0].getAttribute('aria-label')).toBe('Linha 1, coluna 1: sua bala');
-    expect(cells()[4].getAttribute('aria-label')).toBe('Linha 2, coluna 2: ferradura');
-    expect(el.querySelector('#velha-msg')?.textContent).toBe('Sua vez.');
-    await click(fixture, el.querySelector('#velha-close'));
-    expect(panel.hidden).toBe(true);
-  });
-
-  it('duelo: as regras seguem o personagem e mexer antes do sino perde a rodada', async () => {
-    const { fixture, el } = await render();
-    expect(el.querySelector('#d-weapon')?.textContent).toBe('Pistoleiro clássico · arma: revólver');
-    expect(el.querySelectorAll('#d-rules li')).toHaveLength(4);
-    await click(fixture, el.querySelector('#duel-start'));
-    expect(el.querySelector<HTMLElement>('#duel-play')?.hidden).toBe(false);
-    expect(el.querySelector('#d-call')?.textContent).toBe('Preparar...');
-    el.querySelector('#d-fire')!.dispatchEvent(new Event('pointerdown'));
+    expect(el.querySelector('#email')?.getAttribute('href')).toBe('mailto:' + EMAIL);
+    await click(fixture, el.querySelector('#copy-email'));
     await fixture.whenStable();
-    expect(el.querySelector('#d-call')?.textContent).toBe('Desclassificado!');
-    expect(el.querySelector('#d-stamp')?.textContent?.trim()).toBe('Antes do sino!');
-    expect(el.querySelector('#d-joao')?.textContent).toBe('1');
-  });
-
-  it('rodapé: reiniciar os segredos pede confirmação ao xerife', async () => {
-    const { fixture, el } = await render();
-    expect(el.querySelector('#secrets-count')?.textContent).toMatch(/^\d\/9$/);
-    await click(fixture, el.querySelector('#reset-secrets'));
-    expect(el.querySelector('#guide-text')?.textContent).toContain('esconda tudo de novo');
-    await click(fixture, el.querySelector('#guide-actions .s-btn'));
-    expect(el.querySelector('#guide-text')?.textContent).toContain('Escondi tudo de novo');
-    expect(el.querySelector('#secrets-count')?.textContent).toBe('0/9');
+    expect(writeText).toHaveBeenCalledWith(EMAIL);
+    expect(el.querySelector('#copy-email')?.textContent).toContain('Copiado');
+    expect(el.querySelector('#copy-msg')?.textContent).toBe('E-mail copiado.');
+    expect([...el.querySelectorAll<HTMLAnchorElement>('.link-row')].map((a) => a.href)).toEqual(CONTACTS.map((c) => c.href));
   });
 });

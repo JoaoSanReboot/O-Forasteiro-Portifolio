@@ -1,5 +1,5 @@
 // Registro guardado das contribuições (outubro de 2026): só o nível de cada dia, sem a contagem exata.
-// A placa mostra isto enquanto a integração ao vivo (fase 5) não responde.
+// A seção GitHub mostra isto enquanto a integração ao vivo não responde.
 
 export interface HeatDay {
   date: string;
