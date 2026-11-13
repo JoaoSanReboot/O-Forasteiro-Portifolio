@@ -1,31 +1,34 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { PROFILE } from '../../../content/profile';
+import { Chapeu } from '../../../shared/ornaments/ornaments';
 import { IntroService } from '../../intro/intro.service';
-import { SecretsService } from '../../secrets/secrets.service';
+import { Coin } from '../../secrets/coin';
 
-// O rodapé: assinatura, os perfis, reiniciar os segredos (com a confirmação do xerife) e rever a chegada
+// O rodapé: assinatura, voltar ao topo, rever a abertura e o nome gigante cortado no pé da página.
 @Component({
   selector: 'footer[appSiteFooter]',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Chapeu, Coin],
+  host: { class: 'foot' },
   template: `
     <div class="wrap">
-      <div class="foot-brand">
-        <p class="foot-name">João Pedro Santana Rosa</p>
-        <p class="foot-role">Desenvolvedor FullStack · .NET · São José dos Pinhais, PR</p>
-        <ul class="foot-links" aria-label="Perfis">
-          <li><a href="https://github.com/JoaoSanReboot" target="_blank" rel="noopener">GitHub ↗</a></li>
-          <li><a href="https://www.linkedin.com/in/joaopedro-santanarosa" target="_blank" rel="noopener">LinkedIn ↗</a></li>
-          <li><a href="#saloon">Contato</a></li>
-        </ul>
-        <p class="foot-made">© 2026 · Pixel art desenhada em código, com Angular e .NET.</p>
+      <div class="foot-top">
+        <div class="foot-sign">
+          <svg appChapeu class="foot-hat"></svg>
+          <p><b>{{ p.fullName }}</b><span>{{ p.role }} · {{ p.stack }} — {{ p.location }}</span></p>
+        </div>
+        <div class="foot-actions">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="intro.replay()">Rever a abertura</button>
+          <a class="btn btn-ghost btn-sm" href="#inicio">Voltar ao topo <span class="btn-arrow" aria-hidden="true">↑</span></a>
+        </div>
       </div>
-      <div class="foot-actions">
-        <button type="button" class="s-btn alt" id="reset-secrets" (click)="secrets.askReset()">Reiniciar segredos</button>
-        <button type="button" class="s-btn alt site-replay" (click)="intro.replay()">Rever a chegada</button>
-      </div>
+      <p class="foot-word" aria-hidden="true">Forasteiro</p>
+      <app-coin coin="rodape" class="coin-rodape" />
+      <p class="foot-small"><span>© 2026 · Feito à mão com Angular e .NET</span><span>Sertão de cordel, código de agora.</span></p>
     </div>
   `,
 })
 export class SiteFooter {
   protected readonly intro = inject(IntroService);
-  protected readonly secrets = inject(SecretsService);
+  protected readonly p = PROFILE;
 }

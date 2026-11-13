@@ -1,0 +1,48 @@
+/* 01 · Sobre: a ficha presa à esquerda, a frase grande acendendo palavra por palavra (--p, de 0 a 1,
+   vem do componente; sem ele tudo fica aceso) e os números do que já foi entregue. */
+.sobre-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 3fr) 9fr;
+  gap: clamp(32px, 6vw, 104px);
+  align-items: start;
+}
+.sobre-card { position: sticky; top: calc(var(--nav-h) + 24px); padding-top: 18px; border-top: 1px solid var(--ink); }
+.sc-label { margin-bottom: 18px; font: 500 11.5px/1 var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.sobre-card dl { display: grid; gap: 16px; margin: 0; }
+.sobre-card dt { font: 500 11px/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--urucum); }
+.sobre-card dd { margin: 6px 0 0; font: 500 16px/1.35 var(--f-display); }
+
+.statement {
+  font: 500 clamp(1.75rem, 3.7vw, 3.5rem)/1.12 var(--f-display);
+  font-variation-settings: "opsz" 60;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+.statement em { font: italic 400 1.08em/1 var(--f-serif); letter-spacing: -0.005em; color: var(--urucum); }
+.w { opacity: clamp(0.14, calc(var(--p, 1) * (var(--n) + 8) - var(--i)), 1); transition: opacity 0.3s linear; }
+
+.stats {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(20px, 2.6vw, 36px);
+  margin: clamp(80px, 11vw, 150px) 0 0;
+  padding: 0;
+}
+.stat { display: grid; align-content: start; gap: 14px; padding-top: 20px; border-top: 1px solid var(--ink); }
+.stat b {
+  font: 700 clamp(2rem, 3.8vw, 3.5rem)/0.95 var(--f-display);
+  font-variation-settings: "wdth" 78, "opsz" 96;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  transition: color 0.4s;
+}
+.stat span { font-size: 15px; line-height: 1.5; color: var(--muted); }
+.stat:hover b { color: var(--urucum); }
+
+@media (max-width: 1000px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .sobre-grid { grid-template-columns: 1fr; }
+  .sobre-card { position: static; order: 2; }
+}
+@media (max-width: 440px) { .stats { grid-template-columns: 1fr; } }

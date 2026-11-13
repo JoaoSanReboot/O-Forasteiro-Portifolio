@@ -1,0 +1,92 @@
+/* Seções: respiro generoso, cabeçalho numerado e as seções escuras com a borda em dente de serra
+   (como a barra de couro dos chapéus de cangaceiro). */
+.sec {
+  position: relative;
+  padding: clamp(104px, 14vw, 200px) 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+.sec-night { background: var(--night); color: var(--on-night); }
+.sec-night::before, .sec-night::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  height: 14px;
+  pointer-events: none;
+  background-size: 28px 14px;
+  background-repeat: repeat-x;
+}
+/* dentes para cima (ponta no meio de cada ladrilho de 28 × 14) e, embaixo, para baixo */
+.sec-night::before {
+  top: -13px;
+  background-image: conic-gradient(from 135deg at 50% 0, var(--night) 90deg, transparent 0);
+}
+.sec-night::after {
+  bottom: -13px;
+  background-image: conic-gradient(from -45deg at 50% 100%, var(--night) 90deg, transparent 0);
+}
+/* a última seção escura encosta no rodapé, que também é noite: sem dente embaixo */
+.sec-night:last-child::after { display: none; }
+
+/* cabeçalho de cartaz: "✦ Nº 02  PROJETOS ═════ 03 obras", o título em tipo de madeira e o emblema ao lado */
+.sh { display: grid; gap: clamp(18px, 2.4vw, 30px); margin-bottom: clamp(56px, 8vw, 112px); }
+.sh-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font: 500 12.5px/1 var(--f-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.sh-star { flex: none; width: 18px; height: 18px; color: var(--urucum); }
+.sh-num { font: 400 19px/1 var(--f-west); letter-spacing: 0.02em; color: var(--urucum); }
+.sh-label { color: var(--ink); }
+/* fio duplo de cartaz */
+.sh-rule { flex: 1; height: 6px; border-block: 1.5px solid currentColor; opacity: 0.55; transform-origin: 0 50%; }
+.sh-aside { color: var(--ink); }
+
+.sh-row { display: flex; align-items: flex-end; justify-content: space-between; gap: clamp(20px, 4vw, 64px); }
+.sh-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.26em;
+  row-gap: 0.04em;
+  min-width: 0;
+  font: 400 clamp(2.05rem, 7.2vw, 7rem)/0.98 var(--f-wood);
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+.sh-title:focus { outline: none; }
+.sh-mask { display: inline-block; overflow: hidden; padding: 0.06em 0 0.1em; margin: -0.06em 0 -0.1em; }
+.sh-mask > * { display: inline-block; }
+/* a tinta da prensa: borda comida e falhas no preto */
+.sh-wood, .hn-line, .foot-word, .intro-word { filter: url(#tinta); }
+.sh-title em {
+  font: italic 400 1.12em/0.9 var(--f-serif);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--urucum);
+}
+.sh-emblem { flex: none; width: clamp(100px, 13vw, 200px); height: auto; margin-bottom: 0.2em; }
+.sh-emblem[data-em="rastros"] { width: clamp(190px, 27vw, 400px); }
+.sh-emblem[data-em="telegrafo"] { width: clamp(170px, 20vw, 290px); }
+
+.sec-night .sh-meta { color: var(--on-night-muted); }
+.sec-night :is(.sh-num, .sh-star), .sec-night .sh-title em { color: var(--sol); }
+.sec-night :is(.sh-aside, .sh-label) { color: var(--on-night); }
+
+@media (max-width: 720px) {
+  .sh-row { flex-direction: column-reverse; align-items: flex-start; gap: 18px; }
+  .sh-emblem { width: 84px; margin: 0; }
+  .sh-emblem[data-em="rastros"] { width: 190px; }
+  .sh-emblem[data-em="telegrafo"] { width: 150px; }
+  .sh-meta { gap: 10px; flex-wrap: wrap; }
+  .sh-aside { flex-basis: 100%; }
+}
+
+/* o <svg> que só guarda o filtro da tinta */
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }

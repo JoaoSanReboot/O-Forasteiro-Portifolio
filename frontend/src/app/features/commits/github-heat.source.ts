@@ -1,6 +1,6 @@
 import { HeatData, HeatDay } from '../../content/heat-snapshot';
 
-// Acesso aos dados da placa: GET na API (.NET), que guarda o token e conversa com o GitHub.
+// Acesso aos dados da seção GitHub: GET na API (.NET), que guarda o token e conversa com o GitHub.
 // O navegador nunca fala direto com o GitHub.
 
 /** o que a API (GET /api/github/contributions) responde */
@@ -10,7 +10,7 @@ interface LiveResponse {
   fetchedAt?: string;
 }
 
-/** `null`: a API respondeu, mas sem dias (a placa segue com o registro guardado) */
+/** `null`: a API respondeu, mas sem dias (a seção segue com o registro guardado) */
 export type LiveHeat = { data: HeatData; fetchedAt: Date } | null;
 
 /** busca as contribuições; falha de rede ou status fora de 2xx rejeita a promessa */

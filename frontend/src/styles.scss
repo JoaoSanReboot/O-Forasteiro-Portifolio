@@ -1,19 +1,18 @@
-/* Estilos globais, divididos em partes dentro de src/styles/.
-   A ordem importa: há @keyframes com o mesmo nome, e o último vale. */
-@use "styles/base";
+/* Estilos globais, uma parte por assunto dentro de src/styles/ */
 @use "styles/tokens";
-@use "styles/globals";
+@use "styles/base";
+@use "styles/motion";
 @use "styles/intro";
-@use "styles/site/base" as site-base;
-@use "styles/site/nav";
-@use "styles/site/hero";
-@use "styles/site/mural";
-@use "styles/site/shelves";
-@use "styles/site/forge";
-@use "styles/site/cases";
-@use "styles/site/board";
-@use "styles/site/diplomas";
-@use "styles/site/saloon";
-@use "styles/site/layer";
-@use "styles/site/duel";
-@use "styles/site/hud";
+@use "styles/nav";
+@use "styles/hero";
+@use "styles/sections";
+@use "styles/emblems";
+@use "styles/sobre";
+@use "styles/projetos";
+@use "styles/experiencia";
+@use "styles/skills";
+@use "styles/github";
+@use "styles/formacao";
+@use "styles/jogos";
+@use "styles/contato";
+@use "styles/footer";

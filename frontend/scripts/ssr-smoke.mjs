@@ -34,7 +34,7 @@ async function smoke(config, port) {
       const res = await fetch(`http://localhost:${port}/`).catch((e) => fail(`a página não respondeu: ${e.message}`));
       const html = await res.text();
       if (res.status !== 200) fail(`status ${res.status}`);
-      if (!html.includes('id="duelo"') || !html.includes('Forasteiro')) fail('o HTML veio sem o conteúdo do site (renderização no cliente?)');
+      if (!html.includes('id="contato"') || !html.includes('Forasteiro')) fail('o HTML veio sem o conteúdo do site (renderização no cliente?)');
     }
     // o destroy do app no servidor acontece depois da resposta: dá um tempo para o erro aparecer
     await new Promise((r) => setTimeout(r, 2000));

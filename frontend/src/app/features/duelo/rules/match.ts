@@ -1,37 +1,33 @@
-import { Kit } from './kit';
-import { Level, LevelId } from './levels';
+// A caçada: os bandidos em fila, um por rodada. Acertou, ele vai preso e vem o próximo;
+// errou, ele foge e você perde um chapéu. Acaba com todos presos ou sem chapéu.
 
-// A partida: o placar rodada a rodada, quando ela acaba e o que o carimbo final diz
-
-export class DuelMatch {
+export class Hunt {
   round = 0;
-  you = 0;
-  joao = 0;
-  /** rodadas que o visitante venceu */
-  hits = 0;
-  /** dessas, quantas na faixa amarela */
+  caught = 0;
+  escapes = 0;
+  /** prisões na faixa amarela */
   perfects = 0;
 
-  constructor(readonly levelId: LevelId, readonly level: Level) {}
+  constructor(readonly total: number, readonly lives = 3) {}
 
   nextRound(): void { this.round++; }
-  youWin(yellow: boolean): void { this.you++; this.hits++; if (yellow) this.perfects++; }
-  joaoWins(): void { this.joao++; }
+  capture(yellow: boolean): void { this.caught++; if (yellow) this.perfects++; }
+  escape(): void { this.escapes++; }
 
-  get over(): boolean { return this.you === this.level.wins || this.joao === this.level.wins; }
-  get won(): boolean { return this.you === this.level.wins; }
+  /** o bandido da vez (índice na fila) */
+  get current(): number { return Math.min(this.caught, this.total - 1); }
+  get livesLeft(): number { return this.lives - this.escapes; }
+  get over(): boolean { return this.won || this.livesLeft === 0; }
+  get won(): boolean { return this.caught === this.total; }
 
-  /** título do fim: sem levar tiro, vitória ou derrota (cada arma tem as suas palavras) */
-  title(kit: Kit): string { return this.won && this.joao === 0 ? kit.flawless : this.won ? kit.win : kit.lose; }
-
-  summary(kit: Kit): string {
-    return `${this.level.name}: você ${this.you} × ${this.joao} João. ${kit.unit}: ${this.hits}. Na faixa amarela: ${this.perfects}.`
-      + (this.won && this.levelId !== 'dificil' ? ' Que tal subir a dificuldade?' : '');
+  summary(): string {
+    if (this.won) return this.escapes === 0 ? 'Todos presos sem perder um chapéu. O sertão vai falar disso por anos.' : `Todos presos, com ${this.perfects} prisões na faixa amarela. O sertão está em paz.`;
+    return `${this.caught} de ${this.total} presos. O resto fugiu pela caatinga.`;
   }
 }
 
 /**
- * quanto o sino demora (ms) e quando o João tenta enganar (ms desde o início da rodada):
+ * quanto o sino demora (ms) e quando o bandido tenta enganar (ms desde o início da rodada):
  * na primeira rodada às vezes nenhum blefe; depois, um ou dois
  */
 export function planRound(round: number, rand: () => number = Math.random): { wait: number; bluffs: number[] } {
