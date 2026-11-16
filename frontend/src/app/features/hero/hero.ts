@@ -10,19 +10,13 @@ const CACTI = [
   { x: 150, s: 0.55, flip: 1 }, { x: 236, s: 1, flip: -1 }, { x: 860, s: 0.42, flip: 1 },
   { x: 1150, s: 1.15, flip: 1 }, { x: 1238, s: 0.6, flip: -1 },
 ];
-/** os seis tiros do pistoleiro (um tambor), na hora em que cada um sai da arma (s, a partir do início da cena)
- *  e o buraco que deixa no cartaz (posição em % do papel). Os mesmos tempos estão nos @keyframes de _hero.scss */
-const TIROS = [3, 3.5, 4, 7.2, 7.7, 8.2];
-const FUROS = [
-  { x: 17, y: 14 }, { x: 84, y: 27 }, { x: 22, y: 47 }, { x: 80, y: 61 }, { x: 14, y: 80 }, { x: 88, y: 90 },
-].map((f, i) => ({ ...f, t: TIROS[i], r: i * 67 }));
 /** as estacas da cerca */
 const POSTS = Array.from({ length: 9 }, (_, i) => 430 + i * 42);
 /** o redemoinho de poeira: anéis do funil, do mais largo (em cima) ao mais fino (no chão) */
 const FUNIL = [0, 1, 2, 3, 4, 5].map((i) => ({ y: i * 13, rx: 26 - i * 4 }));
 
 // O topo: o nome enorme em tipo de madeira (com o pistoleiro em xilogravura escorado no "O" de João: gira o
-// revólver, descarrega o tambor no cartaz, que fica com os seis buracos, e segue girando a arma de vez em quando), o título "Desenvolvedor FullStack" em letreiro de cartaz, o cartaz de
+// revólver, descarrega o tambor no cartaz, que fica furado de lado a lado, e segue girando a arma de vez em quando), o título "Desenvolvedor FullStack" em letreiro de cartaz, o cartaz de
 // "Procura-se" em papel velho (título, retrato, nome e recompensa), o sol de xilogravura com os urubus rodando
 // (parallax pela rolagem) e o horizonte do sertão no pé: chão, mandacarus e a cerca de estacas, com o vento
 // passando (o feno rolando aos pulos com a sombra no chão, a poeira rasteira e um redemoinho que nasce e some).
@@ -86,9 +80,10 @@ const FUNIL = [0, 1, 2, 3, 4, 5].map((i) => ({ y: i * 13, rx: 26 - i * 4 }));
             <span class="poster-name">{{ p.fullName }}</span>
             <span class="poster-reward"><small>Recompensa</small><span>um bom projeto</span></span>
           </figcaption>
-          @for (f of furos; track $index) {
-            <span class="poster-furo" aria-hidden="true" [style.left.%]="f.x" [style.top.%]="f.y" [style.--t]="f.t + 's'" [style.--r]="f.r + 'deg'"></span>
-          }
+          <!-- os seis buracos de bala (posição e hora de cada um em $furos, _hero.scss) -->
+          <span class="poster-furo f1" aria-hidden="true"></span><span class="poster-furo f2" aria-hidden="true"></span>
+          <span class="poster-furo f3" aria-hidden="true"></span><span class="poster-furo f4" aria-hidden="true"></span>
+          <span class="poster-furo f5" aria-hidden="true"></span><span class="poster-furo f6" aria-hidden="true"></span>
         </div>
       </figure>
     </div>
@@ -121,5 +116,4 @@ export class Hero {
   protected readonly cacti = CACTI;
   protected readonly posts = POSTS;
   protected readonly funil = FUNIL;
-  protected readonly furos = FUROS;
 }

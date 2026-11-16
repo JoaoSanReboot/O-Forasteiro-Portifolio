@@ -9,20 +9,14 @@ export const PROFILE = {
   portrait: 'assets/retrato-cartaz.png',
 } as const;
 
-/**
- * A apresentação, que acende palavra por palavra conforme a página rola.
- * Trechos entre *asteriscos* saem em itálico serifado.
- */
-export const STATEMENT =
-  'Sou desenvolvedor FullStack com o pé firme no *.NET*. Trabalho *do banco de dados à tela*: APIs, integrações financeiras, ' +
-  'relatórios e interfaces. Gosto de pegar o que está lento, travado ou manual e deixar *rápido, assíncrono e automático*.';
-
-/** resultados que já entreguei (vêm da experiência abaixo) */
-export const STATS: readonly { value: string; label: string }[] = [
-  { value: '60 s → 4 s', label: 'no carregamento do grid de contratos, levando o processamento para a query' },
-  { value: '5 dias → 4 h', label: 'no fechamento mensal de um ERP, com mensageria assíncrona na AWS' },
-  { value: '12+', label: 'relatórios dinâmicos em JasperReports para clientes industriais e comerciais' },
-  { value: '1 dia → 2 h', label: 'na exportação automática de notas fiscais' },
+/** A apresentação do Sobre, um parágrafo por item, já inteira quando chega na tela. */
+export const SOBRE: readonly string[] = [
+  'Sou Desenvolvedor FullStack, com experiência em diferentes etapas do desenvolvimento, desde a modelagem e arquitetura ' +
+    'até a implementação e entrega de soluções.',
+  'Movido a café, linhas de código e uma boa dose de criatividade. Sou apaixonado pelo universo do faroeste, ' +
+    'algo que talvez você já tenha percebido por aqui.',
+  'Fique à vontade para explorar meus projetos, conhecer um pouco do meu trabalho e aproveitar sua estadia por estas terras.',
+  'Seja bem-vindo ao Oeste!',
 ];
 
 export interface Job {

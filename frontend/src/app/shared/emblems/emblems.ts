@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 // Os emblemas dos títulos: cada seção ganha um desenho de xilogravura que conta o próprio título
 // e se mexe quando entra na tela (a classe `in` vem do appReveal do cabeçalho):
-//   chapeu     "Prazer, forasteiro."      o chapéu de couro tirado num cumprimento
-//   ferro      "Feitos a ferro e fogo."   o ferro de marcar em brasa, soltando faísca
+//   chapeu     "Olá, forasteiro!"         o vaqueiro que tira o chapéu de cangaceiro num cumprimento
+//   bigorna    "Forjados na bigorna."     o martelo batendo a ferradura em brasa na bigorna, soltando faísca
 //   rastros    "Rastros pelo caminho."    as pegadas de alpercata andando
 //   peixeiras  "Ferramentas do ofício."   as peixeiras cruzadas com a estrela do cangaço
 //   telegrafo  "Sinais do telégrafo."     os postes e o sinal correndo pelo fio
@@ -12,11 +12,11 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 // São só desenho (aria-hidden). Cores: currentColor para o traço e as classes `e-fogo`, `e-sol`,
 // `e-couro` e `e-furo` (CSS em styles/_emblems.scss).
 
-export type EmblemKind = 'chapeu' | 'ferro' | 'rastros' | 'peixeiras' | 'telegrafo' | 'candeeiro' | 'fogueira';
+export type EmblemKind = 'chapeu' | 'bigorna' | 'rastros' | 'peixeiras' | 'telegrafo' | 'candeeiro' | 'fogueira';
 
 const VIEWBOX: Record<EmblemKind, string> = {
-  chapeu: '0 0 120 90',
-  ferro: '0 0 160 120',
+  chapeu: '0 0 100 130',
+  bigorna: '0 0 160 120',
   rastros: '0 0 260 80',
   peixeiras: '0 0 120 120',
   telegrafo: '0 0 200 120',
@@ -49,34 +49,52 @@ const STEPS = Array.from({ length: 8 }, (_, k) => ({ x: 16 + k * 31, y: k % 2 ? 
   template: `
     @switch (kind()) {
       @case ('chapeu') {
-        <svg:g class="e-hat">
-          <svg:path d="M60 28 C38 28 30 46 30 58 L90 58 C90 46 82 28 60 28 Z" class="e-couro" />
-          <svg:path d="M4 32 C20 60 100 60 116 32 C100 68 20 68 4 32 Z" fill="currentColor" />
-          <svg:path d="M14 12 C30 64 90 64 106 12 C96 52 24 52 14 12 Z" fill="currentColor" />
-          <svg:path d="M22 22 C36 54 84 54 98 22" fill="none" class="e-furo-s" stroke-width="1.4" stroke-dasharray="2 3" />
-          <svg:polygon [attr.points]="star" class="e-sol" transform="translate(49 25) scale(.22)" />
-        </svg:g>
-        <svg:path d="M30 86 H90" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1 5" stroke-linecap="round" opacity=".5" />
-      }
-      @case ('ferro') {
-        <svg:g transform="rotate(-24 80 60)">
-          <svg:g class="e-iron">
-            <svg:rect x="6" y="54" width="42" height="13" rx="6.5" class="e-couro" />
-            <svg:path d="M14 54 V67 M22 54 V67 M30 54 V67 M38 54 V67" class="e-furo-s" stroke-width="1.4" />
-            <svg:path d="M48 60.5 H104" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
-            <svg:g class="e-brand">
-              <svg:circle cx="124" cy="60.5" r="17" fill="none" stroke-width="6" />
-              <svg:path d="M118 50 V66 Q118 71 113 71 M126 71 V50 H131 Q137 50 137 56 Q137 62 131 62 H126" fill="none" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
+        <svg:g class="e-boneco" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <svg:path d="M49 82 L45 104 L44 122 M52 82 L56 104 L58 122" stroke-width="7" />
+          <svg:path d="M39 124 H49 M55 124 H65" stroke-width="6" />
+          <svg:g class="e-tronco">
+            <svg:path d="M47 57 L42 72 L45 84" stroke-width="6" />
+            <svg:path d="M50 82 L50 54" stroke-width="15" />
+            <svg:circle cx="50" cy="42" r="8.5" fill="currentColor" stroke="none" />
+            <svg:path d="M43 50 L58 52 L49 60 Z" class="e-fogo" stroke="none" />
+            <svg:circle cx="54.5" cy="41" r="1.3" class="e-furo" stroke="none" />
+            <svg:g class="e-braco">
+              <svg:path d="M54 56 L65 48 L61 35" stroke-width="6" />
+              <svg:g class="e-hat">
+                <svg:path d="M35 35 Q50 10 65 35 Z" fill="currentColor" stroke-width="1.5" />
+                <svg:path d="M29 36.5 Q50 27 71 36.5" stroke-width="3.4" />
+                <svg:path d="M40 31 Q50 21 60 31" class="e-furo-s" stroke-width="1.2" stroke-dasharray="1.6 2.4" />
+                <svg:polygon [attr.points]="star" class="e-sol" stroke="none" transform="translate(45.5 19.5) scale(.09)" />
+              </svg:g>
             </svg:g>
           </svg:g>
         </svg:g>
-        <svg:g class="e-sparks">
-          <svg:circle cx="130" cy="40" r="2.4" style="--k:0" />
-          <svg:circle cx="142" cy="46" r="1.8" style="--k:1" />
-          <svg:circle cx="120" cy="34" r="1.6" style="--k:2" />
-          <svg:circle cx="136" cy="30" r="2" style="--k:3" />
+        <svg:path d="M26 127 H74" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1 5" stroke-linecap="round" opacity=".5" />
+      }
+      @case ('bigorna') {
+        <svg:circle class="e-glow" cx="93" cy="44" r="22" />
+        <svg:g fill="currentColor">
+          <svg:path d="M46 48 Q24 49 12 57 Q30 61 46 61 Z" />
+          <svg:path d="M44 47 H126 V60 H114 Q104 62 100 72 H72 Q68 62 58 60 H44 Z" />
+          <svg:path d="M74 71 H98 L102 88 H70 Z" />
+          <svg:path d="M58 87 H114 L122 99 H50 Z" />
         </svg:g>
-        <svg:path class="e-smoke" d="M128 30 C120 22 136 16 128 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <svg:path d="M50 53 H120" class="e-furo-s" stroke-width="1.2" opacity=".6" />
+        <svg:path class="e-peca" d="M82 44.5 H96 Q104 44.5 104 41.5 Q104 38.5 96 38.5 H82" fill="none" stroke-width="4" stroke-linecap="round" />
+        <svg:g class="e-martelo">
+          <svg:path d="M140 32 L98 25.5" stroke-width="5" stroke-linecap="round" class="e-cabo" />
+          <svg:path d="M92 13 H104 L103 16.5 V34.5 L104 38.5 H92 L93 34.5 V16.5 Z" fill="currentColor" />
+          <svg:path d="M94 23 H102 M94 28 H102" class="e-furo-s" stroke-width="1.1" />
+        </svg:g>
+        <svg:g class="e-faiscas">
+          <svg:circle cx="94" cy="40" r="2" style="--dx:-26px; --dy:-22px" />
+          <svg:circle cx="94" cy="40" r="1.6" style="--dx:-14px; --dy:-32px" />
+          <svg:circle cx="94" cy="40" r="1.8" style="--dx:18px; --dy:-26px" />
+          <svg:circle cx="94" cy="40" r="1.4" style="--dx:30px; --dy:-12px" />
+          <svg:circle cx="94" cy="40" r="1.5" style="--dx:-34px; --dy:-6px" />
+          <svg:circle cx="94" cy="40" r="1.3" style="--dx:6px; --dy:-36px" />
+        </svg:g>
+        <svg:path d="M40 112 H132" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1 5" stroke-linecap="round" opacity=".5" />
       }
       @case ('rastros') {
         @for (s of steps; track $index) {

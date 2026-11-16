@@ -1,3 +1,6 @@
+@use "sass:list";
+@use "sass:string";
+
 /* O topo: nome enorme em tipo de madeira, o título em letreiro, o cartaz de "Procura-se" em papel velho, o sol atrás
    com os urubus rodando (parallax pela rolagem, --sy vem do ScrollState) e o horizonte do sertão no pé.
    Com JavaScript, tudo espera a abertura subir (html.ready) para entrar. */
@@ -64,24 +67,22 @@
 .hero-name .ch { display: inline-block; }
 .hero-name:focus { outline: none; }
 
-/* o pistoleiro em xilogravura de cordel: impresso com a mesma tinta falhada das letras (filtro #tinta), na cor
-   de "João", com os cortes da goiva (o olho, a fita do chapéu, o cinto, a costura do gibão e a sola das botas) e o
-   lenço em urucum. Escorado de costas no último "O", da altura das letras. Gira o revólver no dedo quadro a quadro
-   (como folheto animado), descarrega o tambor no cartaz (coice, clarão e fumaça a cada tiro), gira de novo e segue
-   girando a arma de vez em quando. A cena dura 9s e começa 2.2s depois de html.ready; os tiros saem em
-   3, 3.5, 4, 7.2, 7.7 e 8.2s (os mesmos tempos de TIROS, em hero.ts, que furam o cartaz) */
+/* o pistoleiro em xilogravura de cordel: a figura na cor de "João", com os cortes da goiva (o olho, a fita do
+   chapéu, o cinto, a costura do gibão e a sola das botas) e o lenço em urucum. Escorado de costas no último "O",
+   da altura das letras, respirando devagar (balança no pé). Gira o revólver no dedo, num giro que embala, passa
+   um pouco e assenta; descarrega o tambor no cartaz (coice que volta macio, clarão e um fio de fumaça a cada
+   tiro), gira de novo e segue girando a arma de vez em quando. A cena dura 9s e começa 2.2s depois de
+   html.ready; os tiros saem nos tempos de $tiros (os mesmos que furam o cartaz, mais abaixo) */
 .pistoleiro {
   display: inline-block;
   height: 0.8em;
   width: 0.64em;
   /* o cotovelo encosta na curva do "O" */
-  margin-left: -0.06em;
+  margin-left: -0.09em;
   vertical-align: baseline;
   color: var(--ink);
-  filter: url(#tinta);
-  transform-origin: 50% 100%;
 }
-.pistoleiro svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pistoleiro svg { display: block; width: 100%; height: 100%; overflow: visible; transform-origin: 62% 96%; }
 .pist-goiva { fill: none; stroke: var(--paper); stroke-width: 1.1; stroke-linecap: round; }
 .pist-olho { fill: var(--paper); }
 .pist-estrela { fill: var(--sol); }
@@ -90,28 +91,12 @@
 .pist-cano { fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
 .pist-tambor { fill: currentColor; stroke: var(--paper); stroke-width: 0.9; }
 .pist-fogo { fill: var(--sol); opacity: 0; }
-.pist-fumaca { fill: rgba(242, 220, 179, 0.6); opacity: 0; }
+.pist-fumaca { fill: rgba(242, 220, 179, 0.5); opacity: 0; }
 .pist-mira, .pist-roda, .pist-fogo, .pist-fumaca { transform-box: view-box; }
 .pist-mira { transform-origin: 42.5px 32.5px; }
 .pist-roda { transform-origin: 44.6px 32.6px; }
 .pist-fogo { transform-origin: 58px 30.2px; }
 .pist-fumaca { transform-origin: 59px 29px; }
-
-/* os buracos de bala no papel: o furo escuro, a borda chamuscada e as rachaduras. Sem JavaScript já estão lá */
-.poster-furo {
-  position: absolute;
-  z-index: 1;
-  width: 9cqi;
-  aspect-ratio: 1;
-  margin: -4.5cqi 0 0 -4.5cqi;
-  border-radius: 50%;
-  rotate: var(--r);
-  pointer-events: none;
-  background:
-    radial-gradient(circle, #120a06 0 27%, #3d2513 33%, rgba(120, 66, 26, 0.55) 43%, transparent 66%),
-    conic-gradient(transparent 0 7%, rgba(60, 34, 16, 0.55) 8% 9%, transparent 10% 33%, rgba(60, 34, 16, 0.5) 34% 35%,
-      transparent 36% 57%, rgba(60, 34, 16, 0.45) 58% 59%, transparent 60% 80%, rgba(60, 34, 16, 0.55) 81% 82%, transparent 83%);
-}
 
 /* o título em letreiro de saloon, menor que o nome e no mesmo eixo da esquerda: "Desenvolvedor" no ocre e
    "FullStack" na cor da areia */
@@ -140,7 +125,8 @@
   align-self: center;
   position: relative;
   /* a largura também respeita a altura da tela, para o topo inteiro (com o horizonte) caber sem rolar */
-  width: clamp(230px, min(27vw, (90svh - 9vw - 40px) / 1.7), 400px);
+  --pw: clamp(230px, min(27vw, (90svh - 9vw - 40px) / 1.7), 400px);
+  width: var(--pw);
   margin: clamp(16px, 3vh, 40px) 0 0;
   rotate: -2.2deg;
   filter: drop-shadow(0 26px 30px rgba(0, 0, 0, 0.5));
@@ -203,6 +189,42 @@
 .poster-reward small { font: 400 11.5cqi/1 var(--f-wood); text-transform: uppercase; color: var(--pi); }
 .poster-sheet { transform-origin: 50% 18px; }
 .poster-reward span { font: 400 7.6cqi/1 var(--f-west); text-transform: uppercase; color: var(--pr); }
+
+/* os buracos de bala atravessam o papel: cada um é um furo na máscara do cartaz (vê-se o que está atrás: o sol,
+   o chão, a sombra), com a borda chamuscada e as rachaduras por cima (.poster-furo). O raio de cada furo é
+   --furo × --hN; --hN vai de 0 a 1 na hora do tiro. Sem JavaScript, os furos já estão abertos */
+$tiros: 3s, 3.5s, 4s, 7.2s, 7.7s, 8.2s;
+$furos: (17% 14%), (84% 27%), (22% 47%), (80% 61%), (14% 80%), (88% 90%);
+$mascara: ();
+$abre: ();
+@for $i from 1 through list.length($furos) {
+  $f: list.nth($furos, $i);
+  @property --h#{$i} { syntax: "<number>"; inherits: false; initial-value: 1; }
+  @keyframes abre-#{$i} { from { --h#{$i}: 0; } to { --h#{$i}: 1; } }
+  $mascara: list.append($mascara, string.unquote("radial-gradient(circle at #{list.nth($f, 1)} #{list.nth($f, 2)}, transparent calc(var(--furo) * var(--h#{$i})), #000 calc(var(--furo) * var(--h#{$i}) + 0.7px))"), comma);
+  $abre: list.append($abre, string.unquote("abre-#{$i} 0.24s cubic-bezier(0.2, 1.5, 0.4, 1) calc(2.3s + #{list.nth($tiros, $i)}) both"), comma);
+  .poster-furo.f#{$i} { left: list.nth($f, 1); top: list.nth($f, 2); rotate: $i * 67deg; }
+  html.ready .poster-furo.f#{$i} { animation-delay: calc(2.3s + #{list.nth($tiros, $i)}); }
+}
+.poster-sheet {
+  --furo: calc(var(--pw) * 0.022);
+  mask-image: $mascara;
+  mask-composite: intersect;
+}
+.poster-furo {
+  position: absolute;
+  z-index: 1;
+  width: calc(var(--furo) * 4.4);
+  aspect-ratio: 1;
+  margin: calc(var(--furo) * -2.2) 0 0 calc(var(--furo) * -2.2);
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(closest-side, transparent 0 44%, rgba(26, 14, 7, 0.92) 46% 51%, rgba(120, 66, 26, 0.5) 62%, transparent 100%),
+    conic-gradient(transparent 0 7%, rgba(60, 34, 16, 0.55) 8% 9%, transparent 10% 33%, rgba(60, 34, 16, 0.5) 34% 35%,
+      transparent 36% 57%, rgba(60, 34, 16, 0.45) 58% 59%, transparent 60% 80%, rgba(60, 34, 16, 0.55) 81% 82%, transparent 83%);
+}
+html.js .poster-sheet { --h1: 0; --h2: 0; --h3: 0; --h4: 0; --h5: 0; --h6: 0; }
 
 /* o horizonte do sertão no pé do topo: chão, mandacarus e a cerca de estacas, em silhueta, no mesmo chão
    escuro da tela de carregamento. O viewBox tem folga em cima para a ponta dos mandacarus mais altos e a altura segue a largura (9vw), para
@@ -291,45 +313,51 @@ html.ready .vento { animation: fade-in 1s ease 1s both; }
 html.ready .horizon { animation: fade-up 1.4s var(--ease) 0.6s both; }
 html.ready .hero-sun { animation: fade-in 2s ease 0.1s both; }
 html.js:not(.ready) .pistoleiro, html.js .poster-furo { opacity: 0; }
-html.ready .pistoleiro { animation: pist-chega 0.5s steps(5, jump-end) 1.3s both; }
-html.ready .pist-roda { animation: pist-roda 9s linear 2.2s both, pist-roda-solta 4.2s linear 11.2s infinite; }
+html.ready .pistoleiro { animation: pist-chega 1s var(--ease) 1.2s both; }
+html.ready .pistoleiro svg { animation: pist-respira 3.8s ease-in-out 2.2s infinite alternate; }
+html.ready .pist-roda { animation: pist-roda 9s linear 2.2s both, pist-roda-solta 5s linear 11.2s infinite; }
 html.ready .pist-mira { animation: pist-coice 9s ease-out 2.2s both; }
-html.ready .pist-fogo { animation: pist-fogo 9s linear 2.2s both; }
-html.ready .pist-fumaca { animation: pist-fumaca 9s ease-out 2.2s both; }
-html.ready .poster-sheet { animation: cartaz-tranco 9s ease-out 2.3s both; }
-html.ready .poster-furo { animation: furo 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) calc(2.3s + var(--t)) both; }
-/* a entrada: a prensa desce e o pistoleiro aparece impresso, com a tinta assentando */
-@keyframes pist-chega { 0% { opacity: 0; scale: 1.25; } 40% { opacity: 0.6; scale: 0.96; } 100% { opacity: 1; scale: 1; } }
-/* duas voltas de girar no dedo (três giros cada, de 45° em 45° como quadros de folheto, parando com o cano para o cartaz) */
+html.ready .pist-fogo { animation: pist-fogo 9s ease-out 2.2s both; }
+html.ready .pist-fumaca { animation: pist-fumaca 9s linear 2.2s both; }
+html.ready .poster-sheet { animation: list.join(string.unquote("cartaz-tranco 9s ease-out 2.2s both"), $abre, comma); }
+html.ready .poster-furo { animation: furo 0.35s ease-out both; }
+/* a entrada: sobe de leve e se encosta no "O" */
+@keyframes pist-chega { from { opacity: 0; translate: 0 14%; rotate: 8deg; } to { opacity: 1; translate: 0 0; rotate: 0deg; } }
+/* respira: um balanço miúdo apoiado no pé */
+@keyframes pist-respira { from { rotate: -1.2deg; } to { rotate: 1deg; } }
+/* duas voltas de girar no dedo: três giros que embalam, passam um tico e assentam com o cano para o cartaz */
 @keyframes pist-roda {
-  0%, 3% { rotate: 0deg; animation-timing-function: steps(24, jump-end); }
+  0%, 3% { rotate: 0deg; animation-timing-function: cubic-bezier(0.55, 0, 0.2, 1.03); }
   29% { rotate: 1080deg; animation-timing-function: linear; }
-  52% { rotate: 1080deg; animation-timing-function: steps(24, jump-end); }
+  52% { rotate: 1080deg; animation-timing-function: cubic-bezier(0.55, 0, 0.2, 1.03); }
   76%, 100% { rotate: 2160deg; }
 }
-@keyframes pist-roda-solta { 0%, 50% { rotate: 0deg; animation-timing-function: steps(16, jump-end); } 100% { rotate: 720deg; } }
-/* o coice de cada tiro */
+@keyframes pist-roda-solta { 0%, 55% { rotate: 0deg; animation-timing-function: cubic-bezier(0.55, 0, 0.2, 1.03); } 100% { rotate: 720deg; } }
+/* o coice de cada tiro: sobe rápido, volta passando um pouco e assenta */
 @keyframes pist-coice {
-  0%, 33.3%, 37%, 38.9%, 42.5%, 44.4%, 48%, 80%, 83.6%, 85.6%, 89.2%, 91.1%, 94.7%, 100% { rotate: 0deg; }
-  33.8%, 39.4%, 44.9%, 80.5%, 86.1%, 91.6% { rotate: -24deg; }
+  0%, 33.33%, 36.53%, 38.89%, 42.09%, 44.44%, 47.64%, 80%, 83.2%, 85.56%, 88.76%, 91.11%, 94.31%, 100% { rotate: 0deg; }
+  33.83%, 39.39%, 44.94%, 80.5%, 86.06%, 91.61% { rotate: -22deg; animation-timing-function: cubic-bezier(0.3, 0, 0.3, 1); }
+  35.13%, 40.69%, 46.24%, 81.8%, 87.36%, 92.91% { rotate: 3deg; }
 }
 @keyframes pist-fogo {
-  0%, 33.3%, 35%, 38.9%, 40.6%, 44.4%, 46.1%, 80%, 81.7%, 85.6%, 87.3%, 91.1%, 92.8%, 100% { opacity: 0; scale: 0.4; }
-  33.6%, 39.2%, 44.7%, 80.3%, 85.9%, 91.4% { opacity: 1; scale: 1.3; }
+  0%, 33.33%, 34.83%, 38.89%, 40.39%, 44.44%, 45.94%, 80%, 81.5%, 85.56%, 87.06%, 91.11%, 92.61%, 100% { opacity: 0; scale: 0.3; }
+  33.63%, 39.19%, 44.74%, 80.3%, 85.86%, 91.41% { opacity: 1; scale: 1.3; }
 }
+/* um fio de fumaça sobe do cano depois de cada tiro */
 @keyframes pist-fumaca {
-  0%, 44.4%, 58.1%, 91.1% { opacity: 0; translate: 0 0; scale: 0.5; }
-  46%, 92.7% { opacity: 0.7; }
-  58%, 100% { opacity: 0; translate: 5px -14px; scale: 2.4; }
+  0%, 33.33%, 38.89%, 44.44%, 80%, 85.56%, 91.11% { opacity: 0; translate: 0 0; scale: 0.5; }
+  33.73%, 39.29%, 44.84%, 80.4%, 85.96%, 91.51% { opacity: 0.55; translate: 0 0; scale: 0.6; animation-timing-function: ease-out; }
+  38.43%, 43.99%, 49.54%, 85.1%, 90.66%, 96.21%, 100% { opacity: 0; translate: 4px -11px; scale: 2.2; }
 }
 /* o cartaz treme a cada bala que chega */
 @keyframes cartaz-tranco {
-  0%, 33.3%, 36.5%, 38.9%, 42%, 44.4%, 47.5%, 80%, 83%, 85.6%, 88.6%, 91.1%, 94%, 100% { translate: 0 0; rotate: 0deg; }
-  33.7%, 39.3%, 44.8%, 80.4%, 86%, 91.5% { translate: 2px -3px; rotate: 0.8deg; }
+  0%, 34.44%, 37.44%, 40%, 43%, 45.56%, 48.56%, 81.11%, 84.11%, 86.67%, 89.67%, 92.22%, 95.22%, 100% { translate: 0 0; rotate: 0deg; }
+  34.84%, 40.4%, 45.96%, 81.51%, 87.07%, 92.62% { translate: 2px -3px; rotate: 0.8deg; }
+  36.04%, 41.6%, 47.16%, 82.71%, 88.27%, 93.82% { translate: -1px 1px; rotate: -0.3deg; }
 }
-@keyframes furo { from { opacity: 0; scale: 2.2; } to { opacity: 1; scale: 1; } }
+@keyframes furo { from { opacity: 0; scale: 1.6; } to { opacity: 1; scale: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  html.ready .poster-furo { animation-delay: 0s; }
+  html.ready :is(.poster-sheet, .poster-furo) { animation-delay: 0s !important; }
 }
 @keyframes poster-in { from { opacity: 0; transform: translateY(-28px); } to { opacity: 1; transform: none; } }
 
@@ -341,7 +369,7 @@ html.ready .poster-furo { animation: furo 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) ca
   }
   .hero-name { font-size: clamp(3.2rem, 17.5vw, 9rem); }
   .hn-line { font-size: min(1em, 22cqi); }
-  .poster { justify-self: center; width: clamp(250px, 78vw, 360px); margin-top: clamp(36px, 8vw, 56px); }
+  .poster { --pw: clamp(250px, 78vw, 360px); justify-self: center; margin-top: clamp(36px, 8vw, 56px); }
   .hero-sun { top: 16vh; right: -42vw; width: 100vw; opacity: 0.5; }
   /* o canto de cima é do bolso das moedas */
   .hero { padding-top: 56px; }

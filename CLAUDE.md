@@ -29,7 +29,7 @@ O mapa completo (camadas, onde cada funcionalidade mora, padrões) está em `doc
 | `frontend/src/app/engine/` | TypeScript puro, sem Angular: quadros seguros para SSR (`raf`/`cancelRaf`), matemática e as regras do jogo da memória |
 | `frontend/src/app/core/` | Infraestrutura: plataforma e o estado da rolagem (`ScrollState`) |
 | `frontend/src/app/shared/` | `reveal` (entrada ao rolar), `section-head`, `split` (letras), `ornaments` (SVGs do sertão: estrela, sol, mandacaru, chapéu, céu, bandeirinhas e o feno) e `emblems` (o desenho animado de cada título) |
-| `frontend/src/app/features/` | `intro` (abertura), `site` (casca só de rolagem, sem barra; rodapé, Lenis), `hero`, `travessia` (a cena presa na tela que anda com a rolagem) e as seções `sobre`, `projetos`, `experiencia`, `skills`, `commits` (GitHub), `formacao`, `contato`; os jogos moram dentro das seções: `duelo` (na Experiência), `memoria` (nas Skills) e as moedas de `secrets` |
+| `frontend/src/app/features/` | `intro` (abertura), `site` (casca só de rolagem, sem barra; rodapé, Lenis), `hero` e as seções `sobre`, `projetos`, `experiencia`, `skills`, `commits` (GitHub), `formacao`, `contato`; os jogos moram dentro das seções: `duelo` (na Experiência), `memoria` (nas Skills) e as moedas de `secrets` |
 | `frontend/src/app/content/` | Textos e dados (perfil, experiência, formação, contatos, projetos, skills, jogos, registro guardado do GitHub) |
 | `frontend/src/styles/` | Tokens, base, movimento e uma parte por seção |
 | `frontend/src/environments/` | `githubEndpoint`, `skipIntro` |

@@ -15,7 +15,7 @@ import { SectionHead } from '../../shared/section-head/section-head';
   host: { class: 'sec projetos', id: 'projetos', 'aria-labelledby': 't-projetos' },
   template: `
     <div class="wrap">
-      <header appSectionHead num="02" label="Projetos" title="Feitos a" accent="ferro e fogo." [aside]="count" emblem="ferro" titleId="t-projetos"></header>
+      <header appSectionHead num="02" label="Projetos" title="Forjados na" accent="bigorna." [aside]="count" emblem="bigorna" titleId="t-projetos"></header>
       <ol class="works" #list (pointermove)="move($event)" (pointerleave)="hover.set(-1)">
         @for (w of projects; track w.name; let i = $index) {
           <li class="work" appReveal [revealDelay]="i">
