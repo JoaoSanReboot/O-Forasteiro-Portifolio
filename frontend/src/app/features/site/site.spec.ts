@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { CONTACTS, EMAIL, JOBS } from '../../content/profile';
 import { PROJECTS } from '../../content/projects';
 import { SKILL_SHELVES } from '../../content/skills';
-import { words } from '../sobre/sobre';
 import { Site } from './site';
 
 describe('Site', () => {
@@ -35,7 +34,7 @@ describe('Site', () => {
   it('cada título tem o emblema que o desenha e a tinta da prensa existe', async () => {
     const { el } = await render();
     const emblems = [...el.querySelectorAll('main > section')].slice(1).map((s) => s.querySelector('.sh-emblem')?.getAttribute('data-em'));
-    expect(emblems).toEqual(['chapeu', 'ferro', 'rastros', 'peixeiras', 'telegrafo', 'candeeiro', 'fogueira']);
+    expect(emblems).toEqual(['chapeu', 'bigorna', 'rastros', 'peixeiras', 'telegrafo', 'candeeiro', 'fogueira']);
     for (const e of el.querySelectorAll('.sh-emblem')) expect(e.getAttribute('aria-hidden')).toBe('true');
     expect(el.querySelector('filter#tinta')).not.toBeNull();
     expect(el.querySelector('#t-experiencia')?.textContent).toContain('Rastros pelo');
@@ -86,22 +85,38 @@ describe('Site', () => {
     expect(hero.querySelector('.capim')).toBeNull();
   });
 
-  it('a travessia vem logo depois do topo, com as três falas do caminho na ordem', async () => {
+  it('o Sobre vem logo depois do topo, só com a frase inteira: sem a travessia, sem a ficha e sem os números', async () => {
     const { el } = await render();
-    const tv = el.querySelector('#travessia')!;
-    expect(tv.previousElementSibling?.id).toBe('inicio');
-    expect(tv.nextElementSibling?.id).toBe('sobre');
-    expect([...tv.querySelectorAll('.tv-fala')].map((f) => f.textContent?.trim())).toEqual(['Saiu do banco de dados,', 'atravessou as APIs', 'e chegou na tela.']);
-    expect(tv.querySelectorAll('.tv-rider .perna')).toHaveLength(4);
-    expect(tv.querySelector('.tv-feno svg.feno')).not.toBeNull();
+    expect(el.querySelector('#travessia, .travessia')).toBeNull();
+    const sobre = el.querySelector('#sobre')!;
+    expect(sobre.previousElementSibling?.id).toBe('inicio');
+    expect(sobre.querySelector('.sobre-card, .stats, .stat')).toBeNull();
+    expect(sobre.textContent).not.toContain('Em poucas palavras');
+    expect(sobre.textContent).not.toContain('60 s → 4 s');
+    // "Olá, forasteiro!" e a apresentação inteira, em parágrafos, fechando com a saudação
+    expect(sobre.querySelector('.sh-title')?.textContent?.replace(/\s+/g, '')).toBe('Olá,forasteiro!');
+    const pars = [...sobre.querySelectorAll('.sobre-texto > p')].map((p) => p.textContent?.replace(/\s+/g, ' ').trim());
+    expect(pars).toEqual([
+      'Sou Desenvolvedor FullStack, com experiência em diferentes etapas do desenvolvimento, desde a modelagem e arquitetura até a implementação e entrega de soluções.',
+      'Movido a café, linhas de código e uma boa dose de criatividade. Sou apaixonado pelo universo do faroeste, algo que talvez você já tenha percebido por aqui.',
+      'Fique à vontade para explorar meus projetos, conhecer um pouco do meu trabalho e aproveitar sua estadia por estas terras.',
+      'Seja bem-vindo ao Oeste!',
+    ]);
+    // nada de acender aos poucos e nada de firula: sem estilo de rolagem e sem itálico ou destaque no meio
+    expect(sobre.querySelector('.sobre-texto [style]')).toBeNull();
+    expect(sobre.querySelector('.sobre-texto :is(em, strong, b, i, span)')).toBeNull();
+    // o vaqueiro do cumprimento: tronco, braço e o chapéu de cangaceiro na mão
+    expect(sobre.querySelector('.sh-emblem[data-em="chapeu"] .e-tronco .e-braco .e-hat')).not.toBeNull();
   });
 
-  it('a frase do Sobre vira palavras, com os trechos marcados em itálico', () => {
-    const w = words('Sou dev no *.NET*. Trabalho *do banco à tela*: APIs.');
-    expect(w.map((x) => x.parts.map((p) => p.t).join(''))).toEqual(['Sou', 'dev', 'no', '.NET.', 'Trabalho', 'do', 'banco', 'à', 'tela:', 'APIs.']);
-    expect(w[3].parts).toEqual([{ t: '.NET', em: true }, { t: '.', em: false }]);
-    expect(w.slice(5, 9).every((x) => x.parts[0].em)).toBe(true);
-    expect(w[8].parts[1]).toEqual({ t: ':', em: false });
+  it('projetos: a bigorna forjando no título, sem o ferro de marcar e sem a estrela gigante', async () => {
+    const { el } = await render();
+    const em = el.querySelector('#projetos')!.querySelector('.sh-emblem')!;
+    expect(em.getAttribute('data-em')).toBe('bigorna');
+    expect(em.querySelector('.e-martelo')).not.toBeNull();
+    expect(em.querySelector('.e-peca')).not.toBeNull();
+    expect(em.querySelectorAll('.e-faiscas circle').length).toBeGreaterThan(3);
+    expect(el.querySelector('.e-brand, [data-em="ferro"]')).toBeNull();
   });
 
   it('projetos: uma linha por projeto, cada uma levando ao projeto em outra aba', async () => {

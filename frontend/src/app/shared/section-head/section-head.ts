@@ -5,7 +5,7 @@ import { Reveal } from '../reveal/reveal';
 
 // Cabeçalho de seção como cabeça de cartaz: "✦ Nº 02  PROJETOS ═════ 03 obras" e o título em tipo de
 // madeira (com a tinta falhada da prensa), terminando em itálico serifado. Ao lado, o emblema que
-// desenha o título (o ferro em brasa, as pegadas, as peixeiras...) e se mexe quando entra na tela.
+// desenha o título (a bigorna, as pegadas, as peixeiras...) e se mexe quando entra na tela.
 @Component({
   selector: 'header[appSectionHead]',
   changeDetection: ChangeDetectionStrategy.OnPush,

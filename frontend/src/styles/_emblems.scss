@@ -19,34 +19,71 @@
 [data-reveal="emblem"].rv { transition: opacity 0.6s ease var(--rv-delay, 0ms), transform 1s var(--ease) var(--rv-delay, 0ms); }
 [data-reveal="emblem"].rv:not(.in) { opacity: 0; transform: translateY(18px) rotate(-6deg) scale(0.9); }
 
-/* chapéu: tirado num cumprimento (e de novo quando o mouse passa no cabeçalho) */
-.em[data-em="chapeu"] .e-hat { transform-origin: 60px 60px; }
-.em[data-em="chapeu"].in .e-hat { animation: hat-tip 2.2s var(--ease) 0.7s both; }
-.sh:hover .em[data-em="chapeu"].in .e-hat { animation: hat-tip-2 1.8s var(--ease) both; }
-@keyframes hat-tip { 0% { transform: none; } 28%, 58% { transform: translate(-4px, -14px) rotate(-16deg); } 100% { transform: none; } }
-@keyframes hat-tip-2 { 0% { transform: none; } 28%, 58% { transform: translate(-4px, -14px) rotate(-16deg); } 100% { transform: none; } }
-
-/* ferro de marcar: a marca esquenta até a brasa, com faísca e fumaça */
-.em[data-em="ferro"] .e-brand { stroke: currentColor; }
-.em[data-em="ferro"].in .e-brand { animation: brasa 2.6s ease-in-out 0.8s infinite alternate; }
-@keyframes brasa {
-  0% { stroke: currentColor; filter: none; }
-  55% { stroke: var(--em-fire); filter: drop-shadow(0 0 3px var(--em-fire)); }
-  100% { stroke: var(--em-glow); filter: drop-shadow(0 0 7px var(--em-glow)); }
+/* o cumprimento: quando o cabeçalho chega na tela, o vaqueiro levanta o chapéu de cangaceiro da cabeça, varre
+   para a frente numa mesura (o tronco inclina) e põe de volta; de novo quando o mouse passa no cabeçalho */
+.em[data-em="chapeu"] .e-tronco { transform-origin: 50px 82px; }
+.em[data-em="chapeu"] .e-braco { transform-origin: 54px 56px; }
+.em[data-em="chapeu"] .e-hat { transform-origin: 61px 35px; }
+.em[data-em="chapeu"].in .e-tronco { animation: mesura 2.8s var(--ease-io) 0.6s both; }
+.em[data-em="chapeu"].in .e-braco { animation: tira-chapeu 2.8s var(--ease-io) 0.6s both; }
+.em[data-em="chapeu"].in .e-hat { animation: varre-chapeu 2.8s var(--ease-io) 0.6s both; }
+.sh:hover .em[data-em="chapeu"].in .e-tronco { animation: mesura-2 2.4s var(--ease-io) both; }
+.sh:hover .em[data-em="chapeu"].in .e-braco { animation: tira-chapeu-2 2.4s var(--ease-io) both; }
+.sh:hover .em[data-em="chapeu"].in .e-hat { animation: varre-chapeu-2 2.4s var(--ease-io) both; }
+@keyframes mesura { 0%, 18%, 92%, 100% { transform: none; } 42%, 68% { transform: rotate(18deg); } }
+@keyframes tira-chapeu {
+  0%, 100% { transform: none; }
+  16% { transform: translate(0, -8px); }
+  42%, 68% { transform: translate(0, -2px) rotate(106deg); }
+  90% { transform: translate(0, -6px); }
 }
+@keyframes varre-chapeu { 0%, 16%, 90%, 100% { transform: none; } 42%, 68% { transform: rotate(-34deg); } }
+@keyframes mesura-2 { 0%, 18%, 92%, 100% { transform: none; } 42%, 68% { transform: rotate(18deg); } }
+@keyframes tira-chapeu-2 {
+  0%, 100% { transform: none; }
+  16% { transform: translate(0, -8px); }
+  42%, 68% { transform: translate(0, -2px) rotate(106deg); }
+  90% { transform: translate(0, -6px); }
+}
+@keyframes varre-chapeu-2 { 0%, 16%, 90%, 100% { transform: none; } 42%, 68% { transform: rotate(-34deg); } }
+
+/* a bigorna: o martelo sobe, desce batendo na ferradura em brasa, quica e sobe de novo; a cada
+   batida a peça clareia e as faíscas espirram */
+.em[data-em="bigorna"] .e-cabo { stroke: var(--couro); }
+.em[data-em="bigorna"] .e-peca { stroke: var(--em-fire); filter: drop-shadow(0 0 2px var(--em-fire)); }
+.em[data-em="bigorna"] .e-glow { transform-origin: 93px 44px; }
+.em[data-em="bigorna"] .e-martelo { transform-origin: 140px 32px; transform: rotate(48deg); }
+.em[data-em="bigorna"] .e-faiscas circle { fill: var(--em-glow); opacity: 0; }
+.em[data-em="bigorna"].in .e-martelo { animation: martela 1.5s 0.5s infinite; }
+.em[data-em="bigorna"].in .e-peca { animation: incandesce 1.5s ease-out 0.5s infinite; }
+.em[data-em="bigorna"].in .e-glow { animation: bafo 1.5s ease-out 0.5s infinite; }
+.em[data-em="bigorna"].in .e-faiscas circle { animation: espirra 1.5s ease-out 0.5s infinite; }
+@keyframes martela {
+  0% { transform: rotate(48deg); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  45% { transform: rotate(58deg); animation-timing-function: cubic-bezier(0.6, 0, 1, 1); }
+  60% { transform: rotate(0deg); animation-timing-function: ease-out; }
+  68% { transform: rotate(9deg); animation-timing-function: ease-in; }
+  74% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.3, 0, 0.3, 1); }
+  100% { transform: rotate(48deg); }
+}
+@keyframes incandesce {
+  0%, 59% { stroke: var(--em-fire); filter: drop-shadow(0 0 2px var(--em-fire)); }
+  61% { stroke: var(--em-glow); filter: drop-shadow(0 0 7px var(--em-glow)); }
+  100% { stroke: var(--em-fire); filter: drop-shadow(0 0 2px var(--em-fire)); }
+}
+@keyframes bafo { 0%, 59% { opacity: 0.12; transform: none; } 62% { opacity: 0.4; transform: scale(1.25); } 100% { opacity: 0.12; transform: none; } }
+@keyframes espirra {
+  0%, 59% { opacity: 0; transform: none; }
+  61% { opacity: 1; transform: none; }
+  95%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+}
+
 .em .e-sparks circle { fill: var(--em-glow); opacity: 0; }
 .em.in .e-sparks circle { animation: fagulha 1.9s ease-out calc(1.4s + var(--k) * 0.42s) infinite; }
 @keyframes fagulha {
   0% { opacity: 0; transform: none; }
   12% { opacity: 1; }
   100% { opacity: 0; transform: translate(7px, -30px); }
-}
-.em .e-smoke { opacity: 0; stroke-dasharray: 40; stroke-dashoffset: 40; }
-.em.in .e-smoke { animation: fumaca 3.4s ease-out 1.6s infinite; }
-@keyframes fumaca {
-  0% { opacity: 0; stroke-dashoffset: 40; transform: none; }
-  30% { opacity: 0.35; }
-  100% { opacity: 0; stroke-dashoffset: 0; transform: translateY(-10px); }
 }
 
 /* rastros: as pegadas aparecem uma a uma, andando, e o rastro vai sumindo atrás */
