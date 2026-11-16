@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Bandeirinhas } from './bandeirinhas';
 import { Ceu } from './ceu';
+import { Feno } from './feno';
 
 @Component({
-  imports: [Ceu, Bandeirinhas],
-  template: `<svg appCeu></svg><svg appBandeirinhas></svg>`,
+  imports: [Ceu, Bandeirinhas, Feno],
+  template: `<svg appCeu></svg><svg appBandeirinhas></svg><svg appFeno></svg>`,
 })
 class Palco {}
 
@@ -34,5 +35,16 @@ describe('Ornamentos do sertão', () => {
     const flags = el.querySelector('svg.bandeirinhas')!;
     expect(flags.querySelectorAll('.bd-cord')).toHaveLength(2);
     expect(flags.querySelectorAll('.bd-flag').length).toBeGreaterThan(20);
+  });
+
+  it('o feno é um emaranhado de galhos com gravetos para fora, igual a cada desenho', async () => {
+    const a = (await render()).querySelector('svg.feno')!;
+    expect(a.getAttribute('aria-hidden')).toBe('true');
+    const galhos = a.querySelector('.feno-galho')!.getAttribute('d')!;
+    expect(galhos.match(/M/g)).toHaveLength(12);
+    expect(a.querySelector('.feno-fio')!.getAttribute('d')!.match(/M/g)).toHaveLength(26);
+    expect(a.querySelector('.feno-graveto')!.getAttribute('d')!.match(/M/g)).toHaveLength(14);
+    TestBed.resetTestingModule();
+    expect((await render()).querySelector('svg.feno .feno-galho')!.getAttribute('d')).toBe(galhos);
   });
 });

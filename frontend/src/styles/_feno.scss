@@ -1,0 +1,43 @@
+/* O feno (shared/ornaments/feno): as cores dos galhos e o movimento que o topo e a travessia usam.
+   Quem usa monta três camadas: o caminho (vai de um lado ao outro), o pulo (.feno-pulo: quica com
+   pulos cada vez menores e amassa ao bater no chão) com o desenho girando dentro (.feno-gira) e a
+   sombra no chão (.feno-sombra), que encolhe e clareia quando ele sobe. */
+.feno { display: block; overflow: visible; }
+.feno-miolo { fill: rgba(170, 105, 50, 0.16); }
+.feno :is(.feno-fio, .feno-galho, .feno-graveto) { fill: none; stroke-linecap: round; }
+.feno-fio { stroke: #d6a061; stroke-width: 1; opacity: 0.85; }
+.feno-galho { stroke: #ad6a32; stroke-width: 2.2; }
+.feno-graveto { stroke: #8f5426; stroke-width: 1.2; }
+
+.feno-pulo { position: absolute; inset: 0; transform-origin: 50% 100%; }
+.feno-gira { width: 100%; height: 100%; }
+.feno-sombra {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -6px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(10, 5, 2, 0.6), transparent);
+}
+
+@keyframes feno-gira { to { rotate: 360deg; } }
+/* um pulo alto, um médio, um pequeno e um quique; sobe desacelerando, desce acelerando, amassa no chão */
+@keyframes feno-pulo {
+  0% { translate: 0 0; scale: 1.12 0.86; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  5% { scale: 1 1; }
+  24% { translate: 0 -130%; animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  44% { translate: 0 0; scale: 1.08 0.9; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  48% { scale: 1 1; }
+  62% { translate: 0 -60%; animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  76% { translate: 0 0; scale: 1.05 0.94; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  79% { scale: 1 1; }
+  88% { translate: 0 -22%; animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  100% { translate: 0 0; scale: 1.12 0.86; }
+}
+@keyframes feno-sombra {
+  0%, 44%, 76%, 100% { scale: 1; opacity: 0.75; }
+  24% { scale: 0.45; opacity: 0.25; }
+  62% { scale: 0.7; opacity: 0.45; }
+  88% { scale: 0.88; opacity: 0.6; }
+}
