@@ -4,13 +4,14 @@ import { Chapeu } from '../../../shared/ornaments/ornaments';
 import { IntroService } from '../../intro/intro.service';
 import { Coin } from '../../secrets/coin';
 
-// O rodapé: assinatura, voltar ao topo, rever a abertura e o nome gigante cortado no pé da página.
+// O rodapé: o bordado de cangaceiro no alto, a assinatura, voltar ao topo, rever a abertura e o nome gigante cortado no pé da página.
 @Component({
   selector: 'footer[appSiteFooter]',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Chapeu, Coin],
   host: { class: 'foot' },
   template: `
+    <div class="bordado" aria-hidden="true"></div>
     <div class="wrap">
       <div class="foot-top">
         <div class="foot-sign">

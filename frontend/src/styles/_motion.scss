@@ -27,6 +27,13 @@
 @keyframes stripes { to { background-position: 22.6px 0; } }
 @keyframes pop { 40% { transform: scale(1.6); } 100% { transform: none; } }
 
+/* o céu do sertão (shared/ornaments/ceu): estrelas piscando, cada uma no seu tempo, e o Cruzeiro do Sul */
+.ceu { display: block; pointer-events: none; }
+.ceu-star { fill: var(--on-night); opacity: 0.55; animation: pisca 4.2s ease-in-out calc(var(--d) * -1s) infinite; }
+.ceu-cruz { fill: var(--sol); animation: pisca-forte 5s ease-in-out calc(var(--d) * -1s) infinite; }
+@keyframes pisca { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.12; } }
+@keyframes pisca-forte { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

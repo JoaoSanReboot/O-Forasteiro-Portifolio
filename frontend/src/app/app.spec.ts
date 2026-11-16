@@ -18,24 +18,39 @@ describe('App', () => {
     expect(el.querySelector('#site h1')?.textContent).toContain('João');
   });
 
-  it('pular a abertura solta o site: a cortina sobe, a rolagem volta e o topo entra', async () => {
+  it('a tela de carregamento dá as boas-vindas e não tem como pular: nem botão, nem clique, nem teclado', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
-    el.querySelector<HTMLButtonElement>('.intro-skip')!.click();
+    const intro = el.querySelector<HTMLElement>('app-intro')!;
+    expect(intro.querySelector('.intro-hello')?.textContent).toBe('Seja bem-vindo,');
+    expect(intro.querySelector('.intro-sub')?.textContent).toBe('ao portfólio de João Pedro');
+    expect(intro.querySelector('button')).toBeNull();
+    intro.click();
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await fixture.whenStable();
+    expect(intro.classList.contains('leaving')).toBe(false);
+    expect(document.documentElement.classList.contains('intro-on')).toBe(true);
+  });
+
+  it('quando o contador chega a 100 a cortina sobe sozinha e solta o site', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    await new Promise((r) => setTimeout(r, 2900));
     await fixture.whenStable();
     expect(el.querySelector('app-intro')?.classList.contains('leaving')).toBe(true);
     expect(document.documentElement.classList.contains('intro-on')).toBe(false);
     expect(document.documentElement.classList.contains('ready')).toBe(true);
     expect(el.querySelector('#site')?.hasAttribute('inert')).toBe(false);
-  });
+  }, 6000);
 
   it('"Rever a abertura" traz a abertura de volta', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
-    el.querySelector<HTMLButtonElement>('.intro-skip')!.click();
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 4000));
     await fixture.whenStable();
     expect(el.querySelector('app-intro')).toBeNull();
     const replay = [...el.querySelectorAll<HTMLButtonElement>('.foot button')].find((b) => b.textContent?.includes('Rever a abertura'))!;
@@ -43,5 +58,5 @@ describe('App', () => {
     await fixture.whenStable();
     expect(el.querySelector('app-intro')).not.toBeNull();
     expect(document.documentElement.classList.contains('ready')).toBe(false);
-  });
+  }, 7000);
 });

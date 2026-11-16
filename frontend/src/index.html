@@ -10,9 +10,16 @@
   <meta name="theme-color" content="#efe4cf">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Ultra&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Sancreek&family=Special+Elite&family=Ultra&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap">
   <!-- com JavaScript, o topo espera a abertura para entrar; sem ele, tudo já aparece de cara -->
   <script>document.documentElement.classList.add('js')</script>
+  <!-- recarregar sempre começa na primeira tela: o navegador não devolve a rolagem antiga
+       e uma âncora que ficou no endereço (#contato...) sai antes de a página pular até ela -->
+  <script>
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    addEventListener('pageshow', function () { scrollTo(0, 0); });
+  </script>
 </head>
 <body>
   <app-root></app-root>

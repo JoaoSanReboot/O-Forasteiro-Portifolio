@@ -2,7 +2,7 @@
 .jobs { list-style: none; display: grid; gap: clamp(72px, 10vw, 140px); margin: 0; padding: 0; }
 .job { display: grid; grid-template-columns: minmax(240px, 4fr) 8fr; gap: clamp(28px, 6vw, 104px); }
 .job-side { position: sticky; top: calc(var(--nav-h) + 32px); align-self: start; padding-top: 18px; border-top: 2px solid var(--urucum); }
-.job-period { margin-bottom: 18px; font: 500 12.5px/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--urucum); }
+.job-period { margin-bottom: 18px; font: 400 14px/1 var(--f-type); letter-spacing: 0.06em; text-transform: uppercase; color: var(--urucum); }
 .job-role {
   font: 700 clamp(2rem, 3.6vw, 3.2rem)/0.98 var(--f-display);
   font-variation-settings: "wdth" 82, "opsz" 96;

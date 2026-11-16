@@ -69,17 +69,21 @@
   animation: stripes 1.2s linear infinite;
 }
 .course.rv:not(.in) .course-bar { transform: scaleX(0); }
+/* o carimbo do cartório: borda dupla, tinta falhada e torto */
 .seal {
   justify-self: end;
-  padding: 8px 13px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  font: 500 11px/1 var(--f-mono);
-  letter-spacing: 0.1em;
+  padding: 7px 11px 5px;
+  border: 3px double currentColor;
+  border-radius: 4px;
+  color: var(--mandacaru);
+  font: 400 13px/1 var(--f-type);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
+  rotate: -4deg;
+  filter: url(#tinta);
 }
-.seal.going { border-color: var(--urucum); color: var(--urucum); }
+.seal.going { color: var(--urucum); rotate: 3deg; }
 
 @media (max-width: 760px) {
   .edu { padding-top: 0; }
