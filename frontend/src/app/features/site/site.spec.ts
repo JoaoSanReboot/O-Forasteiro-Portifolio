@@ -59,7 +59,41 @@ describe('Site', () => {
     expect(el.querySelector('#inicio')?.textContent).not.toContain('São José dos Pinhais');
     expect(el.querySelector('.poster-name')).not.toBeNull();
     expect(el.querySelector('.poster-reward')?.textContent).toContain('um bom projeto');
-    expect(el.querySelector('.poster-stamp, .poster-hole, .poster-nail, .poster-seen')).toBeNull();
+    expect(el.querySelector('.poster-stamp, .poster-seen')).toBeNull();
+  });
+
+  it('o topo fica só com o nome, o título e o cartaz: sem o texto de apresentação e sem os dois botões', async () => {
+    const { el } = await render();
+    const hero = el.querySelector('#inicio')!;
+    expect(hero.textContent).not.toContain('Do banco de dados à tela');
+    expect(hero.querySelector('.hero-foot, .hero-lead, .hero-actions, .btn')).toBeNull();
+    // só o título, sem o .NET e sem o fio com a estrela
+    expect([...hero.querySelectorAll('.hero-role > span')].map((s) => s.textContent)).toEqual(['Desenvolvedor', 'FullStack']);
+    expect(hero.querySelector('.role-net, .role-rule, .role-star')).toBeNull();
+    // o cartaz em papel velho, pregado, e o feno de verdade rolando no chão
+    // o nome e o título embaixo dele, no mesmo bloco (mesmo eixo à esquerda)
+    expect(hero.querySelector('.hero-id > .hero-name + .hero-role')).not.toBeNull();
+    expect(hero.querySelector('.poster .poster-nail')).not.toBeNull();
+    expect(hero.querySelector('.poster-sheet .poster-sub')?.textContent).toBe('vivo e codando');
+    expect(hero.querySelector('.poster-sheet .poster-head')?.textContent).toBe('Procura-se');
+    expect(hero.querySelector('.vento .feno-rota svg.feno')).not.toBeNull();
+    // o pistoleiro escorado no "O" de João (depois das letras, fora do leitor de tela) e os seis buracos de bala no cartaz
+    const pist = hero.querySelector('.hn-line:first-child > .pistoleiro');
+    expect(pist?.previousElementSibling?.classList).toContain('hn-txt');
+    expect(pist?.getAttribute('aria-hidden')).toBe('true');
+    expect(pist?.querySelector('.pist-roda .pist-cano')).not.toBeNull();
+    expect(hero.querySelectorAll('.poster-sheet .poster-furo').length).toBe(6);
+    expect(hero.querySelector('.capim')).toBeNull();
+  });
+
+  it('a travessia vem logo depois do topo, com as três falas do caminho na ordem', async () => {
+    const { el } = await render();
+    const tv = el.querySelector('#travessia')!;
+    expect(tv.previousElementSibling?.id).toBe('inicio');
+    expect(tv.nextElementSibling?.id).toBe('sobre');
+    expect([...tv.querySelectorAll('.tv-fala')].map((f) => f.textContent?.trim())).toEqual(['Saiu do banco de dados,', 'atravessou as APIs', 'e chegou na tela.']);
+    expect(tv.querySelectorAll('.tv-rider .perna')).toHaveLength(4);
+    expect(tv.querySelector('.tv-feno svg.feno')).not.toBeNull();
   });
 
   it('a frase do Sobre vira palavras, com os trechos marcados em itálico', () => {

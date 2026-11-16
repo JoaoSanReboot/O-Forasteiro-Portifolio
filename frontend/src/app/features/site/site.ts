@@ -11,6 +11,7 @@ import { Projetos } from '../projetos/projetos';
 import { CoinNews } from '../secrets/coin-news';
 import { CoinPurse } from '../secrets/coin-purse';
 import { Skills } from '../skills/skills';
+import { Travessia } from '../travessia/travessia';
 import { Sobre } from '../sobre/sobre';
 import { SiteFooter } from './site-footer/site-footer';
 import { SmoothScroll, startSmoothScroll } from './smooth-scroll';
@@ -20,7 +21,7 @@ import { SmoothScroll, startSmoothScroll } from './smooth-scroll';
 @Component({
   selector: 'div[appSite]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CoinPurse, Hero, Sobre, Projetos, Experiencia, Skills, Commits, Formacao, Contato, SiteFooter, CoinNews],
+  imports: [CoinPurse, Hero, Travessia, Sobre, Projetos, Experiencia, Skills, Commits, Formacao, Contato, SiteFooter, CoinNews],
   host: { id: 'site', '[attr.inert]': 'covered() ? "" : null' },
   template: `
     <!-- a tinta da prensa: borda comida e falhas no preto dos títulos em tipo de madeira (filter: url(#tinta)) -->
@@ -37,6 +38,7 @@ import { SmoothScroll, startSmoothScroll } from './smooth-scroll';
     <app-coin-purse />
     <main>
       <section appHero></section>
+      <div appTravessia></div>
       <section appSobre></section>
       <section appProjetos></section>
       <section appExperiencia></section>

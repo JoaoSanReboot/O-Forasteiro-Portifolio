@@ -6,7 +6,6 @@ export const PROFILE = {
   role: 'Desenvolvedor FullStack',
   stack: '.NET',
   location: 'São José dos Pinhais, PR',
-  lead: 'Do banco de dados à tela: APIs, integrações e interfaces construídas com cuidado, sem deixar stack trace pelo caminho.',
   portrait: 'assets/retrato-cartaz.png',
 } as const;
 
