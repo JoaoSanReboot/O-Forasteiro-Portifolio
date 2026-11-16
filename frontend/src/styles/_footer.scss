@@ -1,5 +1,6 @@
 /* Rodapé: continua a noite do contato, com a assinatura, os atalhos e "Forasteiro" gigante cortado no pé. */
-.foot { position: relative; overflow: clip; padding: clamp(40px, 5vw, 64px) 0 22px; background: var(--night); color: var(--on-night); border-top: 1px solid var(--night-line); }
+.foot { position: relative; overflow: clip; padding: clamp(64px, 7vw, 88px) 0 22px; background: var(--night); color: var(--on-night); }
+.foot > .bordado { position: absolute; left: 0; right: 0; top: 12px; }
 .foot-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; }
 .foot-sign { display: flex; align-items: center; gap: 16px; }
 .foot-hat { width: 62px; height: 36px; color: var(--sol); }

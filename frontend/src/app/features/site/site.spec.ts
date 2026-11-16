@@ -41,18 +41,22 @@ describe('Site', () => {
     expect(el.querySelector('#t-experiencia')?.textContent).toContain('Rastros pelo');
   });
 
-  it('a barra aponta para seções que existem e o menu do celular abre e fecha', async () => {
-    const { fixture, el } = await render();
-    const ids = [...el.querySelectorAll<HTMLAnchorElement>('.nav-links a')].map((a) => a.getAttribute('href'));
-    expect(ids).toEqual(['#sobre', '#projetos', '#experiencia', '#skills', '#github', '#formacao', '#contato']);
-    for (const id of ids) expect(el.querySelector(id!)).not.toBeNull();
-    const menu = el.querySelector('.nav-menu')!;
-    expect(menu.getAttribute('aria-expanded')).toBe('false');
-    await click(fixture, menu);
-    expect(menu.getAttribute('aria-expanded')).toBe('true');
-    expect(el.querySelector('.nav-links')?.classList.contains('open')).toBe(true);
-    await click(fixture, el.querySelector('.nav-links a'));
-    expect(menu.getAttribute('aria-expanded')).toBe('false');
+  it('a página é só rolagem: sem barra no topo, e o bolso das moedas fica no canto levando ao duelo', async () => {
+    const { el } = await render();
+    expect(el.querySelector('nav, .nav, .nav-links')).toBeNull();
+    const purse = el.querySelector<HTMLAnchorElement>('.coin-purse')!;
+    expect(purse.getAttribute('href')).toBe('#duelo');
+    expect(el.querySelector(purse.getAttribute('href')!)).not.toBeNull();
+    expect(purse.textContent?.replace(/\s/g, '')).toBe('0/5');
+    expect(purse.getAttribute('aria-label')).toContain('0 de 5');
+  });
+
+  it('o topo mostra o nome e o cartaz enxuto, sem o rótulo "Portfólio · 2026"', async () => {
+    const { el } = await render();
+    expect(el.querySelector('#inicio')?.textContent).not.toContain('Portfólio');
+    expect(el.querySelector('.poster-name')).not.toBeNull();
+    expect(el.querySelector('.poster-reward')?.textContent).toContain('um bom projeto');
+    expect(el.querySelector('.poster-stamp, .poster-hole, .poster-nail, .poster-seen')).toBeNull();
   });
 
   it('a frase do Sobre vira palavras, com os trechos marcados em itálico', () => {

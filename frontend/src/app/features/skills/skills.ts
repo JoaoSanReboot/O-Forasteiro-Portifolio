@@ -15,6 +15,7 @@ import { Coin } from '../secrets/coin';
   host: { class: 'sec sec-night skills', id: 'skills', 'aria-labelledby': 't-skills' },
   template: `
     <p class="skills-ghost" aria-hidden="true"><span>Arsenal ✦ Arsenal ✦ Arsenal</span></p>
+    <div class="bordado" aria-hidden="true"></div>
     <div class="wrap">
       <header appSectionHead num="04" label="Skills" title="Ferramentas do" accent="ofício." [aside]="total + ' ferramentas'" emblem="peixeiras" titleId="t-skills"></header>
       <div class="arsenal">

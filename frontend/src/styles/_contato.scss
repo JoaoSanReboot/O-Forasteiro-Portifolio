@@ -1,5 +1,24 @@
 /* 07 · Contato: seção escura, o e-mail grande com o botão de copiar e os perfis em linhas que deslizam. */
-.sec.contato { padding-bottom: clamp(80px, 9vw, 130px); }
+.sec.contato { padding-bottom: clamp(80px, 9vw, 130px); overflow-x: clip; }
+.contato .wrap { position: relative; z-index: 1; }
+.contato-ceu { position: absolute; z-index: 0; left: 0; top: 0; width: 100%; height: clamp(300px, 50vw, 640px); opacity: 0.75; }
+/* aqui o Cruzeiro desce para o vão ao lado do título, longe da fogueira */
+.contato-ceu .cruzeiro { transform: translate(-150px, 150px); opacity: 0.8; }
+
+/* as bandeirinhas atravessadas no alto, cada uma balançando no seu tempo */
+.contato-flags { position: absolute; z-index: 2; left: 0; top: 0; width: 100%; height: clamp(70px, 9.2vw, 140px); }
+.bd-cord { fill: none; stroke: var(--on-night-muted); stroke-width: 1.2; }
+.bd-flag {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: tremula 2.8s ease-in-out calc(var(--d) * -1s) infinite;
+}
+.bd-flag[data-c="0"] { fill: var(--urucum); }
+.bd-flag[data-c="1"] { fill: var(--sol); }
+.bd-flag[data-c="2"] { fill: #5b7f52; }
+.bd-flag[data-c="3"] { fill: var(--paper); }
+.bd-flag[data-c="4"] { fill: var(--latao); }
+@keyframes tremula { 0%, 100% { transform: rotate(-6deg) skewX(2deg); } 50% { transform: rotate(6deg) skewX(-3deg); } }
 .contact { display: grid; gap: clamp(40px, 6vw, 80px); }
 .contact-lead { max-width: 34ch; font: italic 400 clamp(1.4rem, 2.5vw, 2.2rem)/1.3 var(--f-serif); color: var(--on-night-muted); }
 .mail { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; }

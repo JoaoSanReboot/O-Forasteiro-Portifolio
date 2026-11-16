@@ -28,8 +28,8 @@ O mapa completo (camadas, onde cada funcionalidade mora, padrões) está em `doc
 |---|---|
 | `frontend/src/app/engine/` | TypeScript puro, sem Angular: quadros seguros para SSR (`raf`/`cancelRaf`), matemática e as regras do jogo da memória |
 | `frontend/src/app/core/` | Infraestrutura: plataforma e o estado da rolagem (`ScrollState`) |
-| `frontend/src/app/shared/` | `reveal` (entrada ao rolar), `section-head`, `split` (letras), `ornaments` (SVGs do sertão) e `emblems` (o desenho animado de cada título) |
-| `frontend/src/app/features/` | `intro` (abertura), `site` (casca, barra, rodapé, Lenis), `hero` e as seções `sobre`, `projetos`, `experiencia`, `skills`, `commits` (GitHub), `formacao`, `contato`; os jogos moram dentro das seções: `duelo` (na Experiência), `memoria` (nas Skills) e as moedas de `secrets` |
+| `frontend/src/app/shared/` | `reveal` (entrada ao rolar), `section-head`, `split` (letras), `ornaments` (SVGs do sertão: estrela, sol, mandacaru, chapéu, céu e bandeirinhas) e `emblems` (o desenho animado de cada título) |
+| `frontend/src/app/features/` | `intro` (abertura), `site` (casca só de rolagem, sem barra; rodapé, Lenis), `hero` e as seções `sobre`, `projetos`, `experiencia`, `skills`, `commits` (GitHub), `formacao`, `contato`; os jogos moram dentro das seções: `duelo` (na Experiência), `memoria` (nas Skills) e as moedas de `secrets` |
 | `frontend/src/app/content/` | Textos e dados (perfil, experiência, formação, contatos, projetos, skills, jogos, registro guardado do GitHub) |
 | `frontend/src/styles/` | Tokens, base, movimento e uma parte por seção |
 | `frontend/src/environments/` | `githubEndpoint`, `skipIntro` |
@@ -42,8 +42,8 @@ Dependências só num sentido: `features → shared → core → engine` (`conte
 ## Convenções
 
 - Textos da interface e comentários em português do Brasil.
-- Visual "caatinga ao meio-dia": cores, fontes e curvas só pelos tokens de `src/styles/_tokens.scss`. Títulos de seção com `<header appSectionHead>`: tipo de madeira (Ultra) com a tinta da prensa (`filter: url(#tinta)`), o fim em itálico serifado e um `emblem` que desenha o título; ornamentos do sertão por `shared/ornaments`. Rye só em rótulos curtos. Nada de pixel art.
-- Movimento: entradas com `appReveal` (+ `revealDelay`), o topo espera `html.ready`, efeitos de rolagem leem `--sy`/`--progress` ou usam `animation-timeline: view()`. Sempre respeitar "reduzir movimento" e deixar o conteúdo visível sem JavaScript (o que esconde para animar depende de `html.js`).
+- Visual escuro (o sertão à noite, no tom da tela de carregamento): cores, fontes e curvas só pelos tokens de `src/styles/_tokens.scss`. Títulos de seção com `<header appSectionHead>`: tipo de madeira (Ultra) com a tinta da prensa (`filter: url(#tinta)`), o fim em itálico serifado e um `emblem` que desenha o título; ornamentos do sertão por `shared/ornaments`. Rye só em rótulos curtos; Sancreek (toscano de cartaz) e Special Elite (máquina de escrever) só em detalhes. Nada de pixel art.
+- Movimento: entradas com `appReveal` (+ `revealDelay`), o topo espera `html.ready`, efeitos de rolagem leem `--sy` ou usam `animation-timeline: view()`. Sempre respeitar "reduzir movimento" e deixar o conteúdo visível sem JavaScript (o que esconde para animar depende de `html.js`).
 - Estado que muda a cada quadro fica fora dos Signals (estilo ou variável CSS direto no elemento); Signals só para o que a interface mostra.
 - O código também roda no Node (prerender e SSR do `ng serve`): nada de `window`, `document` ou armazenamento fora do navegador.
   Animações começam em `afterNextRender`; quadros usam `raf`/`cancelRaf` de `engine/core/browser.ts`; cleanups com `DestroyRef`.

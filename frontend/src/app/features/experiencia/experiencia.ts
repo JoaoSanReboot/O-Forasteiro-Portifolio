@@ -28,7 +28,7 @@ const marks = (s: string) => s.split('**').map((t, i) => ({ t, strong: i % 2 ===
             <div class="job-body">
               <ul class="job-bullets">
                 @for (b of j.bullets; track $index) {
-                  <li appReveal>@for (m of b; track $index) {@if (m.strong) {<strong>{{ m.t }}</strong>} @else {{{ m.t }}}}</li>
+                  <li appReveal><span>@for (m of b; track $index) {@if (m.strong) {<strong>{{ m.t }}</strong>} @else {{{ m.t }}}}</span></li>
                 }
               </ul>
               <p class="job-tech-label">Ferramentas do dia a dia</p>

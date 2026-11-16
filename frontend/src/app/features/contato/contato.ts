@@ -1,16 +1,21 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { CONTACTS, EMAIL } from '../../content/profile';
+import { Bandeirinhas } from '../../shared/ornaments/bandeirinhas';
+import { Ceu } from '../../shared/ornaments/ceu';
 import { Reveal } from '../../shared/reveal/reveal';
 import { SectionHead } from '../../shared/section-head/section-head';
 import { Coin } from '../secrets/coin';
 
-// 07 · Contato: o convite enorme, o e-mail com o botão de copiar e os perfis em linhas grandes.
+// 07 · Contato: noite de prosa no terreiro, com as bandeirinhas balançando e o céu do sertão por cima.
+// O convite enorme, o e-mail com o botão de copiar e os perfis em linhas grandes.
 @Component({
   selector: 'section[appContato]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SectionHead, Reveal, Coin],
+  imports: [SectionHead, Reveal, Coin, Ceu, Bandeirinhas],
   host: { class: 'sec sec-night contato', id: 'contato', 'aria-labelledby': 't-contato' },
   template: `
+    <svg appCeu class="contato-ceu"></svg>
+    <svg appBandeirinhas class="contato-flags"></svg>
     <div class="wrap">
       <header appSectionHead num="07" label="Contato" title="Bora" accent="prosear?" emblem="fogueira" titleId="t-contato"></header>
       <div class="contact">

@@ -1,6 +1,6 @@
 import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { PROFILE } from '../../content/profile';
-import { Estrela, Sol } from '../../shared/ornaments/ornaments';
+import { Sol } from '../../shared/ornaments/ornaments';
 import { Letters } from '../../shared/split/letters';
 import { Coin } from '../secrets/coin';
 
@@ -13,15 +13,21 @@ const CACTI = [
 ];
 /** as estacas da cerca */
 const POSTS = Array.from({ length: 9 }, (_, i) => 430 + i * 42);
+/** o rolo de capim seco: galhos enrolados (elipses giradas) e uns gravetos soltos */
+const CAPIM = Array.from({ length: 8 }, (_, i) => ({ ry: 8 + (i % 3) * 5, a: i * 23 }));
+const GRAVETOS = 'M14 -15 L25 -22 M-17 12 L-27 17 M6 19 L9 28 M-9 -18 L-12 -27 M19 8 L28 10';
+/** o redemoinho de poeira: anéis do funil, do mais largo (em cima) ao mais fino (no chão) */
+const FUNIL = [0, 1, 2, 3, 4, 5].map((i) => ({ y: i * 13, rx: 26 - i * 4 }));
 
-// O topo: o nome enorme em tipo de madeira, o cartaz de "Procura-se" pregado na parede (balançando
-// no prego, com o carimbo batendo), o sol de xilogravura com os urubus rodando (parallax pela rolagem)
-// e o horizonte do sertão no pé: chão, mandacarus e a cerca de estacas.
+// O topo: o nome enorme em tipo de madeira, o cartaz de "Procura-se" (enxuto: título, retrato, nome e recompensa),
+// o sol de xilogravura com os urubus rodando (parallax pela rolagem)
+// e o horizonte do sertão no pé: chão, mandacarus e a cerca de estacas, com o vento passando
+// (o rolo de capim seco quicando, a poeira rasteira e um redemoinho que nasce e some).
 // A entrada é por CSS e começa quando a abertura sobe (`html.ready`).
 @Component({
   selector: 'section[appHero]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Letters, Sol, Estrela, Coin],
+  imports: [Letters, Sol, Coin],
   host: { class: 'hero', id: 'inicio', 'aria-labelledby': 'hero-title' },
   template: `
     <div class="hero-sun" aria-hidden="true">
@@ -34,7 +40,6 @@ const POSTS = Array.from({ length: 9 }, (_, i) => 430 + i * 42);
     </div>
     <div class="wrap hero-in">
       <div class="hero-top">
-        <p class="hero-meta"><svg appEstrela class="meta-star"></svg>Portfólio · 2026</p>
         <p class="hero-meta hero-where">{{ p.location }}@if (clock()) { <span class="hero-clock"><span class="sr-only">, agora são </span>{{ clock() }}</span> }</p>
       </div>
       <h1 class="hero-name" id="hero-title" tabindex="-1">
@@ -44,18 +49,12 @@ const POSTS = Array.from({ length: 9 }, (_, i) => 430 + i * 42);
       </h1>
       <p class="hero-role" aria-hidden="true"><em>desenvolvedor</em><span>FullStack · .NET</span></p>
       <figure class="poster">
-        <span class="poster-nail" aria-hidden="true"></span>
-        <div class="poster-sheet">
-          <p class="poster-head">Procura-se</p>
-          <div class="poster-photo"><img [src]="p.portrait" alt="Retrato de João Pedro" width="160" height="200" fetchpriority="high"></div>
-          <figcaption>
-            <span class="poster-name">{{ p.fullName }}</span>
-            <span class="poster-alias">vulgo <em>O Forasteiro</em></span>
-            <span class="poster-reward"><small>Recompensa</small>um bom projeto</span>
-            <span class="poster-seen">Visto por último entre o banco de dados e a tela</span>
-          </figcaption>
-        </div>
-        <span class="poster-stamp" aria-hidden="true">Sem stack trace</span>
+        <p class="poster-head">Procura-se</p>
+        <div class="poster-photo"><img [src]="p.portrait" alt="Retrato de João Pedro" width="160" height="200" fetchpriority="high"></div>
+        <figcaption>
+          <span class="poster-name">{{ p.fullName }}</span>
+          <span class="poster-reward"><small>Recompensa</small> um bom projeto</span>
+        </figcaption>
       </figure>
       <div class="hero-foot">
         <p class="hero-lead">{{ p.lead }}</p>
@@ -66,6 +65,13 @@ const POSTS = Array.from({ length: 9 }, (_, i) => 430 + i * 42);
       </div>
     </div>
     <app-coin coin="horizonte" class="coin-horizonte" />
+    <div class="vento" aria-hidden="true">
+      <span class="poeira"></span><span class="poeira p2"></span><span class="poeira p3"></span>
+      <svg class="redemoinho" viewBox="-30 -8 60 84" focusable="false">
+        @for (f of funil; track f.y) { <ellipse cx="0" [attr.cy]="f.y" [attr.rx]="f.rx" ry="3.4" [style.--i]="$index" /> }
+      </svg>
+      <span class="capim"><svg viewBox="-30 -30 60 60" focusable="false">@for (c of capim; track c.a) { <ellipse rx="20" [attr.ry]="c.ry" [attr.transform]="'rotate(' + c.a + ')'" /> }<path [attr.d]="gravetos" /></svg></span>
+    </div>
     <svg class="horizon" viewBox="0 0 1440 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
       <g class="hz-fence" fill="none" stroke="currentColor" stroke-linecap="round">
         @for (x of posts; track x) { <path [attr.d]="'M' + x + ' 104 V' + (78 + ($index % 3) * 3)" stroke-width="4" /> }
@@ -86,6 +92,9 @@ export class Hero {
   protected readonly p = PROFILE;
   protected readonly cacti = CACTI;
   protected readonly posts = POSTS;
+  protected readonly capim = CAPIM;
+  protected readonly gravetos = GRAVETOS;
+  protected readonly funil = FUNIL;
   /** a hora em São José dos Pinhais (só no navegador: o prerender sai sem ela) */
   protected readonly clock = signal('');
 

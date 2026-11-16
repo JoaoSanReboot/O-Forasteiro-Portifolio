@@ -1,4 +1,4 @@
-/* O topo: nome enorme em tipo de madeira, o cartaz de "Procura-se" pregado (balança no prego), o sol atrás
+/* O topo: nome enorme em tipo de madeira, o cartaz de "Procura-se" enxuto, o sol atrás
    com os urubus rodando (parallax pela rolagem, --sy vem do ScrollState) e o horizonte do sertão no pé.
    Com JavaScript, tudo espera a abertura subir (html.ready) para entrar. */
 .hero {
@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  padding-top: calc(var(--nav-h) + 20px);
+  padding-top: 20px;
   overflow: clip;
   background: var(--paper);
 }
@@ -18,7 +18,7 @@
   right: -9vw;
   width: clamp(380px, 50vw, 820px);
   color: var(--sol);
-  opacity: 0.62;
+  opacity: 0.42;
   transform: translate3d(0, calc(var(--sy, 0) * 0.28px), 0);
   will-change: transform;
 }
@@ -53,7 +53,7 @@
   column-gap: clamp(24px, 4vw, 72px);
 }
 
-.hero-top { grid-area: top; display: flex; justify-content: space-between; gap: 16px; padding-top: 6px; }
+.hero-top { grid-area: top; display: flex; justify-content: flex-end; gap: 16px; padding-top: 6px; }
 .hero-meta {
   display: inline-flex;
   align-items: center;
@@ -63,7 +63,6 @@
   text-transform: uppercase;
   color: var(--muted);
 }
-.meta-star { width: 16px; height: 16px; color: var(--urucum); animation: spin 14s linear infinite; }
 .hero-clock { margin-left: 10px; padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .hero-name {
@@ -93,104 +92,38 @@
 }
 .hero-role em { font: italic 400 1.45em/1 var(--f-serif); text-transform: none; letter-spacing: 0; color: var(--couro); }
 
-/* o cartaz de "Procura-se": papel queimado nas bordas, pregado na parede e balançando no prego */
+/* o cartaz de "Procura-se", enxuto: um fio de papel em volta, o título em toscano, o retrato em sépia,
+   o nome e a recompensa. Inclinado de leve, sem balanço, prego, carimbo nem furos. */
 .poster {
   grid-area: poster;
   align-self: center;
-  position: relative;
-  width: clamp(220px, 23vw, 320px);
-  margin: 0;
-  transform-origin: 50% 0;
-  animation: balanca 7s ease-in-out infinite;
-}
-@keyframes balanca { 0%, 100% { transform: rotate(-2.6deg); } 50% { transform: rotate(-0.6deg); } }
-.poster-nail {
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  top: 9px;
-  width: 12px;
-  height: 12px;
-  margin-left: -6px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #8a7a6a, var(--ink) 70%);
-  box-shadow: 0 2px 3px rgba(28, 20, 16, 0.4);
-}
-.poster-sheet {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
-  gap: 10px;
-  padding: 26px 20px 20px;
-  background: #ecdcb8;
-  box-shadow:
-    inset 0 0 0 6px #ecdcb8,
-    inset 0 0 0 7.5px var(--ink),
-    inset 0 0 40px rgba(126, 69, 38, 0.45);
+  gap: 14px;
+  width: clamp(220px, 22vw, 300px);
+  margin-top: clamp(24px, 4vh, 48px);
+  padding: 22px 20px 20px;
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.7);
+  outline: 1px solid var(--line);
+  outline-offset: 5px;
   text-align: center;
-  clip-path: polygon(0 1%, 8% 0, 22% 1.2%, 40% 0.2%, 62% 1%, 80% 0, 100% 0.8%, 99.4% 22%, 100% 48%, 99.2% 76%, 100% 99%, 78% 100%, 55% 99%, 30% 100%, 10% 99.2%, 0 100%, 0.8% 70%, 0 40%);
+  rotate: -1.5deg;
 }
-.poster::before {
-  content: "";
-  position: absolute;
-  inset: 14px -4px -14px 10px;
-  z-index: -1;
-  background: rgba(28, 20, 16, 0.22);
-  filter: blur(14px);
-}
-.poster-head { margin-top: 4px; font: 400 clamp(1.7rem, 2.6vw, 2.4rem)/1 var(--f-west); letter-spacing: 0.02em; text-transform: uppercase; }
-.poster-photo {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 4.4;
-  overflow: hidden;
-  border: 1.5px solid var(--ink);
-  background: var(--sol);
-}
-/* xilogravura: a foto em tons de cinza "carimbada" sobre o ocre, com uma retícula por cima */
-.poster-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.3) brightness(1.08); mix-blend-mode: multiply; }
-.poster-photo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, rgba(28, 20, 16, 0.32) 0.8px, transparent 1.3px) 0 0 / 5px 5px;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
-.poster figcaption { display: grid; justify-items: center; gap: 6px; width: 100%; }
-.poster-name { font: 400 clamp(1.1rem, 1.5vw, 1.45rem)/1 var(--f-wood); text-transform: uppercase; }
-.poster-alias { font: italic 400 19px/1 var(--f-serif); color: var(--couro); }
-.poster-alias em { color: var(--urucum); }
+.poster-head { font: 400 clamp(1.6rem, 2.4vw, 2.2rem)/1 var(--f-tuscan); letter-spacing: 0.02em; text-transform: uppercase; color: var(--sol); }
+.poster-photo { width: 100%; aspect-ratio: 4 / 4.4; overflow: hidden; background: var(--paper-2); }
+.poster-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) sepia(0.35) contrast(1.1); }
+.poster figcaption { display: grid; justify-items: center; gap: 10px; width: 100%; }
+.poster-name { font: 400 clamp(1rem, 1.35vw, 1.3rem)/1.1 var(--f-wood); text-transform: uppercase; }
 .poster-reward {
-  display: grid;
-  gap: 5px;
   width: 100%;
-  margin-top: 4px;
-  padding: 9px 0 8px;
-  border-block: 1.5px solid var(--ink);
-  font: 400 clamp(0.95rem, 1.25vw, 1.15rem)/1 var(--f-wood);
-  text-transform: uppercase;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-strong);
+  font: italic 400 1.15rem/1 var(--f-serif);
+  color: var(--ink-2);
 }
-.poster-reward small { font: 500 10px/1 var(--f-mono); letter-spacing: 0.22em; color: var(--muted); }
-.poster-seen { max-width: 26ch; font: 500 9.5px/1.4 var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
-/* o carimbo: tinta de urucum, torto, batido por cima */
-.poster-stamp {
-  position: absolute;
-  z-index: 3;
-  left: -15%;
-  top: 24%;
-  padding: 8px 12px 6px;
-  border: 2.5px solid var(--urucum);
-  border-radius: 6px;
-  outline: 1px solid var(--urucum);
-  outline-offset: 2px;
-  color: var(--urucum);
-  font: 400 clamp(13px, 1.2vw, 16px)/1 var(--f-west);
-  text-transform: uppercase;
-  white-space: nowrap;
-  background: rgba(236, 220, 184, 0.92);
-  transform: rotate(-13deg);
-}
+.poster-reward small { font: 500 10px/1 var(--f-mono); font-style: normal; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
 
 .hero-foot {
   grid-area: foot;
@@ -207,21 +140,102 @@
 .hero-actions .btn-ghost { --bg: var(--paper); }
 
 /* o horizonte do sertão no pé do topo: chão, mandacarus e a cerca de estacas */
-.horizon { position: relative; z-index: 1; display: block; width: 100%; height: clamp(72px, 9vw, 130px); margin-top: -10px; color: var(--ink); }
+/* em silhueta, no mesmo chão escuro da tela de carregamento */
+.horizon { position: relative; z-index: 1; display: block; width: 100%; height: clamp(72px, 9vw, 130px); margin-top: -10px; color: var(--night); }
+
+/* o vento no chão do topo: o rolo de capim seco atravessa quicando, a poeira rasteira vem junto
+   e de vez em quando um redemoinho nasce perto da cerca e some. Fora da tela quando parado. */
+.vento {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: calc(clamp(72px, 9vw, 130px) * 0.11);
+  height: 110px;
+  pointer-events: none;
+  color: var(--couro);
+}
+.capim { position: absolute; left: 0; bottom: 0; width: 52px; height: 52px; translate: -90px 0; animation: rola 24s linear 4s infinite; }
+.capim svg { width: 100%; height: 100%; overflow: visible; animation: gira 1.15s linear infinite, quica 0.62s infinite; }
+.capim :is(ellipse, path) { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+.capim::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -4px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(28, 20, 16, 0.28), transparent);
+}
+@keyframes rola { 0% { translate: -90px 0; } 48%, 100% { translate: calc(100vw + 90px) 0; } }
+@keyframes gira { to { rotate: 360deg; } }
+@keyframes quica {
+  0% { translate: 0 0; animation-timing-function: cubic-bezier(0.3, 0.7, 0.6, 1); }
+  50% { translate: 0 -18px; animation-timing-function: cubic-bezier(0.4, 0, 0.7, 0.3); }
+  100% { translate: 0 0; }
+}
+
+.poeira {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 34vw;
+  height: 14px;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(126, 69, 38, 0.3), transparent);
+  filter: blur(3px);
+  animation: sopra 24s linear 3.6s infinite;
+}
+.poeira.p2 { bottom: 22px; width: 22vw; height: 8px; animation-delay: 4.3s; }
+.poeira.p3 { bottom: 10px; width: 16vw; height: 10px; animation-delay: 5s; }
+@keyframes sopra {
+  0% { opacity: 0; translate: -40vw 0; }
+  8% { opacity: 1; }
+  44% { opacity: 0.8; }
+  52%, 100% { opacity: 0; translate: 110vw 0; }
+}
+
+.redemoinho {
+  position: absolute;
+  left: 63%;
+  bottom: 0;
+  width: 58px;
+  overflow: visible;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  animation: vagueia 19s ease-in-out 9s infinite;
+}
+.redemoinho ellipse {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-dasharray: 9 6;
+  stroke-linecap: round;
+  animation: rodopia 0.8s linear infinite, torce 1.6s ease-in-out calc(var(--i) * -0.22s) infinite;
+}
+@keyframes rodopia { to { stroke-dashoffset: -30; } }
+@keyframes torce { 0%, 100% { translate: calc(var(--i) * -1.6px) 0; } 50% { translate: calc(var(--i) * 1.6px) 0; } }
+@keyframes vagueia {
+  0% { opacity: 0; transform: scale(0.4, 0.2); }
+  12% { opacity: 0.75; transform: none; }
+  55% { opacity: 0.7; transform: translateX(-140px) rotate(-4deg); }
+  70%, 100% { opacity: 0; transform: translateX(-180px) scale(1.2, 0.7); }
+}
 
 /* a entrada depois da abertura */
 html.js:not(.ready) .hero-name .ch { transform: translateY(108%); }
-html.js:not(.ready) :is(.hero-top, .hero-role, .poster, .hero-foot, .horizon, .hero-sun) { opacity: 0; }
+html.js:not(.ready) :is(.hero-top, .hero-role, .poster, .hero-foot, .horizon, .hero-sun, .vento) { opacity: 0; }
 html.ready .hero-name .ch { animation: rise 1.25s var(--ease) both; animation-delay: calc(0.15s + var(--i) * 50ms); }
 html.ready .hero-top { animation: fade-in 1s ease 0.2s both; }
 html.ready .hero-role { animation: fade-up 1.1s var(--ease) 0.7s both; }
-html.ready .poster { animation: poster-in 1.4s var(--ease) 0.45s both, balanca 7s ease-in-out 1.85s infinite; }
-html.ready .poster-stamp { animation: carimbo 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) 1.5s both; }
+html.ready .poster { animation: poster-in 1.3s var(--ease) 0.45s both; }
+html.ready .vento { animation: fade-in 1s ease 1s both; }
 html.ready .hero-foot { animation: fade-up 1.1s var(--ease) 0.85s both; }
 html.ready .horizon { animation: fade-up 1.4s var(--ease) 0.6s both; }
 html.ready .hero-sun { animation: fade-in 2s ease 0.1s both; }
-@keyframes poster-in { from { opacity: 0; transform: translateY(-60px) rotate(-12deg); } to { opacity: 1; transform: rotate(-2.6deg); } }
-@keyframes carimbo { from { opacity: 0; transform: rotate(-13deg) scale(2.6); } to { opacity: 1; transform: rotate(-13deg); } }
+@keyframes poster-in { from { opacity: 0; transform: translateY(-28px); } to { opacity: 1; transform: none; } }
 
 @media (max-width: 900px) {
   .hero-in {
@@ -233,14 +247,13 @@ html.ready .hero-sun { animation: fade-in 2s ease 0.1s both; }
   .hn-2 { margin-left: 0; }
   .hn-line { font-size: min(1em, 22cqi); }
   .poster { justify-self: center; width: clamp(210px, 62vw, 300px); margin-top: clamp(36px, 8vw, 56px); }
-  .poster-sheet { padding: 22px 16px 16px; gap: 8px; }
   .poster-head { font-size: clamp(1.4rem, 7vw, 2rem); }
-  .poster-stamp { left: -12%; top: 26%; }
   .hero-sun { top: 16vh; right: -42vw; width: 100vw; opacity: 0.5; }
   .hero-where { text-align: right; }
 }
 @media (max-width: 560px) {
-  .hero-top { flex-direction: column; gap: 6px; }
-  .hero-where { text-align: left; }
+  /* o canto esquerdo é do bolso das moedas */
+  .hero-top { padding-left: 96px; }
+  .hero-where { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; min-width: 0; letter-spacing: 0.08em; }
   .hero-actions .btn { flex: 1; justify-content: center; }
 }
