@@ -1,10 +1,8 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PROFILE } from '../../content/profile';
 import { Sol } from '../../shared/ornaments/ornaments';
 import { Letters } from '../../shared/split/letters';
 import { Coin } from '../secrets/coin';
-
-const clockFmt = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 
 /** os mandacarus do horizonte: posição, altura (escala) e o lado dos braços */
 const CACTI = [
@@ -39,9 +37,6 @@ const FUNIL = [0, 1, 2, 3, 4, 5].map((i) => ({ y: i * 13, rx: 26 - i * 4 }));
       </div>
     </div>
     <div class="wrap hero-in">
-      <div class="hero-top">
-        <p class="hero-meta hero-where">{{ p.location }}@if (clock()) { <span class="hero-clock"><span class="sr-only">, agora são </span>{{ clock() }}</span> }</p>
-      </div>
       <h1 class="hero-name" id="hero-title" tabindex="-1">
         <span class="hn-line"><span appLetters="João"></span></span>
         <span class="hn-line hn-2"><span appLetters="Pedro" [offset]="4"></span></span>
@@ -95,16 +90,4 @@ export class Hero {
   protected readonly capim = CAPIM;
   protected readonly gravetos = GRAVETOS;
   protected readonly funil = FUNIL;
-  /** a hora em São José dos Pinhais (só no navegador: o prerender sai sem ela) */
-  protected readonly clock = signal('');
-
-  constructor() {
-    const destroyRef = inject(DestroyRef);
-    afterNextRender(() => {
-      const tick = () => this.clock.set(clockFmt.format(new Date()));
-      tick();
-      const id = setInterval(tick, 20_000);
-      destroyRef.onDestroy(() => clearInterval(id));
-    });
-  }
 }

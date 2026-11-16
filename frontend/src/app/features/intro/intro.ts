@@ -14,7 +14,7 @@ const CHAMBERS = [0, 1, 2, 3, 4, 5];
 
 // A tela de carregamento: madrugada no sertão, com o Cruzeiro do Sul e uma estrela cadente; o sol de xilogravura
 // nasce atrás do mandacaru, "Seja bem-vindo, Forasteiro" entra letra por letra e o tambor do revólver
-// é carregado bala por bala, com o contador de 1 a 6. Aí a cortina sobe e o site aparece por baixo.
+// é carregado bala por bala, sem número nenhum: só o tambor girando. Aí a cortina sobe e o site aparece por baixo.
 // Não dá para pular: ela roda inteira a cada visita e a cada recarregamento (com "reduzir movimento", sem as animações).
 // Sem JavaScript, o CSS tira a abertura da frente sozinho depois de alguns segundos.
 @Component({
@@ -54,14 +54,12 @@ const CHAMBERS = [0, 1, 2, 3, 4, 5];
             </g>
           }
         </svg>
-        <span class="intro-count"><span #count>1</span><small>/6</small></span>
       </span>
     </div>
   `,
 })
 export class Intro {
   private readonly intro = inject(IntroService);
-  private readonly count = viewChild.required<ElementRef<HTMLElement>>('count');
   private readonly tambor = viewChild.required<ElementRef<SVGElement>>('tambor');
   protected readonly chambers = CHAMBERS;
   protected readonly leaving = signal(false);
@@ -74,16 +72,16 @@ export class Intro {
       this.intro.begin();
       // atalho só de desenvolvimento: direto para o site
       if (environment.skipIntro) { this.leave(true); return; }
-      const el = this.count().nativeElement, drum = this.tambor().nativeElement;
+      const drum = this.tambor().nativeElement;
       // o relógio começa no primeiro quadro (o tempo do quadro e o performance.now() nem sempre têm a mesma origem)
       let t0 = -1, loaded = -1;
       const tick = (now: number) => {
         if (t0 < 0) t0 = now;
         const k = Math.min(1, (now - t0) / LOAD_MS);
-        // uma bala a mais a cada sexto do tempo: o contador sobe e o tambor gira uma câmara (o CSS anima o giro);
+        // uma bala a mais a cada sexto do tempo: o tambor gira uma câmara (o CSS anima o giro);
         // a sexta entra antes do fim, para o tambor cheio ficar um instante na tela
         const n = Math.min(6, 1 + Math.floor(k * 6));
-        if (n !== loaded) { loaded = n; el.textContent = String(n); drum.style.setProperty('--n', String(n)); }
+        if (n !== loaded) { loaded = n; drum.style.setProperty('--n', String(n)); }
         if (k < 1) this.frame = raf(tick); else this.leave();
       };
       this.frame = raf(tick);

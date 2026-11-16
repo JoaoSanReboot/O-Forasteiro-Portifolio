@@ -1,31 +1,39 @@
-/* Tokens: o sertão à noite, no mesmo tom escuro da tela de carregamento. "Papel" é o fundo (terra queimada)
-   e "tinta" é o que se escreve nele (creme); urucum, sol, mandacaru e couro continuam acendendo os detalhes.
+/* Tokens: terra do sertão. "Papel" é o chão de barro queimado (com a textura de terra manchada e fibra de couro
+   em --textura) e "tinta" é a areia clara que se escreve nele; urucum, ocre, couro e mandacaru, saturados, nos detalhes.
    Tipografia editorial: grotesca condensada enorme (Bricolage), itálico serifado (Instrument Serif) e mono nos rótulos. */
 :root {
   /* fundo e escrita */
-  --paper: #1e1612;
-  --paper-2: #2a2019;
-  --paper-3: #362920;
-  --ink: #efe4cf;
-  --ink-2: #d8c9b0;
-  --muted: #a8957f;
-  --line: rgba(239, 228, 207, 0.12);
-  --line-strong: rgba(239, 228, 207, 0.28);
+  --paper: #35211a;
+  --paper-2: #43291f;
+  --paper-3: #523326;
+  --ink: #f2dcb3;
+  --ink-2: #e2c595;
+  --muted: #bf9a6e;
+  --line: rgba(242, 220, 179, 0.14);
+  --line-strong: rgba(242, 220, 179, 0.32);
 
   /* as cores do sertão */
-  --urucum: #c8431f;
-  --urucum-hi: #de5a30;
-  --sol: #e3a23a;
-  --mandacaru: #6f9465;
-  --couro: #b5733f;
-  --latao: #c49a5a;
+  --urucum: #d9502a;
+  --urucum-hi: #ec6a3c;
+  --sol: #eba12e;
+  --mandacaru: #86a35a;
+  --couro: #c97a3d;
+  --latao: #cfa55c;
 
-  /* a noite funda (seções alternadas, abertura e rodapé), um tom abaixo do fundo */
-  --night: #140e0b;
-  --night-2: #221913;
-  --on-night: #efe4cf;
-  --on-night-muted: #b8a68f;
-  --night-line: rgba(239, 228, 207, 0.14);
+  /* a terra funda (seções alternadas, abertura e rodapé), um tom abaixo do barro */
+  --night: #1f120d;
+  --night-2: #2b1912;
+  --on-night: #f2dcb3;
+  --on-night-muted: #c4a27a;
+  --night-line: rgba(242, 220, 179, 0.15);
+
+  /* a textura da terra: pintas finas de barro (escuras e claras) por cima de manchas largas que se repetem
+     em tamanhos desencontrados, para o chão não parecer liso nem ter emenda à vista */
+  --textura:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='e'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .08 0 0 0 0 .04 0 0 0 0 .02 -3 0 0 0 1.25'/></filter><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='2' seed='8' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .98 0 0 0 0 .86 0 0 0 0 .66 3 0 0 0 -1.9'/></filter><rect width='100%' height='100%' filter='url(%23e)' opacity='.55'/><rect width='100%' height='100%' filter='url(%23c)' opacity='.3'/></svg>") 0 0 / 220px 220px,
+    radial-gradient(closest-side, rgba(12, 6, 3, 0.26), transparent) 0 0 / 560px 420px,
+    radial-gradient(closest-side, rgba(12, 6, 3, 0.2), transparent) 210px 160px / 820px 610px,
+    radial-gradient(closest-side, rgba(240, 190, 130, 0.06), transparent) 380px 60px / 690px 470px;
 
   --f-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
   --f-serif: "Instrument Serif", Georgia, "Times New Roman", serif;

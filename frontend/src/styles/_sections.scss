@@ -3,10 +3,10 @@
 .sec {
   position: relative;
   padding: clamp(104px, 14vw, 200px) 0;
-  background: var(--paper);
+  background: var(--textura), var(--paper);
   color: var(--ink);
 }
-.sec-night { background: var(--night); color: var(--on-night); }
+.sec-night { background: var(--textura), var(--night); color: var(--on-night); }
 .sec-night::before, .sec-night::after {
   content: "";
   position: absolute;
@@ -43,9 +43,10 @@
   overflow-x: clip;
   /* por cima das manchas, o papel volta nas bordas: uma seção passa para a outra sem degrau */
   background:
+    var(--textura),
     linear-gradient(var(--paper), transparent clamp(120px, 14vw, 220px), transparent calc(100% - clamp(120px, 14vw, 220px)), var(--paper)),
-    radial-gradient(62% 52% at calc(6% + var(--wa) * 34%) calc(4% + var(--wa) * 30%), color-mix(in srgb, var(--wash-1) 15%, transparent), transparent 74%),
-    radial-gradient(56% 48% at calc(96% - var(--wa) * 30%) calc(96% - var(--wa) * 34%), color-mix(in srgb, var(--wash-2) 11%, transparent), transparent 74%),
+    radial-gradient(62% 52% at calc(6% + var(--wa) * 34%) calc(4% + var(--wa) * 30%), color-mix(in srgb, var(--wash-1) 26%, transparent), transparent 74%),
+    radial-gradient(56% 48% at calc(96% - var(--wa) * 30%) calc(96% - var(--wa) * 34%), color-mix(in srgb, var(--wash-2) 18%, transparent), transparent 74%),
     var(--paper);
 }
 .sec:not(.sec-night)::before {
@@ -58,7 +59,7 @@
   aspect-ratio: 1;
   pointer-events: none;
   background: var(--orn);
-  opacity: 0.1;
+  opacity: 0.16;
   -webkit-mask: var(--orn-shape) center / contain no-repeat;
   mask: var(--orn-shape) center / contain no-repeat;
   rotate: calc(var(--wa) * 90deg - 45deg);

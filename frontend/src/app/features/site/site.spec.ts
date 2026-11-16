@@ -51,9 +51,12 @@ describe('Site', () => {
     expect(purse.getAttribute('aria-label')).toContain('0 de 5');
   });
 
-  it('o topo mostra o nome e o cartaz enxuto, sem o rótulo "Portfólio · 2026"', async () => {
+  it('o topo mostra o nome e o cartaz enxuto, sem o rótulo "Portfólio · 2026" nem o local e a hora', async () => {
     const { el } = await render();
     expect(el.querySelector('#inicio')?.textContent).not.toContain('Portfólio');
+    // nem o local e a hora no alto
+    expect(el.querySelector('.hero-top, .hero-clock')).toBeNull();
+    expect(el.querySelector('#inicio')?.textContent).not.toContain('São José dos Pinhais');
     expect(el.querySelector('.poster-name')).not.toBeNull();
     expect(el.querySelector('.poster-reward')?.textContent).toContain('um bom projeto');
     expect(el.querySelector('.poster-stamp, .poster-hole, .poster-nail, .poster-seen')).toBeNull();
