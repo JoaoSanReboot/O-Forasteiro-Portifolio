@@ -1,6 +1,6 @@
 /* Base: página, textura de papel, tipografia, botões, etiquetas e acessibilidade */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scrollbar-width: thin; scrollbar-color: rgba(28, 20, 16, 0.35) var(--paper); }
+html { -webkit-text-size-adjust: 100%; scrollbar-width: thin; scrollbar-color: var(--line-strong) var(--paper); }
 @media (prefers-reduced-motion: no-preference) { html:not(.lenis) { scroll-behavior: smooth; } }
 /* a abertura está na frente: a página não rola embaixo dela */
 html.intro-on { overflow: hidden; }

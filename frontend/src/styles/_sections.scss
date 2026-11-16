@@ -30,7 +30,7 @@
 /* a última seção escura encosta no rodapé, que também é noite: sem dente embaixo */
 .sec-night:last-child::after { display: none; }
 
-/* Cor na rolagem das seções claras: cada uma tem a sua paleta do sertão (--wash-1/--wash-2) em duas
+/* Cor na rolagem das seções de fundo (no escuro, só um brilho baixo, como lume de candeeiro): cada uma tem a sua paleta do sertão (--wash-1/--wash-2) em duas
    manchas de luz que escorregam conforme a seção passa pela tela, e um ornamento gigante em cor
    (o sol, a estrela de couro, o mandacaru) que gira e sobe atrás do texto, como um parallax.
    Onde o navegador não anima pela rolagem (ou com "reduzir movimento"), tudo fica parado no lugar. */
@@ -44,8 +44,8 @@
   /* por cima das manchas, o papel volta nas bordas: uma seção passa para a outra sem degrau */
   background:
     linear-gradient(var(--paper), transparent clamp(120px, 14vw, 220px), transparent calc(100% - clamp(120px, 14vw, 220px)), var(--paper)),
-    radial-gradient(62% 52% at calc(6% + var(--wa) * 34%) calc(4% + var(--wa) * 30%), color-mix(in srgb, var(--wash-1) 58%, transparent), transparent 74%),
-    radial-gradient(56% 48% at calc(96% - var(--wa) * 30%) calc(96% - var(--wa) * 34%), color-mix(in srgb, var(--wash-2) 34%, transparent), transparent 74%),
+    radial-gradient(62% 52% at calc(6% + var(--wa) * 34%) calc(4% + var(--wa) * 30%), color-mix(in srgb, var(--wash-1) 15%, transparent), transparent 74%),
+    radial-gradient(56% 48% at calc(96% - var(--wa) * 30%) calc(96% - var(--wa) * 34%), color-mix(in srgb, var(--wash-2) 11%, transparent), transparent 74%),
     var(--paper);
 }
 .sec:not(.sec-night)::before {
@@ -58,7 +58,7 @@
   aspect-ratio: 1;
   pointer-events: none;
   background: var(--orn);
-  opacity: 0.28;
+  opacity: 0.1;
   -webkit-mask: var(--orn-shape) center / contain no-repeat;
   mask: var(--orn-shape) center / contain no-repeat;
   rotate: calc(var(--wa) * 90deg - 45deg);

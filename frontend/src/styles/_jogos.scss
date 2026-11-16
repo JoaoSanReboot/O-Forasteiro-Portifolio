@@ -12,7 +12,7 @@
   border: 1.5px solid var(--ink);
   border-radius: 6px;
   background: var(--paper);
-  box-shadow: 6px 6px 0 var(--ink);
+  box-shadow: 6px 6px 0 var(--paper-3);
 }
 .game-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
 .game-kicker { flex-basis: 100%; font: 500 11.5px/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--urucum); }
@@ -71,7 +71,7 @@
   border: 1.5px solid var(--ink);
   border-radius: 999px;
   background: var(--paper);
-  box-shadow: 4px 4px 0 var(--ink);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
   font: 500 14.5px/1.35 var(--f-display);
   transform: translateY(160%);
   transition: transform 0.6s var(--ease);
@@ -81,21 +81,34 @@
 .coin-news svg { flex: none; width: 30px; height: 30px; }
 .coin-news span { font: 400 14.5px/1.4 var(--f-type); }
 
-/* o bolso na barra do topo */
-.nav-purse {
+/* o bolso das moedas: preso no canto esquerdo da tela, entra junto com o topo */
+.coin-purse {
+  position: fixed;
+  z-index: 60;
+  top: 18px;
+  left: var(--gutter);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px 6px 6px;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  font: 500 12.5px/1 var(--f-mono);
+  background: color-mix(in srgb, var(--night) 72%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font: 600 13px/1 var(--f-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--ink);
   text-decoration: none;
   white-space: nowrap;
+  transition: border-color 0.3s, transform 0.3s var(--ease);
 }
-.nav-purse svg { width: 20px; height: 20px; }
-.nav.menu-open .nav-purse { color: var(--on-night); border-color: var(--night-line); }
+.coin-purse small { font-size: 0.85em; color: var(--muted); }
+.coin-purse svg { width: 22px; height: 22px; }
+.coin-purse:hover { border-color: var(--sol); transform: translateY(-1px); }
+.coin-purse.full { border-color: var(--sol); }
+html.js:not(.ready) .coin-purse { opacity: 0; }
+html.ready .coin-purse { animation: fade-in 1s ease 0.9s both; }
 
 /* ---------------- duelo ---------------- */
 .duel-stage {
@@ -183,7 +196,7 @@
 .duel-hud { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 10px; padding: 16px; pointer-events: none; text-align: center; }
 .duel-call { font: 400 clamp(2.2rem, 5.6vw, 4.6rem)/1 var(--f-wood); color: var(--urucum); text-transform: uppercase; filter: url(#tinta); animation: grito 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both; transform: translateY(-30%); }
 /* a chamada antes do sino: um letreiro de papel no alto do palco, legível por cima dos duelistas */
-.duel-hud .duel-call-sm { position: absolute; top: 5%; left: 50%; width: max-content; max-width: 90%; translate: -50% 0; padding: 8px 18px; border: 1.5px solid var(--ink); border-radius: 999px; background: rgba(239, 228, 207, 0.94); font-size: clamp(1.05rem, 2vw, 1.5rem); transform: none; }
+.duel-hud .duel-call-sm { position: absolute; top: 5%; left: 50%; width: max-content; max-width: 90%; translate: -50% 0; padding: 8px 18px; border: 1.5px solid var(--ink); border-radius: 999px; background: color-mix(in srgb, var(--paper) 94%, transparent); font-size: clamp(1.05rem, 2vw, 1.5rem); transform: none; }
 .duel-call-sm b { font-style: normal; font-family: var(--f-west); color: var(--urucum); }
 .duel-call-sm { font: italic 400 clamp(1.3rem, 2.6vw, 2rem)/1.2 var(--f-serif); color: var(--ink); filter: none; animation: fade-in 0.5s ease both; text-transform: none; }
 @keyframes grito { from { opacity: 0; transform: translateY(-30%) scale(2); } to { opacity: 1; transform: translateY(-30%); } }
@@ -196,7 +209,7 @@
   outline: 1.5px solid var(--mandacaru);
   outline-offset: 3px;
   border-radius: 6px;
-  background: rgba(239, 228, 207, 0.94);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
   color: var(--mandacaru);
   transform: rotate(-4deg) translateY(-24%);
   animation: carimbo-duelo 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
@@ -228,7 +241,7 @@
   overflow: hidden;
   border: 1.5px solid var(--ink);
   border-radius: 999px;
-  background: repeating-linear-gradient(90deg, transparent 0 9.5%, rgba(28, 20, 16, 0.12) 9.5% 10%), var(--paper-2);
+  background: repeating-linear-gradient(90deg, transparent 0 9.5%, var(--line) 9.5% 10%), var(--paper-2);
 }
 .zone { position: absolute; top: 0; bottom: 0; background: rgba(185, 56, 26, 0.28); transition: background-color 0.3s; }
 .zone.gun { background: rgba(185, 56, 26, 0.6); }
@@ -276,7 +289,7 @@ kbd { padding: 2px 6px; border: 1px solid var(--line-strong); border-bottom-widt
 .duel-gun.on { color: var(--mandacaru); }
 
 @media (max-width: 900px) {
-  .game { box-shadow: 4px 4px 0 var(--ink); }
+  .game { box-shadow: 4px 4px 0 var(--paper-3); }
 }
 @media (max-width: 560px) {
   .duel-stage { height: auto; aspect-ratio: 4 / 3; }

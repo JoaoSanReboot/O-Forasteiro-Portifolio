@@ -6,15 +6,15 @@ import { Mandacaru, Sol } from '../../shared/ornaments/ornaments';
 import { Letters } from '../../shared/split/letters';
 import { IntroService } from './intro.service';
 
-/** quanto o contador leva de 000 a 100 (ms) e quanto a cortina leva para subir */
-const COUNT_MS = 2600;
+/** quanto o tambor leva para receber as seis balas (ms) e quanto a cortina leva para subir */
+const LOAD_MS = 2700;
 const CURTAIN_MS = 1100;
-/** as câmaras do tambor do revólver (uma bala a cada sexto do contador) */
+/** as seis câmaras do tambor do revólver */
 const CHAMBERS = [0, 1, 2, 3, 4, 5];
 
 // A tela de carregamento: madrugada no sertão, com o Cruzeiro do Sul e uma estrela cadente; o sol de xilogravura
-// nasce atrás do mandacaru, "Seja bem-vindo, Forasteiro" entra letra por letra e o contador vai de 000 a 100
-// enquanto o tambor do revólver é carregado, bala por bala. Aí a cortina sobe e o site aparece por baixo.
+// nasce atrás do mandacaru, "Seja bem-vindo, Forasteiro" entra letra por letra e o tambor do revólver
+// é carregado bala por bala, com o contador de 1 a 6. Aí a cortina sobe e o site aparece por baixo.
 // Não dá para pular: ela roda inteira a cada visita e a cada recarregamento (com "reduzir movimento", sem as animações).
 // Sem JavaScript, o CSS tira a abertura da frente sozinho depois de alguns segundos.
 @Component({
@@ -44,7 +44,7 @@ const CHAMBERS = [0, 1, 2, 3, 4, 5];
     </div>
     <div class="intro-foot" aria-hidden="true">
       <span class="intro-load">
-        <svg class="tambor" #tambor viewBox="-50 -50 100 100" focusable="false">
+        <svg class="tambor" #tambor style="--n: 1" viewBox="-50 -50 100 100" focusable="false">
           <circle class="tb-body" r="47" />
           <circle class="tb-axis" r="9" />
           @for (c of chambers; track c) {
@@ -54,7 +54,7 @@ const CHAMBERS = [0, 1, 2, 3, 4, 5];
             </g>
           }
         </svg>
-        <span class="intro-count" #count>000</span>
+        <span class="intro-count"><span #count>1</span><small>/6</small></span>
       </span>
     </div>
   `,
@@ -79,13 +79,11 @@ export class Intro {
       let t0 = -1, loaded = -1;
       const tick = (now: number) => {
         if (t0 < 0) t0 = now;
-        const k = Math.min(1, (now - t0) / COUNT_MS);
-        // começa rápido e segura no fim, como um carregamento de verdade
-        const eased = 1 - Math.pow(1 - k, 3);
-        el.textContent = String(Math.round(eased * 100)).padStart(3, '0');
-        // uma bala a mais a cada sexto: o tambor gira uma câmara (o CSS anima o giro)
-        const n = Math.min(6, Math.floor(eased * 6.02));
-        if (n !== loaded) { loaded = n; drum.style.setProperty('--n', String(n)); }
+        const k = Math.min(1, (now - t0) / LOAD_MS);
+        // uma bala a mais a cada sexto do tempo: o contador sobe e o tambor gira uma câmara (o CSS anima o giro);
+        // a sexta entra antes do fim, para o tambor cheio ficar um instante na tela
+        const n = Math.min(6, 1 + Math.floor(k * 6));
+        if (n !== loaded) { loaded = n; el.textContent = String(n); drum.style.setProperty('--n', String(n)); }
         if (k < 1) this.frame = raf(tick); else this.leave();
       };
       this.frame = raf(tick);
@@ -93,7 +91,7 @@ export class Intro {
     destroyRef.onDestroy(() => { cancelRaf(this.frame); if (this.timer) clearTimeout(this.timer); });
   }
 
-  /** o carregamento terminou: a cortina sobe (`now` tira a abertura sem animação) */
+  /** o tambor está cheio: a cortina sobe (`now` tira a abertura sem animação) */
   private leave(now = false): void {
     if (this.leaving()) return;
     cancelRaf(this.frame);

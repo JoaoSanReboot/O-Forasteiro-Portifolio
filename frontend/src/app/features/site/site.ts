@@ -9,18 +9,18 @@ import { Hero } from '../hero/hero';
 import { IntroService } from '../intro/intro.service';
 import { Projetos } from '../projetos/projetos';
 import { CoinNews } from '../secrets/coin-news';
+import { CoinPurse } from '../secrets/coin-purse';
 import { Skills } from '../skills/skills';
 import { Sobre } from '../sobre/sobre';
 import { SiteFooter } from './site-footer/site-footer';
-import { SiteNav } from './site-nav/site-nav';
 import { SmoothScroll, startSmoothScroll } from './smooth-scroll';
 
-// O site: a barra, o topo e as seções na ordem, e o rodapé.
+// O site: só rolagem, sem barra no topo. O topo e as seções na ordem, o rodapé e o bolso das moedas no canto esquerdo.
 // Fica sempre no HTML (o prerender sai com tudo); enquanto a abertura está na frente ele fica `inert`.
 @Component({
   selector: 'div[appSite]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SiteNav, Hero, Sobre, Projetos, Experiencia, Skills, Commits, Formacao, Contato, SiteFooter, CoinNews],
+  imports: [CoinPurse, Hero, Sobre, Projetos, Experiencia, Skills, Commits, Formacao, Contato, SiteFooter, CoinNews],
   host: { id: 'site', '[attr.inert]': 'covered() ? "" : null' },
   template: `
     <!-- a tinta da prensa: borda comida e falhas no preto dos títulos em tipo de madeira (filter: url(#tinta)) -->
@@ -34,7 +34,7 @@ import { SmoothScroll, startSmoothScroll } from './smooth-scroll';
       </filter>
     </svg>
     <a class="skip-link" href="#sobre">Pular para o conteúdo</a>
-    <nav appSiteNav></nav>
+    <app-coin-purse />
     <main>
       <section appHero></section>
       <section appSobre></section>

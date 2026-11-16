@@ -1,26 +1,27 @@
-/* Tokens: "caatinga ao meio-dia". Papel de cordel, tinta de xilogravura, urucum, sol, mandacaru e couro.
+/* Tokens: o sertão à noite, no mesmo tom escuro da tela de carregamento. "Papel" é o fundo (terra queimada)
+   e "tinta" é o que se escreve nele (creme); urucum, sol, mandacaru e couro continuam acendendo os detalhes.
    Tipografia editorial: grotesca condensada enorme (Bricolage), itálico serifado (Instrument Serif) e mono nos rótulos. */
 :root {
-  /* papel e tinta */
-  --paper: #efe4cf;
-  --paper-2: #e6d7bc;
-  --paper-3: #dccaa9;
-  --ink: #1c1410;
-  --ink-2: #3a2c22;
-  --muted: #6b5a4b;
-  --line: rgba(28, 20, 16, 0.14);
-  --line-strong: rgba(28, 20, 16, 0.3);
+  /* fundo e escrita */
+  --paper: #1e1612;
+  --paper-2: #2a2019;
+  --paper-3: #362920;
+  --ink: #efe4cf;
+  --ink-2: #d8c9b0;
+  --muted: #a8957f;
+  --line: rgba(239, 228, 207, 0.12);
+  --line-strong: rgba(239, 228, 207, 0.28);
 
   /* as cores do sertão */
-  --urucum: #b9381a;
-  --urucum-hi: #d24a24;
+  --urucum: #c8431f;
+  --urucum-hi: #de5a30;
   --sol: #e3a23a;
-  --mandacaru: #3e5a38;
-  --couro: #7e4526;
+  --mandacaru: #6f9465;
+  --couro: #b5733f;
   --latao: #c49a5a;
 
-  /* a noite (seções escuras, abertura e rodapé) */
-  --night: #17110d;
+  /* a noite funda (seções alternadas, abertura e rodapé), um tom abaixo do fundo */
+  --night: #140e0b;
   --night-2: #221913;
   --on-night: #efe4cf;
   --on-night-muted: #b8a68f;
@@ -44,5 +45,5 @@
   --maxw: 1360px;
   --nav-h: 72px;
 
-  color-scheme: light;
+  color-scheme: dark;
 }

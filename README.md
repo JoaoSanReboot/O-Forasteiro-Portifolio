@@ -60,7 +60,7 @@ Em `frontend/src/environments/` (`environment.ts` em produção, `environment.de
 
 ## Abertura e movimento
 
-Toda visita e todo recarregamento começam na tela de carregamento ("Seja bem-vindo, Forasteiro", uns 4 segundos) e voltam ao topo da página. Ela não tem botão de pular. "Rever a abertura" fica no rodapé.
+Toda visita e todo recarregamento começam na tela de carregamento ("Seja bem-vindo, Forasteiro", com o tambor do revólver recebendo as balas de 1 a 6, uns 4 segundos) e voltam ao topo da página. Ela não tem botão de pular. "Rever a abertura" fica no rodapé.
 Com "reduzir movimento" ligado no sistema, a tela de carregamento aparece sem as animações.
 
 ## Jogos dentro das seções

@@ -90,17 +90,19 @@
   animation: fade-in 1s ease 0.6s both;
 }
 .intro-load { display: flex; align-items: center; gap: 14px; }
-/* o tambor do revólver: cada sexto do contador põe uma bala de latão e gira uma câmara */
+/* o tambor do revólver: cada bala de latão que entra gira uma câmara; o contador vai de 1 a 6 */
 .tambor { --n: 0; width: clamp(44px, 5vw, 60px); height: auto; rotate: calc(var(--n) * -60deg); transition: rotate 0.32s cubic-bezier(0.3, 1.5, 0.5, 1); }
 .tb-body { fill: #2b201a; stroke: var(--on-night-muted); stroke-width: 2; stroke-dasharray: 16 8.6; }
 .tb-axis { fill: var(--night); stroke: var(--on-night-muted); stroke-width: 2; }
 .tb-hole { fill: #0c0806; }
 .tb-bala { fill: var(--latao); stroke: #e8c88a; stroke-width: 2; opacity: clamp(0, calc(var(--n) - var(--i)), 1); transition: opacity 0.15s; }
 .intro-count {
+  display: inline-flex;
+  align-items: baseline;
   font: 700 clamp(2.6rem, 6vw, 4.8rem)/0.9 var(--f-display);
   font-variation-settings: "wdth" 80;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   color: var(--on-night);
 }
-  
+  .intro-count small { margin-left: 0.08em; font-size: 0.42em; color: var(--on-night-muted); }
