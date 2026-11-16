@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { installFakeCanvas } from '../../../testing/fake-canvas';
 import { Commits } from './commits';
 import { GITHUB_ENDPOINT } from './github-endpoint';
 
@@ -14,11 +13,10 @@ const LIVE = {
   fetchedAt: '2026-10-29T12:00:00.000Z',
 };
 
-// só o que a placa lê da resposta; nada sai para a rede
+// só o que a seção lê da resposta; nada sai para a rede
 const reply = (status: number, body: unknown) => Promise.resolve({ ok: status >= 200 && status < 300, status, json: () => Promise.resolve(body) } as Response);
 
-describe('Commits (placa do GitHub)', () => {
-  beforeAll(installFakeCanvas);
+describe('Commits (seção GitHub)', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   async function render(endpoint: string | null, fetch: () => Promise<Response>) {
@@ -48,7 +46,7 @@ describe('Commits (placa do GitHub)', () => {
     expect(buttons()[1].getAttribute('aria-label')).toBe('segunda-feira, 26 de outubro de 2026: 1 contribuição');
     expect(buttons()[2].getAttribute('aria-label')).toBe('terça-feira, 27 de outubro de 2026: 5 contribuições');
     expect(el.querySelector('#heat-count')?.textContent).toBe('6');
-    expect([...el.querySelectorAll('.heat-legend span')].map((s) => s.textContent?.trim())).toEqual(['out 2026', 'out 2026']);
+    expect([...el.querySelectorAll('.heat-legend > span:not(.heat-scale)')].map((s) => s.textContent?.trim())).toEqual(['out 2026', 'out 2026']);
     expect(status()).toBe('Ao vivo do GitHub · atualizado em 29/10/2026.');
   });
 

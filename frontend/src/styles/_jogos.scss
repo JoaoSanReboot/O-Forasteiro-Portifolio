@@ -1,0 +1,393 @@
+/* Os jogos que moram dentro das seções: o duelo (Experiência), o cordel da memória (Skills),
+   as moedas escondidas pelo site e o aviso que sobe quando uma é achada. */
+
+/* cada jogo: um folheto de papel com a borda de cartaz */
+.game {
+  position: relative;
+  margin-top: clamp(48px, 7vw, 96px);
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: clamp(20px, 2.6vw, 34px);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: 6px 6px 0 var(--paper-3);
+}
+.game-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+.game-kicker { flex-basis: 100%; font: 500 11.5px/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--urucum); }
+.game-title { font: 400 clamp(1.6rem, 2.8vw, 2.5rem)/1 var(--f-wood); text-transform: uppercase; }
+.game-title em { font: italic 400 1.15em/1 var(--f-serif); text-transform: none; color: var(--urucum); }
+.game-score { margin-left: auto; font: 500 13px/1.4 var(--f-mono); letter-spacing: 0.04em; color: var(--muted); }
+.game-score b { color: var(--ink); font-size: 1.25em; }
+.game-say { min-height: 1.5em; flex: 1; font: italic 400 20px/1.3 var(--f-serif); color: var(--couro); }
+.game-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+
+/* ---------------- as moedas ---------------- */
+.coin-edge { fill: #b8862b; }
+.coin-face { fill: #e9b949; stroke: #8f6420; stroke-width: 1.2; }
+.coin-star { fill: #b8862b; }
+.coin-spot { position: absolute; z-index: 5; display: block; }
+.coin {
+  display: block;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 2px rgba(28, 20, 16, 0.35));
+  animation: brilho 5s ease-in-out infinite;
+}
+.coin svg { width: 100%; height: 100%; }
+.coin:hover { transform: scale(1.15) rotate(-10deg); }
+.coin.taking { animation: pega 0.85s var(--ease) forwards; pointer-events: none; }
+@keyframes brilho { 0%, 86%, 100% { filter: drop-shadow(0 2px 2px rgba(28, 20, 16, 0.35)) brightness(1); } 92% { filter: drop-shadow(0 0 8px #f3cf6a) brightness(1.3); } }
+@keyframes pega { 0% { transform: none; } 40% { transform: translateY(-40px) rotateY(360deg) scale(1.4); opacity: 1; } 100% { transform: translateY(-70px) rotateY(720deg) scale(0.4); opacity: 0; } }
+
+/* os esconderijos */
+.coin-horizonte { right: 31%; bottom: clamp(12px, 1.6vw, 22px); }
+.coin-couro { right: 46px; bottom: 14px; }
+.coin-candeeiro { right: var(--gutter); top: clamp(250px, 26vw, 380px); }
+.coin-prosa { right: 0; top: -10px; }
+.contact { position: relative; }
+.coin-rodape { right: var(--gutter); bottom: 10px; }
+.foot { position: relative; }
+.formacao { position: relative; }
+.coin-couro .coin, .coin-rodape .coin { width: 20px; height: 20px; }
+
+/* o aviso de moeda achada, com o causo cunhado nela */
+.coin-news {
+  position: fixed;
+  z-index: 80;
+  left: var(--gutter);
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(440px, calc(100vw - 2 * var(--gutter)));
+  padding: 12px 18px 12px 12px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+  font: 500 14.5px/1.35 var(--f-display);
+  transform: translateY(160%);
+  transition: transform 0.6s var(--ease);
+  pointer-events: none;
+}
+.coin-news.on { transform: none; }
+.coin-news svg { flex: none; width: 30px; height: 30px; }
+.coin-news span { font: 400 14.5px/1.4 var(--f-type); }
+
+/* o bolso das moedas: preso no canto esquerdo da tela, entra junto com o topo */
+.coin-purse {
+  position: fixed;
+  z-index: 60;
+  top: 18px;
+  left: var(--gutter);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--night) 72%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font: 600 13px/1 var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.3s, transform 0.3s var(--ease);
+}
+.coin-purse small { font-size: 0.85em; color: var(--muted); }
+.coin-purse svg { width: 22px; height: 22px; }
+.coin-purse:hover { border-color: var(--sol); transform: translateY(-1px); }
+.coin-purse.full { border-color: var(--sol); }
+html.js:not(.ready) .coin-purse { opacity: 0; }
+html.ready .coin-purse { animation: fade-in 1s ease 0.9s both; }
+
+/* ---------------- duelo ---------------- */
+.duel-stage {
+  --charge: 0;
+  position: relative;
+  overflow: hidden;
+  height: clamp(260px, 34vw, 420px);
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  background: #e8b765;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.duel-stage.ph-waiting, .duel-stage.ph-draw { cursor: crosshair; }
+.duel-scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ds-sun { fill: var(--paper); opacity: 0.55; }
+.ds-cactus path { stroke: var(--mandacaru); }
+.ds-far path { fill: var(--paper); stroke: var(--couro); stroke-width: 2; stroke-linejoin: round; opacity: 0.75; }
+.ds-far .ds-far-line { fill: none; stroke-width: 3; stroke-linecap: round; }
+.ds-far .ds-door { fill: var(--couro); }
+.ds-cracks { fill: none; stroke: var(--couro); stroke-width: 1.6; stroke-linejoin: round; opacity: 0.8; }
+.ds-post { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.ds-ground { fill: var(--ink); }
+.bell { fill: var(--couro); stroke: var(--ink); stroke-width: 2; }
+.bell-waves { fill: none; stroke: var(--urucum); stroke-width: 3; stroke-linecap: round; opacity: 0; }
+.ring .bell { animation: sino 0.9s ease-in-out; }
+.ring .bell-waves { animation: ondas 0.9s ease-out; }
+@keyframes sino { 0%, 100% { transform: none; } 20% { transform: rotate(26deg); } 45% { transform: rotate(-22deg); } 70% { transform: rotate(12deg); } 85% { transform: rotate(-6deg); } }
+@keyframes ondas { 0% { opacity: 0; transform: scale(0.8); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.3); } }
+
+.d-ink { fill: var(--ink); }
+.d-limb { fill: none; stroke: var(--ink); stroke-linecap: round; }
+.d-gun { fill: none; stroke: #3d3a36; stroke-width: 6; stroke-linecap: round; }
+.d-wood { fill: none; stroke: var(--couro); stroke-linecap: round; }
+.d-rope { fill: none; stroke: var(--couro); stroke-width: 3; }
+.d-belt { fill: var(--couro); }
+.d-couro { fill: var(--couro); }
+.d-scarf { fill: var(--urucum); }
+.d-strap { fill: none; stroke: var(--couro); stroke-width: 4; }
+.d-star { fill: var(--sol); }
+.d-shadow { fill: var(--ink); opacity: 0.3; }
+.flash { fill: #fff3c4; stroke: var(--sol); stroke-width: 3; opacity: 0; }
+
+/* as poses: o braço gira pelo ombro (a origem do grupo é o ombro) */
+.arm { transition: transform 0.35s var(--ease); }
+.duelist .arm-2, .duelist [class^="g-"] { display: none; }
+.w-revolver .you .g-revolver, .w-twin .you .g-revolver, .w-rifle .you .g-rifle, .w-pin .you .g-pin, .w-lasso .you .g-lasso { display: inline; }
+.w-twin .you .arm-2 { display: inline; }
+.ph-draw .arm-1, .ph-draw .arm-2 { transform: rotate(-22deg); }
+.cocked .you .arm-1, .out-you .you .arm-1, .out-bandit .bandit .arm-1 { transform: rotate(-73deg); }
+.w-twin.out-you .you .arm-2, .twin-shot.ph-draw .you .arm-2 { transform: rotate(-73deg); }
+.w-pin.ph-draw .you .arm-1 { transform: rotate(calc(var(--charge) * -160deg)); }
+.w-pin.out-you .you .arm-1, .w-lasso.out-you .you .arm-1 { transform: rotate(-60deg); }
+.w-lasso.spin .you .arm-1 { transform: rotate(-168deg); }
+.spin .loop { animation: gira 0.42s linear infinite; }
+@keyframes gira { 0% { transform: scaleX(1); } 50% { transform: scaleX(0.25); } 100% { transform: scaleX(1); } }
+.out-you:not(.w-pin):not(.w-lasso) .you .arm-1 .flash, .out-bandit .bandit .flash, .twin-shot .you .arm-2 .flash { animation: clarao-tiro 0.35s ease-out 0.12s; }
+.w-twin.out-you .you .arm-2 .flash { animation: clarao-tiro 0.35s ease-out 0.1s; }
+@keyframes clarao-tiro { 0% { opacity: 0; transform: scale(0.4); } 30% { opacity: 1; transform: scale(1.3); } 100% { opacity: 0; transform: scale(1.6); } }
+.flash { transform-box: fill-box; transform-origin: center; }
+
+/* o chapéu de quem perdeu voa para trás */
+.out-you .bandit .hat, .out-bandit .you .hat { animation: chapeu-voa 1.1s cubic-bezier(0.2, 0.7, 0.4, 1) 0.2s forwards; }
+.w-pin.out-you .bandit .hat { animation-delay: 0.55s; }
+.w-lasso.out-you .bandit .hat { animation-delay: 0.6s; }
+@keyframes chapeu-voa { 0% { transform: none; } 100% { transform: translate(-90px, -150px) rotate(-320deg); opacity: 0; } }
+.out-you .bandit, .out-bandit .you { transition: opacity 0.4s 0.8s; }
+
+/* o laço voa e o rolo é atirado */
+.rope { fill: none; stroke: var(--couro); stroke-width: 3.5; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; }
+.w-lasso.out-you .rope { opacity: 1; animation: laca 0.6s var(--ease) forwards; }
+@keyframes laca { to { stroke-dashoffset: 0; } }
+.pin-fly { opacity: 0; }
+.pin-fly rect { fill: var(--couro); stroke: var(--ink); stroke-width: 1.5; }
+.pin-fly path { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.w-pin.out-you .pin-fly { animation: rolo 0.6s cubic-bezier(0.3, 0.2, 0.6, 1) forwards; }
+@keyframes rolo { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 50% { transform: translate(132px, -60px) rotate(540deg); } 100% { opacity: 1; transform: translate(262px, 6px) rotate(1080deg); } 101% { opacity: 0; } }
+
+.duel-stage.shake { animation: treme 0.4s linear 0.15s; }
+@keyframes treme { 0%, 100% { transform: none; } 20% { transform: translate(-6px, 3px); } 40% { transform: translate(5px, -4px); } 60% { transform: translate(-4px, 2px); } 80% { transform: translate(3px, -1px); } }
+
+/* o que aparece por cima do palco */
+.duel-hud { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 10px; padding: 16px; pointer-events: none; text-align: center; }
+.duel-call { font: 400 clamp(2.2rem, 5.6vw, 4.6rem)/1 var(--f-wood); color: var(--urucum); text-transform: uppercase; filter: url(#tinta); animation: grito 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both; transform: translateY(-30%); }
+/* a chamada antes do sino: um letreiro de papel no alto do palco, legível por cima dos duelistas */
+.duel-hud .duel-call-sm { position: absolute; top: 5%; left: 50%; width: max-content; max-width: 90%; translate: -50% 0; padding: 8px 18px; border: 1.5px solid var(--ink); border-radius: 999px; background: color-mix(in srgb, var(--paper) 94%, transparent); font-size: clamp(1.05rem, 2vw, 1.5rem); transform: none; }
+.duel-call-sm b { font-style: normal; font-family: var(--f-west); color: var(--urucum); }
+.duel-call-sm { font: italic 400 clamp(1.3rem, 2.6vw, 2rem)/1.2 var(--f-serif); color: var(--ink); filter: none; animation: fade-in 0.5s ease both; text-transform: none; }
+@keyframes grito { from { opacity: 0; transform: translateY(-30%) scale(2); } to { opacity: 1; transform: translateY(-30%); } }
+.duel-stamp {
+  display: grid;
+  gap: 6px;
+  max-width: 34ch;
+  padding: 14px 20px 12px;
+  border: 3px solid var(--mandacaru);
+  outline: 1.5px solid var(--mandacaru);
+  outline-offset: 3px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  color: var(--mandacaru);
+  transform: rotate(-4deg) translateY(-24%);
+  animation: carimbo-duelo 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.duel-stamp.bad { border-color: var(--urucum); outline-color: var(--urucum); color: var(--urucum); }
+.duel-stamp b { font: 400 clamp(1.5rem, 3.4vw, 2.4rem)/1 var(--f-west); text-transform: uppercase; }
+.duel-stamp span { font: 500 14px/1.4 var(--f-display); color: var(--ink-2); }
+@keyframes carimbo-duelo { from { opacity: 0; transform: rotate(-4deg) translateY(-24%) scale(2.2); } to { opacity: 1; transform: rotate(-4deg) translateY(-24%); } }
+.duel-bluff {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(28, 20, 16, 0.82);
+  color: var(--paper);
+  font: 500 13px/1.3 var(--f-mono);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: fade-up 0.4s var(--ease) both;
+}
+
+/* a barra de reflexo: a faixa vermelha (só vale com o revólver aprimorado) e a amarela dentro dela */
+.duel-play { display: grid; gap: 16px; }
+.duel-bar {
+  --charge: 0;
+  position: relative;
+  height: 30px;
+  overflow: hidden;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, transparent 0 9.5%, var(--line) 9.5% 10%), var(--paper-2);
+}
+.zone { position: absolute; top: 0; bottom: 0; background: rgba(185, 56, 26, 0.28); transition: background-color 0.3s; }
+.zone.gun { background: rgba(185, 56, 26, 0.6); }
+.zone i { position: absolute; top: 0; bottom: 0; background: var(--sol); }
+.zone.hit, .zone.hit i { background: var(--mandacaru); }
+.fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--charge) * 100%); background: linear-gradient(90deg, var(--sol), var(--urucum)); display: none; }
+.duel-bar.meter .fill { display: block; }
+.mark { --at: 0%; position: absolute; top: -2px; bottom: -2px; left: var(--at); width: 4px; margin-left: -2px; border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 2px var(--paper); opacity: 0; }
+.mark.on { opacity: 1; }
+.duel-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.duel-action { min-width: 220px; justify-content: center; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.duel-action.armed { --bg: var(--urucum); --edge: var(--urucum); }
+.duel-action:disabled { opacity: 0.6; cursor: default; }
+.duel-hint { flex: 1; min-width: 200px; font-size: 14.5px; color: var(--muted); }
+kbd { padding: 2px 6px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; font: 500 12px/1 var(--f-mono); color: var(--ink); }
+
+/* o menu do duelo */
+.duel-setup { display: grid; gap: 20px; }
+.pick { margin: 0; padding: 0; border: 0; display: grid; gap: 10px; }
+.pick legend { margin-bottom: 10px; padding: 0; font: 500 11.5px/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.pick-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick-chip { position: relative; cursor: pointer; }
+.pick-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pick-chip span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  font: 500 15px/1 var(--f-display);
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+}
+.pick-chip small { font: 500 11px/1 var(--f-mono); color: inherit; opacity: 0.7; }
+.pick-chip:hover span { border-color: var(--ink); }
+.pick-chip input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.pick-chip input:focus-visible + span { outline: 2px solid var(--urucum); outline-offset: 3px; }
+.duel-how { font: italic 400 19px/1.35 var(--f-serif); color: var(--couro); }
+.duel-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
+.duel-gun { flex: 1; min-width: 260px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.duel-gun .purse { display: inline-flex; gap: 4px; }
+.duel-gun .purse svg { width: 18px; height: 18px; opacity: 0.25; filter: grayscale(1); transition: opacity 0.4s, filter 0.4s; }
+.duel-gun .purse svg.got { opacity: 1; filter: none; }
+.link-btn { padding: 0; border: 0; background: none; font: inherit; color: var(--urucum); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.duel-gun.on { color: var(--mandacaru); }
+
+@media (max-width: 900px) {
+  .game { box-shadow: 4px 4px 0 var(--paper-3); }
+}
+@media (max-width: 560px) {
+  .duel-stage { height: auto; aspect-ratio: 4 / 3; }
+  .game-score { margin-left: 0; flex-basis: 100%; }
+  .duel-action { flex: 1; min-width: 0; }
+  .duel-bluff { white-space: normal; width: calc(100% - 28px); }
+}
+
+/* ---------------- os cartazes dos bandidos (os problemas que eu resolvi) ---------------- */
+.wanted { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; }
+.wanted-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 14px 14px 12px;
+  border: 1.5px solid var(--ink);
+  background: #ecdcb8;
+  box-shadow: inset 0 0 22px rgba(126, 69, 38, 0.3);
+  text-align: center;
+  transition: transform 0.5s var(--ease), box-shadow 0.5s;
+}
+.wanted-card:nth-child(odd) { transform: rotate(-1.2deg); }
+.wanted-card:nth-child(even) { transform: rotate(1deg); }
+.wanted-card.now { transform: translateY(-6px) rotate(0); box-shadow: inset 0 0 22px rgba(126, 69, 38, 0.3), 0 0 0 3px var(--urucum); }
+.wc-head { font: 400 13px/1 var(--f-tuscan); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.wc-alias { font: 400 clamp(1rem, 1.5vw, 1.25rem)/1.05 var(--f-wood); text-transform: uppercase; }
+.wc-crime { font: italic 400 16px/1.25 var(--f-serif); color: var(--couro); }
+.wc-crime s { text-decoration-color: var(--urucum); text-decoration-thickness: 2px; }
+.wanted-card:not(.caught) .wc-crime s { text-decoration: none; }
+.wc-stamp {
+  justify-self: center;
+  margin-top: 4px;
+  padding: 5px 10px 4px;
+  border: 2px solid var(--mandacaru);
+  border-radius: 4px;
+  font: 400 13px/1 var(--f-west);
+  text-transform: uppercase;
+  color: var(--mandacaru);
+  transform: rotate(-6deg);
+  animation: preso 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes preso { from { opacity: 0; transform: rotate(-6deg) scale(2.2); } to { opacity: 1; transform: rotate(-6deg); } }
+.wc-how { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
+.wc-how i { display: block; margin-top: 2px; font: 500 10.5px/1.3 var(--f-mono); font-style: normal; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------------- cordel da memória: folhetos virados, com o sol de xilogravura no verso ---------------- */
+/* o folheto de papel dentro da seção escura: botão e texto voltam às cores do papel */
+.sec-night .memoria { color: var(--ink); }
+.sec-night .memoria .btn { --bg: var(--ink); --fg: var(--paper); --edge: var(--ink); }
+.mem-board { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; perspective: 900px; }
+.mem-card {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.55s var(--ease);
+}
+.mem-card.up { transform: rotateY(180deg); cursor: default; }
+.mem-card:focus-visible { outline: 2px solid var(--urucum); outline-offset: 4px; }
+.mem-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  backface-visibility: hidden;
+}
+.mem-back {
+  color: var(--paper);
+  background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(0, 0, 0, 0.12) 6px 7px), var(--couro);
+  box-shadow: inset 0 0 0 4px var(--couro), inset 0 0 0 5.5px rgba(239, 228, 207, 0.6);
+}
+.mem-back svg { width: 46%; height: auto; --orn-hole: var(--couro); }
+.mem-card:not(.up):hover .mem-back { background-color: var(--urucum); box-shadow: inset 0 0 0 4px var(--urucum), inset 0 0 0 5.5px rgba(239, 228, 207, 0.6); }
+.mem-front {
+  transform: rotateY(180deg);
+  background: #ecdcb8;
+  font: 500 clamp(12px, 1.05vw, 14.5px)/1.3 var(--f-display);
+  color: var(--ink-2);
+  text-align: center;
+}
+.mem-card.tool .mem-front { font: 400 clamp(13px, 1.3vw, 18px)/1.1 var(--f-wood); text-transform: uppercase; color: var(--ink); }
+.mem-card.found .mem-front { background: var(--mandacaru); border-color: var(--mandacaru); color: var(--paper); }
+
+@media (max-width: 900px) {
+  .wanted { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mem-board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .mem-board { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .mem-face { padding: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mem-card { transition: none; }
+}

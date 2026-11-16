@@ -1,26 +1,21 @@
-import { KIT } from './kit';
-import { LEVELS } from './levels';
-import { DuelMatch, planRound } from './match';
+import { Hunt, planRound } from './match';
 
-describe('duelo: a partida', () => {
-  it('acaba quando alguém chega às vitórias do nível', () => {
-    const m = new DuelMatch('facil', LEVELS.facil);
-    m.youWin(true); expect(m.over).toBe(false);
-    m.joaoWins(); m.youWin(false);
-    expect(m.over).toBe(true);
-    expect(m.won).toBe(true);
-    expect([m.hits, m.perfects]).toEqual([2, 1]);
+describe('duelo: a caçada', () => {
+  it('prende um bandido por acerto e acaba com todos presos', () => {
+    const h = new Hunt(3);
+    h.capture(true); expect(h.current).toBe(1);
+    h.escape(); h.capture(false);
+    expect(h.over).toBe(false);
+    h.capture(true);
+    expect([h.over, h.won, h.perfects, h.livesLeft]).toEqual([true, true, 2, 2]);
+    expect(h.summary()).toContain('Todos presos');
   });
 
-  it('o carimbo final: sem levar tiro, vitória e derrota', () => {
-    const flawless = new DuelMatch('facil', LEVELS.facil);
-    flawless.youWin(true); flawless.youWin(true);
-    expect(flawless.title(KIT.revolver)).toBe(KIT.revolver.flawless);
-    expect(flawless.summary(KIT.revolver)).toBe('Fácil: você 2 × 0 João. Tiros certeiros: 2. Na faixa amarela: 2. Que tal subir a dificuldade?');
-    const lost = new DuelMatch('dificil', LEVELS.dificil);
-    for (let i = 0; i < LEVELS.dificil.wins; i++) lost.joaoWins();
-    expect(lost.title(KIT.lasso)).toBe(KIT.lasso.lose);
-    expect(lost.summary(KIT.lasso)).not.toContain('subir a dificuldade');
+  it('sem chapéu a caçada acaba e conta quantos ficaram presos', () => {
+    const h = new Hunt(4, 2);
+    h.capture(true); h.escape(); h.escape();
+    expect([h.over, h.won]).toEqual([true, false]);
+    expect(h.summary()).toBe('1 de 4 presos. O resto fugiu pela caatinga.');
   });
 
   it('o sino toca entre 1,8 s e 4,4 s; os blefes vêm antes dele', () => {

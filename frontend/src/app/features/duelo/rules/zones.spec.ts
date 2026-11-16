@@ -1,12 +1,12 @@
-import { LEVELS } from './levels';
+import { LEVEL } from './levels';
 import { judge, makeZone } from './zones';
 
 describe('duelo: faixas da barra', () => {
-  const z = makeZone(LEVELS.normal, 30, 94, () => 0.5);
+  const z = makeZone(LEVEL, 30, 94, () => 0.5);
 
   it('a faixa fica dentro do intervalo pedido', () => {
-    expect(z.s).toBe(30 + 0.5 * (94 - 30 - 20));
-    expect(z.mid).toBe(z.s + 10);
+    expect(z.s).toBe(30 + 0.5 * (94 - 30 - LEVEL.zone));
+    expect(z.mid).toBe(z.s + LEVEL.zone / 2);
   });
 
   it('amarela vale sempre; vermelha só com o revólver aprimorado', () => {

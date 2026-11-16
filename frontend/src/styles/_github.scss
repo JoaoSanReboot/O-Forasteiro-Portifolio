@@ -1,0 +1,80 @@
+/* 05 · GitHub: o total enorme e o ano de contribuições num quadro de papel.
+   A varredura (commits.ts) acende cada dia com commit (.on); sem JavaScript os dias já vêm acesos. */
+.gh {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  grid-template-areas: "total board" "foot foot";
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+.gh-total { grid-area: total; display: grid; gap: 20px; }
+.gh-total b {
+  font: 400 clamp(4.4rem, 10vw, 9rem)/0.9 var(--f-wood);
+  letter-spacing: -0.01em;
+  color: var(--mandacaru);
+  font-variant-numeric: tabular-nums;
+}
+.gh-total span { max-width: 30ch; font-size: 16px; line-height: 1.55; color: var(--muted); }
+
+.gh-board {
+  grid-area: board;
+  min-width: 0;
+  padding: clamp(18px, 2.4vw, 30px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper-2);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 30px 60px -40px rgba(0, 0, 0, 0.6);
+}
+.heat-wrap { overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: thin; }
+.heat {
+  --cell: clamp(9px, 1.02vw, 13px);
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, var(--cell));
+  grid-auto-columns: var(--cell);
+  gap: 3px;
+  width: max-content;
+}
+.heat .pad, .heat button { width: var(--cell); height: var(--cell); padding: 0; border: 0; border-radius: 3px; }
+.heat button { background: var(--line); cursor: default; transition: background-color 0.4s; }
+.heat button[class^="l"] { cursor: pointer; }
+.heat .l1.on, html:not(.js) .heat .l1, .heat-scale .l1 { background: #d6a656; }
+.heat .l2.on, html:not(.js) .heat .l2, .heat-scale .l2 { background: var(--couro); }
+.heat .l3.on, html:not(.js) .heat .l3, .heat-scale .l3 { background: var(--urucum); }
+.heat-scale .l0 { background: var(--line); }
+.heat button.scan { background: var(--ink); }
+.heat button.pop { animation: pop 0.7s var(--ease); }
+.heat button:focus-visible { outline-offset: 1px; }
+
+.heat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  font: 500 12px/1 var(--f-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.heat-legend b { color: var(--ink); font-weight: 500; }
+.heat-scale { display: inline-flex; align-items: center; gap: 4px; text-transform: lowercase; }
+.heat-scale i { width: 11px; height: 11px; border-radius: 3px; }
+#heat-tip { min-height: 1.5em; margin-top: 14px; font: 500 13px/1.5 var(--f-mono); color: var(--ink-2); }
+
+.gh-foot {
+  grid-area: foot;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-strong);
+}
+.gh-foot .note { font: 500 12.5px/1.5 var(--f-mono); color: var(--muted); }
+
+@media (max-width: 900px) {
+  .gh { grid-template-columns: 1fr; grid-template-areas: "total" "board" "foot"; }
+}

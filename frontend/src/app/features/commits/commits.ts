@@ -1,7 +1,8 @@
 import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, Injector, PendingTasks, signal, viewChild } from '@angular/core';
 import { PlatformService } from '../../core/platform/platform.service';
 import { HeatData, snapshotData } from '../../content/heat-snapshot';
-import { SceneCanvas } from '../../shared/scene-canvas/scene-canvas';
+import { Reveal } from '../../shared/reveal/reveal';
+import { SectionHead } from '../../shared/section-head/section-head';
 import { cancelRaf, raf } from '../../engine/core/browser';
 import { GITHUB_ENDPOINT } from './github-endpoint';
 import { fetchLiveHeat } from './github-heat.source';
@@ -13,12 +14,12 @@ const SNAPSHOT_LABEL = 'registro de outubro de 2026';
 
 interface Cell { b: HTMLButtonElement; l: number }
 
-// IV · Commits: a placa do telégrafo acende dia por dia
+// 05 · GitHub: o ano de contribuições acende dia por dia, numa varredura, quando a grade aparece
 @Component({
   selector: 'section[appCommits]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SceneCanvas],
-  host: { class: 'sector alt flip', id: 'commits', 'aria-labelledby': 't-commits' },
+  imports: [SectionHead, Reveal],
+  host: { class: 'sec github', id: 'github', 'aria-labelledby': 't-github' },
   templateUrl: './commits.html',
 })
 export class Commits {
@@ -30,9 +31,9 @@ export class Commits {
   private readonly countRef = viewChild.required<ElementRef<HTMLElement>>('count');
 
   protected readonly data = signal<HeatData>(snapshotData());
-  protected readonly tip = signal('Toque nos quadradinhos pra ver cada contribuição.');
+  protected readonly tip = signal('Toque num quadradinho para ver o dia.');
   protected readonly status = signal(this.endpoint
-    ? 'Consultando o GitHub pelo telégrafo...'
+    ? 'Consultando o GitHub...'
     : `Integração ao vivo com o GitHub ainda não configurada: mostrando o ${SNAPSHOT_LABEL}.`);
 
   /** a grade começa no domingo, como no GitHub */
@@ -74,7 +75,7 @@ export class Commits {
     this.countRef().nativeElement.textContent = String(this.data().total);
   }
 
-  // integração ao vivo (github-heat.source.ts): em qualquer falha a placa segue com o registro guardado
+  // integração ao vivo (github-heat.source.ts): em qualquer falha a seção segue com o registro guardado
   private liveHeat(endpoint: string): () => void {
     const ctrl = new AbortController();
     const done = this.pendingTasks.add();

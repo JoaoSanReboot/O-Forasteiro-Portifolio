@@ -1,0 +1,259 @@
+/* O topo: nome enorme em tipo de madeira, o cartaz de "Procura-se" enxuto, o sol atrás
+   com os urubus rodando (parallax pela rolagem, --sy vem do ScrollState) e o horizonte do sertão no pé.
+   Com JavaScript, tudo espera a abertura subir (html.ready) para entrar. */
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding-top: 20px;
+  overflow: clip;
+  background: var(--paper);
+}
+
+.hero-sun {
+  position: absolute;
+  z-index: 0;
+  top: 9vh;
+  right: -9vw;
+  width: clamp(380px, 50vw, 820px);
+  color: var(--sol);
+  opacity: 0.42;
+  transform: translate3d(0, calc(var(--sy, 0) * 0.28px), 0);
+  will-change: transform;
+}
+.hero-sun > svg { width: 100%; animation: spin 120s linear infinite; }
+
+/* urubus rodando em volta do sol, batendo asa de vez em quando */
+.urubus { position: absolute; left: 50%; top: 50%; }
+.urubu {
+  --r: calc(clamp(380px, 50vw, 820px) * (0.4 + var(--u) * 0.08));
+  position: absolute;
+  width: calc(34px - var(--u) * 6px);
+  color: var(--ink);
+  animation: orbita calc(26s + var(--u) * 9s) linear calc(var(--u) * -7s) infinite;
+}
+.urubu svg { width: 100%; overflow: visible; animation: asa 1.6s ease-in-out calc(var(--u) * -0.5s) infinite; }
+.urubu path { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes orbita { from { transform: rotate(0) translateX(var(--r)) rotate(0); } to { transform: rotate(-360deg) translateX(var(--r)) rotate(360deg); } }
+@keyframes asa { 0%, 60%, 100% { transform: none; } 70% { transform: scaleY(0.4); } 80% { transform: scaleY(1.1); } 90% { transform: scaleY(0.5); } }
+
+.hero-in {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "top top"
+    "name poster"
+    "role poster"
+    "foot foot";
+  grid-template-rows: auto auto auto 1fr;
+  column-gap: clamp(24px, 4vw, 72px);
+}
+
+.hero-top { grid-area: top; display: flex; justify-content: flex-end; gap: 16px; padding-top: 6px; }
+.hero-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 12px/1.4 var(--f-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hero-clock { margin-left: 10px; padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.hero-name {
+  grid-area: name;
+  /* o tamanho das letras sai da largura da coluna (cqi): "PEDRO" sempre cabe numa linha só */
+  container-type: inline-size;
+  margin-top: clamp(28px, 5vh, 64px);
+  font: 400 clamp(3.4rem, 11.2vw, 11.5rem)/0.88 var(--f-wood);
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+}
+.hn-line { display: block; overflow: hidden; padding: 0.04em 0 0.06em; white-space: nowrap; font-size: min(1em, 20.5cqi); }
+.hn-2 { margin-left: min(5vw, 96px, 7cqi); color: var(--urucum); }
+.hero-name .ch { display: inline-block; }
+.hero-name:focus { outline: none; }
+
+.hero-role {
+  grid-area: role;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35em 0.5em;
+  margin-top: clamp(16px, 2.4vw, 28px);
+  font: 600 clamp(1.1rem, 2.1vw, 1.8rem)/1.1 var(--f-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.hero-role em { font: italic 400 1.45em/1 var(--f-serif); text-transform: none; letter-spacing: 0; color: var(--couro); }
+
+/* o cartaz de "Procura-se", enxuto: um fio de papel em volta, o título em toscano, o retrato em sépia,
+   o nome e a recompensa. Inclinado de leve, sem balanço, prego, carimbo nem furos. */
+.poster {
+  grid-area: poster;
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: clamp(220px, 22vw, 300px);
+  margin-top: clamp(24px, 4vh, 48px);
+  padding: 22px 20px 20px;
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.7);
+  outline: 1px solid var(--line);
+  outline-offset: 5px;
+  text-align: center;
+  rotate: -1.5deg;
+}
+.poster-head { font: 400 clamp(1.6rem, 2.4vw, 2.2rem)/1 var(--f-tuscan); letter-spacing: 0.02em; text-transform: uppercase; color: var(--sol); }
+.poster-photo { width: 100%; aspect-ratio: 4 / 4.4; overflow: hidden; background: var(--paper-2); }
+.poster-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) sepia(0.35) contrast(1.1); }
+.poster figcaption { display: grid; justify-items: center; gap: 10px; width: 100%; }
+.poster-name { font: 400 clamp(1rem, 1.35vw, 1.3rem)/1.1 var(--f-wood); text-transform: uppercase; }
+.poster-reward {
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-strong);
+  font: italic 400 1.15rem/1 var(--f-serif);
+  color: var(--ink-2);
+}
+.poster-reward small { font: 500 10px/1 var(--f-mono); font-style: normal; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+
+.hero-foot {
+  grid-area: foot;
+  align-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px 48px;
+  padding: clamp(28px, 5vh, 56px) 0 clamp(24px, 4vh, 40px);
+}
+.hero-lead { max-width: 44ch; font-size: clamp(16px, 1.35vw, 19px); line-height: 1.55; color: var(--ink-2); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-actions .btn-ghost { --bg: var(--paper); }
+
+/* o horizonte do sertão no pé do topo: chão, mandacarus e a cerca de estacas */
+/* em silhueta, no mesmo chão escuro da tela de carregamento */
+.horizon { position: relative; z-index: 1; display: block; width: 100%; height: clamp(72px, 9vw, 130px); margin-top: -10px; color: var(--night); }
+
+/* o vento no chão do topo: o rolo de capim seco atravessa quicando, a poeira rasteira vem junto
+   e de vez em quando um redemoinho nasce perto da cerca e some. Fora da tela quando parado. */
+.vento {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: calc(clamp(72px, 9vw, 130px) * 0.11);
+  height: 110px;
+  pointer-events: none;
+  color: var(--couro);
+}
+.capim { position: absolute; left: 0; bottom: 0; width: 52px; height: 52px; translate: -90px 0; animation: rola 24s linear 4s infinite; }
+.capim svg { width: 100%; height: 100%; overflow: visible; animation: gira 1.15s linear infinite, quica 0.62s infinite; }
+.capim :is(ellipse, path) { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+.capim::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -4px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(28, 20, 16, 0.28), transparent);
+}
+@keyframes rola { 0% { translate: -90px 0; } 48%, 100% { translate: calc(100vw + 90px) 0; } }
+@keyframes gira { to { rotate: 360deg; } }
+@keyframes quica {
+  0% { translate: 0 0; animation-timing-function: cubic-bezier(0.3, 0.7, 0.6, 1); }
+  50% { translate: 0 -18px; animation-timing-function: cubic-bezier(0.4, 0, 0.7, 0.3); }
+  100% { translate: 0 0; }
+}
+
+.poeira {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 34vw;
+  height: 14px;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(126, 69, 38, 0.3), transparent);
+  filter: blur(3px);
+  animation: sopra 24s linear 3.6s infinite;
+}
+.poeira.p2 { bottom: 22px; width: 22vw; height: 8px; animation-delay: 4.3s; }
+.poeira.p3 { bottom: 10px; width: 16vw; height: 10px; animation-delay: 5s; }
+@keyframes sopra {
+  0% { opacity: 0; translate: -40vw 0; }
+  8% { opacity: 1; }
+  44% { opacity: 0.8; }
+  52%, 100% { opacity: 0; translate: 110vw 0; }
+}
+
+.redemoinho {
+  position: absolute;
+  left: 63%;
+  bottom: 0;
+  width: 58px;
+  overflow: visible;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  animation: vagueia 19s ease-in-out 9s infinite;
+}
+.redemoinho ellipse {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-dasharray: 9 6;
+  stroke-linecap: round;
+  animation: rodopia 0.8s linear infinite, torce 1.6s ease-in-out calc(var(--i) * -0.22s) infinite;
+}
+@keyframes rodopia { to { stroke-dashoffset: -30; } }
+@keyframes torce { 0%, 100% { translate: calc(var(--i) * -1.6px) 0; } 50% { translate: calc(var(--i) * 1.6px) 0; } }
+@keyframes vagueia {
+  0% { opacity: 0; transform: scale(0.4, 0.2); }
+  12% { opacity: 0.75; transform: none; }
+  55% { opacity: 0.7; transform: translateX(-140px) rotate(-4deg); }
+  70%, 100% { opacity: 0; transform: translateX(-180px) scale(1.2, 0.7); }
+}
+
+/* a entrada depois da abertura */
+html.js:not(.ready) .hero-name .ch { transform: translateY(108%); }
+html.js:not(.ready) :is(.hero-top, .hero-role, .poster, .hero-foot, .horizon, .hero-sun, .vento) { opacity: 0; }
+html.ready .hero-name .ch { animation: rise 1.25s var(--ease) both; animation-delay: calc(0.15s + var(--i) * 50ms); }
+html.ready .hero-top { animation: fade-in 1s ease 0.2s both; }
+html.ready .hero-role { animation: fade-up 1.1s var(--ease) 0.7s both; }
+html.ready .poster { animation: poster-in 1.3s var(--ease) 0.45s both; }
+html.ready .vento { animation: fade-in 1s ease 1s both; }
+html.ready .hero-foot { animation: fade-up 1.1s var(--ease) 0.85s both; }
+html.ready .horizon { animation: fade-up 1.4s var(--ease) 0.6s both; }
+html.ready .hero-sun { animation: fade-in 2s ease 0.1s both; }
+@keyframes poster-in { from { opacity: 0; transform: translateY(-28px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 900px) {
+  .hero-in {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "top" "name" "role" "poster" "foot";
+    grid-template-rows: auto auto auto auto 1fr;
+  }
+  .hero-name { font-size: clamp(3.2rem, 17.5vw, 9rem); }
+  .hn-2 { margin-left: 0; }
+  .hn-line { font-size: min(1em, 22cqi); }
+  .poster { justify-self: center; width: clamp(210px, 62vw, 300px); margin-top: clamp(36px, 8vw, 56px); }
+  .poster-head { font-size: clamp(1.4rem, 7vw, 2rem); }
+  .hero-sun { top: 16vh; right: -42vw; width: 100vw; opacity: 0.5; }
+  .hero-where { text-align: right; }
+}
+@media (max-width: 560px) {
+  /* o canto esquerdo é do bolso das moedas */
+  .hero-top { padding-left: 96px; }
+  .hero-where { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; min-width: 0; letter-spacing: 0.08em; }
+  .hero-actions .btn { flex: 1; justify-content: center; }
+}

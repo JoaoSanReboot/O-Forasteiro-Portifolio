@@ -1,0 +1,178 @@
+/* Seções: respiro generoso, cabeçalho numerado e as seções escuras com a borda em dente de serra
+   (como a barra de couro dos chapéus de cangaceiro). */
+.sec {
+  position: relative;
+  padding: clamp(104px, 14vw, 200px) 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+.sec-night { background: var(--night); color: var(--on-night); }
+.sec-night::before, .sec-night::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  height: 14px;
+  pointer-events: none;
+  background-size: 28px 14px;
+  background-repeat: repeat-x;
+}
+/* dentes para cima (ponta no meio de cada ladrilho de 28 × 14) e, embaixo, para baixo */
+.sec-night::before {
+  top: -13px;
+  background-image: conic-gradient(from 135deg at 50% 0, var(--night) 90deg, transparent 0);
+}
+.sec-night::after {
+  bottom: -13px;
+  background-image: conic-gradient(from -45deg at 50% 100%, var(--night) 90deg, transparent 0);
+}
+/* a última seção escura encosta no rodapé, que também é noite: sem dente embaixo */
+.sec-night:last-child::after { display: none; }
+
+/* Cor na rolagem das seções de fundo (no escuro, só um brilho baixo, como lume de candeeiro): cada uma tem a sua paleta do sertão (--wash-1/--wash-2) em duas
+   manchas de luz que escorregam conforme a seção passa pela tela, e um ornamento gigante em cor
+   (o sol, a estrela de couro, o mandacaru) que gira e sobe atrás do texto, como um parallax.
+   Onde o navegador não anima pela rolagem (ou com "reduzir movimento"), tudo fica parado no lugar. */
+@property --wa { syntax: "<number>"; inherits: true; initial-value: 0.5; }
+.sec:not(.sec-night) {
+  --wash-1: var(--sol);
+  --wash-2: var(--urucum);
+  --orn: var(--sol);
+  isolation: isolate;
+  overflow-x: clip;
+  /* por cima das manchas, o papel volta nas bordas: uma seção passa para a outra sem degrau */
+  background:
+    linear-gradient(var(--paper), transparent clamp(120px, 14vw, 220px), transparent calc(100% - clamp(120px, 14vw, 220px)), var(--paper)),
+    radial-gradient(62% 52% at calc(6% + var(--wa) * 34%) calc(4% + var(--wa) * 30%), color-mix(in srgb, var(--wash-1) 15%, transparent), transparent 74%),
+    radial-gradient(56% 48% at calc(96% - var(--wa) * 30%) calc(96% - var(--wa) * 34%), color-mix(in srgb, var(--wash-2) 11%, transparent), transparent 74%),
+    var(--paper);
+}
+.sec:not(.sec-night)::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 8%;
+  right: -10%;
+  width: clamp(300px, 44vw, 680px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: var(--orn);
+  opacity: 0.1;
+  -webkit-mask: var(--orn-shape) center / contain no-repeat;
+  mask: var(--orn-shape) center / contain no-repeat;
+  rotate: calc(var(--wa) * 90deg - 45deg);
+  translate: 0 calc(var(--wa) * -18% + 9%);
+}
+.sec:not(.sec-night) { --orn-shape: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M85.9 47.4 L100.0 50.0 L85.9 52.6 Z M85.4 56.8 L92.5 61.4 L84.0 61.8 Z M82.4 65.7 L93.3 75.0 L79.8 70.2 Z M77.2 73.6 L81.1 81.1 L73.6 77.2 Z M70.2 79.8 L75.0 93.3 L65.7 82.4 Z M61.8 84.0 L61.4 92.5 L56.8 85.4 Z M52.6 85.9 L50.0 100.0 L47.4 85.9 Z M43.2 85.4 L38.6 92.5 L38.2 84.0 Z M34.3 82.4 L25.0 93.3 L29.8 79.8 Z M26.4 77.2 L18.9 81.1 L22.8 73.6 Z M20.2 70.2 L6.7 75.0 L17.6 65.7 Z M16.0 61.8 L7.5 61.4 L14.6 56.8 Z M14.1 52.6 L0.0 50.0 L14.1 47.4 Z M14.6 43.2 L7.5 38.6 L16.0 38.2 Z M17.6 34.3 L6.7 25.0 L20.2 29.8 Z M22.8 26.4 L18.9 18.9 L26.4 22.8 Z M29.8 20.2 L25.0 6.7 L34.3 17.6 Z M38.2 16.0 L38.6 7.5 L43.2 14.6 Z M47.4 14.1 L50.0 0.0 L52.6 14.1 Z M56.8 14.6 L61.4 7.5 L61.8 16.0 Z M65.7 17.6 L75.0 6.7 L70.2 20.2 Z M73.6 22.8 L81.1 18.9 L77.2 26.4 Z M79.8 29.8 L93.3 25.0 L82.4 34.3 Z M84.0 38.2 L92.5 38.6 L85.4 43.2 Z' fill='white'/><circle cx='50' cy='50' r='31' fill='white'/></svg>"); }
+.sec.projetos { --wash-1: var(--urucum); --wash-2: var(--sol); --orn: var(--urucum); --orn-shape: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill-rule='evenodd' fill='white' d='M50.0,0.0 59.2,27.8 85.4,14.6 72.2,40.8 100.0,50.0 72.2,59.2 85.4,85.4 59.2,72.2 50.0,100.0 40.8,72.2 14.6,85.4 27.8,59.2 0.0,50.0 27.8,40.8 14.6,14.6 40.8,27.8 Z M50.0,22.0 55.4,37.1 69.8,30.2 62.9,44.6 78.0,50.0 62.9,55.4 69.8,69.8 55.4,62.9 50.0,78.0 44.6,62.9 30.2,69.8 37.1,55.4 22.0,50.0 37.1,44.6 30.2,30.2 44.6,37.1 Z'/><circle cx='50' cy='50' r='6' fill='white'/></svg>"); }
+.sec.projetos::before { right: auto; left: -12%; top: 30%; }
+.sec.experiencia { --wash-1: #5b7f52; --wash-2: var(--sol); --orn: var(--mandacaru); --orn-shape: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160'><g fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round'><path d='M50 158 V20' stroke-width='20'/><path d='M44 96 H27 Q20 96 20 89 V52' stroke-width='15'/><path d='M56 74 H74 Q81 74 81 67 V34' stroke-width='15'/></g></svg>"); }
+/* o mandacaru não gira: só cresce do chão subindo um pouco */
+.sec.experiencia::before { top: auto; bottom: -4%; right: -4%; aspect-ratio: 100 / 160; width: clamp(220px, 26vw, 420px); opacity: 0.3; rotate: none; translate: 0 calc(var(--wa) * -14% + 10%); }
+.sec.github { --wash-1: var(--couro); --wash-2: #5b7f52; --orn: var(--couro); --orn-shape: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill-rule='evenodd' fill='white' d='M50.0,0.0 59.2,27.8 85.4,14.6 72.2,40.8 100.0,50.0 72.2,59.2 85.4,85.4 59.2,72.2 50.0,100.0 40.8,72.2 14.6,85.4 27.8,59.2 0.0,50.0 27.8,40.8 14.6,14.6 40.8,27.8 Z M50.0,22.0 55.4,37.1 69.8,30.2 62.9,44.6 78.0,50.0 62.9,55.4 69.8,69.8 55.4,62.9 50.0,78.0 44.6,62.9 30.2,69.8 37.1,55.4 22.0,50.0 37.1,44.6 30.2,30.2 44.6,37.1 Z'/><circle cx='50' cy='50' r='6' fill='white'/></svg>"); }
+.sec.github::before { right: auto; left: -14%; top: 12%; opacity: 0.22; }
+.sec.formacao { --wash-1: var(--sol); --wash-2: var(--couro); --orn: var(--urucum); }
+.sec.formacao::before { top: 40%; opacity: 0.2; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sec:not(.sec-night) { --wa: 0; animation: lava linear both; animation-timeline: view(); animation-range: cover; }
+  }
+}
+@keyframes lava { from { --wa: 0; } to { --wa: 1; } }
+
+/* cabeçalho de cartaz: "✦ Nº 02  PROJETOS ═════ 03 obras", o título em tipo de madeira e o emblema ao lado */
+.sh { display: grid; gap: clamp(18px, 2.4vw, 30px); margin-bottom: clamp(56px, 8vw, 112px); }
+.sh-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font: 500 12.5px/1 var(--f-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.sh-star { flex: none; width: 18px; height: 18px; color: var(--urucum); }
+.sh-num { font: 400 20px/1 var(--f-tuscan); letter-spacing: 0.02em; color: var(--urucum); }
+.sh-label { color: var(--ink); }
+/* fio duplo de cartaz */
+.sh-rule { flex: 1; height: 6px; border-block: 1.5px solid currentColor; opacity: 0.55; transform-origin: 0 50%; }
+.sh-aside { color: var(--ink); }
+
+.sh-row { display: flex; align-items: flex-end; justify-content: space-between; gap: clamp(20px, 4vw, 64px); }
+.sh-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.26em;
+  row-gap: 0.04em;
+  min-width: 0;
+  font: 400 clamp(2.05rem, 7.2vw, 7rem)/0.98 var(--f-wood);
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+.sh-title:focus { outline: none; }
+.sh-mask { display: inline-block; overflow: hidden; padding: 0.06em 0 0.1em; margin: -0.06em 0 -0.1em; }
+.sh-mask > * { display: inline-block; }
+/* a tinta da prensa: borda comida e falhas no preto */
+.sh-wood, .hn-line, .foot-word, .intro-word { filter: url(#tinta); }
+.sh-title em {
+  font: italic 400 1.12em/0.9 var(--f-serif);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--urucum);
+}
+.sh-emblem { flex: none; width: clamp(100px, 13vw, 200px); height: auto; margin-bottom: 0.2em; }
+.sh-emblem[data-em="rastros"] { width: clamp(190px, 27vw, 400px); }
+.sh-emblem[data-em="telegrafo"] { width: clamp(170px, 20vw, 290px); }
+
+.sec-night .sh-meta { color: var(--on-night-muted); }
+.sec-night :is(.sh-num, .sh-star), .sec-night .sh-title em { color: var(--sol); }
+.sec-night :is(.sh-aside, .sh-label) { color: var(--on-night); }
+
+@media (max-width: 720px) {
+  .sh-row { flex-direction: column-reverse; align-items: flex-start; gap: 18px; }
+  .sh-emblem { width: 84px; margin: 0; }
+  .sh-emblem[data-em="rastros"] { width: 190px; }
+  .sh-emblem[data-em="telegrafo"] { width: 150px; }
+  .sh-meta { gap: 10px; flex-wrap: wrap; }
+  .sh-aside { flex-basis: 100%; }
+}
+
+/* o bordado do cangaceiro: signo de Salomão e losangos em linha de ouro, com a costura de urucum
+   em cima e embaixo. Duas máscaras (o desenho e a costura), cada uma na sua cor; entra se costurando
+   da esquerda para a direita conforme aparece na tela. */
+.bordado { position: relative; height: 24px; pointer-events: none; color: var(--sol); }
+.bordado::before, .bordado::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 48px 24px;
+  mask-size: 48px 24px;
+}
+.bordado::before {
+  background: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='24'><path d='M12 3.5 L19.4 16.3 H4.6 Z M12 20.5 L19.4 7.7 H4.6 Z' fill='none' stroke='white' stroke-width='1.7' stroke-linejoin='round'/><circle cx='12' cy='12' r='1.6' fill='white'/><path fill='white' fill-rule='evenodd' d='M36 4 L44 12 L36 20 L28 12 Z M36 8.5 L39.5 12 L36 15.5 L32.5 12 Z'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='24'><path d='M12 3.5 L19.4 16.3 H4.6 Z M12 20.5 L19.4 7.7 H4.6 Z' fill='none' stroke='white' stroke-width='1.7' stroke-linejoin='round'/><circle cx='12' cy='12' r='1.6' fill='white'/><path fill='white' fill-rule='evenodd' d='M36 4 L44 12 L36 20 L28 12 Z M36 8.5 L39.5 12 L36 15.5 L32.5 12 Z'/></svg>");
+}
+.bordado::after {
+  background: var(--urucum);
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='24'><path d='M0 1 H48 M0 23 H48' stroke='white' stroke-width='1.6' stroke-dasharray='5 3'/><circle cx='24' cy='12' r='1.4' fill='white'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='24'><path d='M0 1 H48 M0 23 H48' stroke='white' stroke-width='1.6' stroke-dasharray='5 3'/><circle cx='24' cy='12' r='1.4' fill='white'/></svg>");
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bordado { animation: costura linear both; animation-timeline: view(); animation-range: entry 10% cover 35%; }
+  }
+}
+@keyframes costura { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+.skills > .bordado { position: absolute; z-index: 1; left: 0; right: 0; top: 30px; }
+
+/* a estrela do cabeçalho gira como a roseta de uma espora quando o fio se estende */
+[data-reveal="line"].rv .sh-star { transition: rotate 1.6s var(--ease) 0.1s; }
+[data-reveal="line"].rv:not(.in) .sh-star { rotate: -225deg; }
+
+/* o <svg> que só guarda o filtro da tinta */
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }

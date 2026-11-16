@@ -1,4 +1,4 @@
-// as prateleiras do armeiro (seção Skills)
+// o arsenal (seção Skills): as ferramentas por categoria
 export interface Shelf {
   readonly label: string;
   readonly items: readonly string[];

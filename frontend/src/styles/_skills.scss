@@ -1,0 +1,75 @@
+/* 04 · Skills: seção escura, a palavra gigante vazada atravessando o fundo (pela rolagem, onde o navegador
+   anima pela linha do tempo da página) e o arsenal em fichas de couro. */
+.skills { overflow-x: clip; }
+.skills-ghost {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 0;
+  margin: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  font: 400 clamp(7rem, 19vw, 19rem)/1 var(--f-wood);
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(239, 228, 207, 0.1);
+  transform: translateY(-50%);
+}
+.skills-ghost span { display: inline-block; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .skills-ghost span { animation: ghost-slide linear both; animation-timeline: view(); animation-range: cover; }
+  }
+}
+@keyframes ghost-slide { from { transform: translateX(4%); } to { transform: translateX(-40%); } }
+.skills .wrap { position: relative; z-index: 1; }
+
+.arsenal { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+.kit {
+  grid-column: span 2;
+  position: relative;
+  overflow: hidden;
+  padding: clamp(22px, 2.4vw, 32px);
+  border-radius: 16px;
+  /* couro curtido: a peça mais escura nas bordas, a costura tracejada por dentro e os rebites nos cantos */
+  background:
+    radial-gradient(circle at 16px 16px, #c49a5a 2.5px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 16px) 16px, #c49a5a 2.5px, transparent 3.5px),
+    radial-gradient(circle at 16px calc(100% - 16px), #c49a5a 2.5px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 16px) calc(100% - 16px), #c49a5a 2.5px, transparent 3.5px),
+    radial-gradient(130% 120% at 30% 0%, #4a2a18 0%, #2e1b10 60%, #24150c 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.45);
+  outline: 1.5px dashed rgba(227, 162, 58, 0.38);
+  outline-offset: -9px;
+  transition: outline-color 0.4s, transform 0.6s var(--ease);
+}
+.kit:nth-child(-n + 2) { grid-column: span 3; }
+.kit:hover { outline-color: rgba(227, 162, 58, 0.8); transform: translateY(-4px); }
+.kit-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 24px; }
+.kit-n { font: 500 12px/1 var(--f-mono); color: var(--sol); }
+.kit-head h3 { flex: 1; font: 400 clamp(21px, 2vw, 27px)/1.1 var(--f-west); letter-spacing: 0.01em; }
+.kit-count { font: italic 400 38px/0.8 var(--f-serif); color: var(--on-night-muted); }
+.kit-list { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; position: relative; z-index: 1; }
+.kit-list li {
+  padding: 9px 15px;
+  border: 1px solid var(--night-line);
+  border-radius: 999px;
+  background: rgba(239, 228, 207, 0.05);
+  font: 500 15px/1.2 var(--f-display);
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+}
+.kit-list li:hover { background: var(--sol); border-color: var(--sol); color: var(--ink); }
+.skills .kit-star { --orn-hole: transparent; }
+.kit-star { position: absolute; right: -34px; bottom: -34px; width: 140px; height: 140px; color: rgba(239, 228, 207, 0.04); transition: transform 1.4s var(--ease), color 0.5s; }
+.kit:hover .kit-star { transform: rotate(67.5deg); color: rgba(227, 162, 58, 0.18); }
+
+@media (max-width: 980px) {
+  .arsenal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kit, .kit:nth-child(-n + 2) { grid-column: span 1; }
+  .kit:first-child { grid-column: span 2; }
+}
+@media (max-width: 600px) {
+  .arsenal { grid-template-columns: 1fr; }
+  .kit, .kit:first-child { grid-column: auto; }
+}

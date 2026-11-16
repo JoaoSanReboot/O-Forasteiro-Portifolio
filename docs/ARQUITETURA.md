@@ -13,11 +13,11 @@ features  →  shared  →  core  →  engine
 
 | Camada | O que tem | Pode importar |
 |---|---|---|
-| `engine/` | Pixel art em TypeScript puro: canvas, primitivas, figuras, cenas, áudio, jogos. **Não conhece o Angular.** | só o próprio engine |
-| `content/` | Textos e dados do portfólio (projetos, skills, registro guardado da placa) | `engine` (tipos) |
-| `core/` | Infraestrutura sem regra de negócio: plataforma, armazenamento, áudio, o laço único das cenas e os contratos que elas usam | `engine`, `content` |
-| `shared/` | Componentes reaproveitados por várias seções (`scene-canvas`) | `core`, `engine`, `content` |
-| `features/` | Uma pasta por funcionalidade, com o componente, o estado e as regras dela | tudo acima (e outras features pelo serviço público delas) |
+| `engine/` | Utilitários em TypeScript puro, sem Angular: quadros seguros para SSR (`core/browser.ts`), matemática (`core/math.ts`) e as regras do jogo da memória (`games/memory.ts`) | só o próprio engine |
+| `content/` | Textos e dados do portfólio: perfil, experiência, formação e contatos (`profile.ts`), projetos, skills e o registro guardado do GitHub | `engine` (tipos) |
+| `core/` | Infraestrutura sem regra de negócio: `platform/` (navegador, "reduzir movimento", mouse) e `scroll/` (o estado da rolagem: `--sy`) | `engine`, `content` |
+| `shared/` | Peças reaproveitadas: `reveal/` (entrada ao rolar), `section-head/` (cabeçalho numerado), `split/` (texto letra por letra), `ornaments/` (estrela de couro, sol, mandacaru, chapéu, o céu com o Cruzeiro do Sul e as bandeirinhas, em SVG) e `emblems/` (o desenho animado de cada título) | `core`, `engine`, `content` |
+| `features/` | Uma pasta por funcionalidade | tudo acima (e outras features pelo serviço público delas) |
 
 `app.ts` e `app.config*.ts` só compõem a aplicação. A regra é conferida por `npm run lint:arch`, que também roda no CI.
 
@@ -25,35 +25,29 @@ features  →  shared  →  core  →  engine
 
 | Funcionalidade | Pasta | Peças |
 |---|---|---|
-| Abertura | `features/intro/` | `intro.ts` (orquestra), `intro.service.ts` (site aberto, chegada, "Rever a chegada"), `gate/` (tela inicial e escolha do personagem), `ride/` (cavalgada) |
-| Cavalgada | `features/intro/ride/` | `ride.ts` (laço e fases), `timeline.ts`, `tale.ts` (narração), `palette.ts`, `sprites.ts`, `stage.ts` (palco e projeção), `landscape.ts`, `roadside.ts`, `particles.ts`, `arrival.ts` (porteira), `poster.ts` (cartaz) |
-| Personagem escolhido | `features/heroes/` | `hero.service.ts`; o elenco e o desenho ficam em `engine/heroes/` |
-| Site (casca) | `features/site/` | `site.ts` (ordem das seções e chegada no mural), `site-nav/` (barra do topo e menu do celular), `site-footer/`, `scene-host.ts` (liga as cenas ao resto) |
-| Segredos | `features/secrets/` | `secrets.service.ts` (moedas, revólver, segredo do Saloon, progresso no navegador), `secrets-lines.ts` (falas), `secrets-hud/` (contador) |
-| Xerife | `features/guide/` | `guide.service.ts` (o balão), `guide.ts` (botão e área atual), `guide-tips.ts` (falas por área); o desenho em `engine/figures/sheriff.ts` |
-| Mural, Projetos, Trabalhos, Skills, Formação | `features/<seção>/` | um componente cada (a pasta tem o id da seção) |
-| Commits | `features/commits/` | `commits.ts` (placa e varredura), `github-heat.source.ts` (acesso à API), `github-endpoint.ts` |
-| Saloon | `features/saloon/` | `saloon.ts` (cena e convite), `saloon.service.ts` (estado da cena), `candle-secret.ts` (segredo da vela), `tic-tac-toe/`, `drinks-menu/` (contatos) |
-| Duelo | `features/duelo/` | `duelo.ts` (interface, cena, som e relógio), `duel.service.ts` (estado da cena), `duel-records.service.ts` (vitórias), `rules/` (regras puras) |
-| Regras do duelo | `features/duelo/rules/` | `levels.ts`, `kit.ts` (falas de cada arma), `zones.ts` (faixas e julgamento), `mechanics.ts` (a mecânica de cada arma), `match.ts` (placar e sorteio do sino) |
-| Cenas em canvas | `engine/scenes/` | uma cena por arquivo (`armeiro.ts`, `ferraria.ts`...), registradas em `index.ts`; figuras reaproveitadas em `engine/figures/` |
-| Trilha e efeitos | `engine/audio/` | `vila-audio.ts` (orquestração), `rig.ts` (mesa de som), `instruments.ts`, `notes.ts`, `tracks.ts`, `effects.ts` |
+| Abertura | `features/intro/` | `intro.ts` (tela de carregamento sem pular: sol, mandacarus, "Seja bem-vindo, Forasteiro" letra por letra, tambor com o contador de 1 a 6 balas e a cortina), `intro.service.ts` (`showing`/`done`, "Rever a abertura"; põe `intro-on` e `ready` no `<html>`) |
+| Site (casca) | `features/site/` | `site.ts` (ordem das seções, `inert` sob a abertura, liga o `ScrollState` e a inércia), sem barra no topo (a página é só rolagem), `site-footer/`, `smooth-scroll.ts` (Lenis, num pedaço à parte) |
+| Topo | `features/hero/` | nome enorme em tipo de madeira, o cartaz de "Procura-se" enxuto (título, retrato, nome e recompensa), sol com parallax e urubus, e o horizonte (chão, mandacarus e cerca) |
+| Seções | `features/<id>/` | `sobre` (frase que acende pela rolagem e os números), `projetos` (índice com prévia seguindo o cursor), `experiencia` (ficha presa e entregas), `skills` (fichas por categoria), `formacao` (régua de anos), `contato` (e-mail com copiar e os perfis) |
+| Jogos | `features/duelo/`, `memoria/`, `secrets/` e `content/jogos.ts` | Moram dentro das seções e usam os dados do portfólio. `duelo/` fica no fim da Experiência: o palco em SVG e, em `rules/`, a caçada aos bandidos (os problemas resolvidos), as faixas, o ritmo e a mecânica de cada arma, sem DOM. `memoria/` fica no fim das Skills: ferramenta e onde ela trabalhou. `secrets/` cuida das moedas escondidas, cada uma com um causo: o aviso, o bolso fixo no canto esquerdo da tela (`coin-purse.ts`) e o progresso no `localStorage`, lido só depois da hidratação |
+| GitHub | `features/commits/` | `commits.ts` (grade e varredura), `github-heat.source.ts` (acesso à API), `github-endpoint.ts` |
+| Estilos | `src/styles/` | `_tokens.scss` (cores, fontes, curvas), `_base.scss`, `_motion.scss` (entradas e keyframes), uma parte por seção |
 
 ### Padrões
 
-- **Estado quadro a quadro em objetos comuns, Signals só para a interface.** As cenas leem objetos simples a cada quadro (`DuelState`, `PianoState`); o que a página mostra são Signals.
-- **As cenas não conhecem as features.** O `SceneCanvas` e o `SceneLoopService` dependem só dos contratos `SCENES_ACTIVE` e `SCENE_HOST` (`core/scene/scene-host.ts`); quem os implementa é o site (`features/site/scene-host.ts`, registrado em `app.config.ts` e nos provedores dos testes).
-- **Regras sem DOM.** As regras do duelo falam com a tela, a cena e o som por uma porta (`DuelPort`); cada arma é uma estratégia (`Mechanic`). Isso deixa as regras testáveis sem navegador.
-- **O código também roda no Node** (prerender e SSR do `ng serve`): nada de `window`, `document`, armazenamento, áudio ou canvas fora do navegador. Animações começam em `afterNextRender`; quadros usam `raf`/`cancelRaf` de `engine/core/browser.ts`.
-- **Sistema visual ("noite no deserto").** As cores, fontes e sombras ficam em `src/styles/_tokens.scss` (`--bg`, `--surface`, `--text`, `--muted`, `--accent`...). Títulos em Space Grotesk, texto e rótulos em IBM Plex, e Pixelify Sans só como acento. O pixel aparece nas cenas, nos ícones, no marcador numerado das seções e na faixa pontilhada entre elas. O cartaz de procurado e os balões das cenas mantêm o visual de época.
-- **Componentes pelo atributo.** As seções usam seletores de atributo (`section[appDuelo]`, `div[appTicTacToe]`) para manter o HTML e o CSS de sempre.
+- **Sistema visual (escuro, o sertão à noite).** `--paper` é o fundo escuro e `--ink` a escrita creme; urucum, sol, mandacaru e couro, em `src/styles/_tokens.scss`. Títulos em tipo de madeira de cartaz (Ultra) com a tinta falhada da prensa (o filtro SVG `#tinta`, no `site.ts`), terminando em Instrument Serif itálico; letreiro de cartaz (Rye) só em rótulos curtos; o toscano de "Procura-se" (Sancreek) no cartaz e nos números de seção; a máquina de escrever das fichas da volante (Special Elite) em datas, fichas e carimbos; texto em Bricolage Grotesque; rótulos em JetBrains Mono. As seções escuras têm a borda em dente de serra (a barra de couro do chapéu de cangaceiro), o bordado de cangaceiro (`.bordado`: signo de Salomão e losangos, só CSS) marca as Skills e o rodapé, e um grão de papel cobre a página. As seções claras ganham cor na rolagem: cada uma tem a sua paleta (`--wash-1`/`--wash-2`) em manchas que escorregam e um ornamento gigante em cor atrás do texto, tudo animado pela linha do tempo da rolagem (`animation-timeline: view()`, só CSS em `_sections.scss`).
+- **Recarregar volta ao topo.** O `index.html` desliga a restauração de rolagem do navegador e tira a âncora do endereço antes de a página pular até ela: todo recarregamento começa na abertura e no topo que apresenta o João.
+- **Emblemas dos títulos.** Cada `<header appSectionHead>` recebe `emblem` e ganha o desenho que conta o título: chapéu tirado no cumprimento (sobre), ferro de marcar em brasa (projetos), pegadas andando (experiência), peixeiras cruzadas (skills), sinal correndo no fio do telégrafo (GitHub), candeeiro (formação) e fogueira (contato). O movimento começa quando o cabeçalho entra na tela (`styles/_emblems.scss`).
+- **Movimento.** Entradas por `appReveal` (`up`, `mask`, `line`), escalonadas com `revealDelay`. O topo entra depois da abertura (`html.ready`). Rolagem com inércia pelo Lenis. Efeitos ligados à rolagem leem `--sy` (ScrollState) ou usam `animation-timeline: view()` onde existe. Tudo respeita "reduzir movimento".
+- **Sem JavaScript, tudo aparece.** O prerender sai com o site inteiro; o que fica escondido para animar depende de `html.js` (posto por um script no `index.html`), e a abertura sai da frente sozinha pelo CSS.
+- **O código também roda no Node** (prerender e SSR do `ng serve`): nada de `window`, `document` ou armazenamento fora do navegador. Animações começam em `afterNextRender`; quadros usam `raf`/`cancelRaf` de `engine/core/browser.ts`.
+- **Componentes pelo atributo.** As seções usam seletores de atributo (`section[appProjetos]`, `header[appSectionHead]`).
 
 ### Nova seção, passo a passo
 
-1. Crie `features/<id>/<id>.ts` (e `.html`) com o seletor `section[app<Nome>]` e o `id` da seção no `host`.
-2. Se tiver cena, crie `engine/scenes/<id>.ts` e registre em `engine/scenes/index.ts`; use `<figure appScene="<id>">` no template.
-3. Coloque a seção em `features/site/site.ts`, na ordem certa (e o link em `features/site/site-nav/`), e o CSS em `src/styles/site/`.
-4. Rode `npm test`, `npm run lint:arch` e `npm run test:ssr`.
+1. Crie `features/<id>/<id>.ts` com o seletor `section[app<Nome>]`, `class: 'sec'` e o `id` da seção no `host`, e use `<header appSectionHead>` (com um `emblem` de `shared/emblems`, ou um novo desenho lá).
+2. Coloque os textos em `content/`, a seção em `features/site/site.ts` e o CSS em `src/styles/_<id>.scss` (importado em `styles.scss`).
+3. Rode `npm test`, `npm run lint:arch` e `npm run test:ssr`.
 
 ## API (`api/`)
 

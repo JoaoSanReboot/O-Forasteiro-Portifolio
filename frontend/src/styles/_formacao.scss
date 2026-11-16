@@ -1,0 +1,93 @@
+/* 06 · Formação: cada curso numa linha, com uma barra numa régua de anos (2022 → 2028).
+   A régua (anos, linhas e a marca de "hoje") fica numa camada por trás, na mesma coluna das barras. */
+.edu {
+  --edu-a: 36%;
+  --edu-c: 150px;
+  --edu-g: clamp(20px, 3vw, 40px);
+  position: relative;
+  padding-top: 44px;
+}
+.edu-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--edu-a) + var(--edu-g));
+  right: calc(var(--edu-c) + var(--edu-g));
+  pointer-events: none;
+}
+.edu-year {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding-left: 7px;
+  border-left: 1px dashed var(--line-strong);
+  font: 500 11.5px/1 var(--f-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.edu-today { position: absolute; top: 22px; bottom: 0; border-left: 2px solid var(--urucum); }
+.edu-today span {
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--urucum);
+  color: var(--paper);
+  font: 600 10.5px/1 var(--f-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+}
+
+.edu-list { position: relative; list-style: none; margin: 0; padding: 0; }
+.course {
+  display: grid;
+  grid-template-columns: var(--edu-a) minmax(0, 1fr) var(--edu-c);
+  column-gap: var(--edu-g);
+  align-items: center;
+  padding: clamp(24px, 3vw, 36px) 0;
+  border-top: 1px solid var(--line-strong);
+}
+.course:last-child { border-bottom: 1px solid var(--line-strong); }
+.course h3 { font: 600 clamp(19px, 1.7vw, 24px)/1.2 var(--f-display); letter-spacing: -0.01em; }
+.course-inst { margin-top: 6px; font: italic 400 19px/1.3 var(--f-serif); color: var(--couro); }
+.course-note { margin-top: 8px; font-size: 14.5px; line-height: 1.5; color: var(--muted); }
+.course-track { position: relative; height: 16px; }
+.course-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  transform-origin: 0 50%;
+  transition: transform 1.5s var(--ease) calc(var(--rv-delay, 0ms) + 250ms);
+}
+.course-bar.going {
+  background: repeating-linear-gradient(-45deg, var(--urucum) 0 8px, var(--urucum-hi) 8px 16px);
+  background-size: 22.6px 22.6px;
+  animation: stripes 1.2s linear infinite;
+}
+.course.rv:not(.in) .course-bar { transform: scaleX(0); }
+/* o carimbo do cartório: borda dupla, tinta falhada e torto */
+.seal {
+  justify-self: end;
+  padding: 7px 11px 5px;
+  border: 3px double currentColor;
+  border-radius: 4px;
+  color: var(--mandacaru);
+  font: 400 13px/1 var(--f-type);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  rotate: -4deg;
+  filter: url(#tinta);
+}
+.seal.going { color: var(--urucum); rotate: 3deg; }
+
+@media (max-width: 760px) {
+  .edu { padding-top: 0; }
+  .edu-rail, .course-track { display: none; }
+  .course { grid-template-columns: 1fr; row-gap: 14px; }
+  .seal { justify-self: start; }
+}

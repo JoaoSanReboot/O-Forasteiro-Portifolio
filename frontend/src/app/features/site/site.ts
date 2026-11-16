@@ -1,65 +1,71 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, effect, inject, Injector, untracked } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, inject } from '@angular/core';
 import { PlatformService } from '../../core/platform/platform.service';
-import { raf } from '../../engine/core/browser';
+import { ScrollState } from '../../core/scroll/scroll-state';
 import { Commits } from '../commits/commits';
-import { Duelo } from '../duelo/duelo';
+import { Contato } from '../contato/contato';
+import { Experiencia } from '../experiencia/experiencia';
 import { Formacao } from '../formacao/formacao';
-import { Guide } from '../guide/guide';
+import { Hero } from '../hero/hero';
 import { IntroService } from '../intro/intro.service';
-import { Mural } from '../mural/mural';
 import { Projetos } from '../projetos/projetos';
-import { Saloon } from '../saloon/saloon';
-import { SecretsHud } from '../secrets/secrets-hud/secrets-hud';
+import { CoinNews } from '../secrets/coin-news';
+import { CoinPurse } from '../secrets/coin-purse';
 import { Skills } from '../skills/skills';
-import { Trabalhos } from '../trabalhos/trabalhos';
+import { Sobre } from '../sobre/sobre';
 import { SiteFooter } from './site-footer/site-footer';
-import { SiteNav } from './site-nav/site-nav';
+import { SmoothScroll, startSmoothScroll } from './smooth-scroll';
 
-// O site: a barra de navegação, o portfólio por dentro das casas, na ordem das seções; o contador de segredos, o xerife e o rodapé por cima.
-// O topo fica vazio para a cena do portão (fixa, atrás, desenhada pela abertura) aparecer.
+// O site: só rolagem, sem barra no topo. O topo e as seções na ordem, o rodapé e o bolso das moedas no canto esquerdo.
+// Fica sempre no HTML (o prerender sai com tudo); enquanto a abertura está na frente ele fica `inert`.
 @Component({
   selector: 'div[appSite]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Mural, Projetos, Trabalhos, Skills, Commits, Formacao, Saloon, Duelo, SecretsHud, Guide, SiteFooter, SiteNav],
-  host: { id: 'site', '[hidden]': '!siteOn()' },
+  imports: [CoinPurse, Hero, Sobre, Projetos, Experiencia, Skills, Commits, Formacao, Contato, SiteFooter, CoinNews],
+  host: { id: 'site', '[attr.inert]': 'covered() ? "" : null' },
   template: `
-    <nav appSiteNav></nav>
-    <section class="hero" id="inicio" aria-labelledby="hero-title">
-      <h1 id="hero-title" class="sr-only" tabindex="-1">João Pedro, desenvolvedor Backend .NET: portfólio</h1>
-    </section>
+    <!-- a tinta da prensa: borda comida e falhas no preto dos títulos em tipo de madeira (filter: url(#tinta)) -->
+    <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <filter id="tinta" x="-2%" y="-6%" width="104%" height="112%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="7" result="grao" />
+        <feDisplacementMap in="SourceGraphic" in2="grao" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="borda" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="3" seed="3" result="falha" />
+        <feColorMatrix in="falha" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -20 0 0 0 15.6" result="mascara" />
+        <feComposite in="borda" in2="mascara" operator="in" />
+      </filter>
+    </svg>
+    <a class="skip-link" href="#sobre">Pular para o conteúdo</a>
+    <app-coin-purse />
     <main>
-      <section appMural></section>
+      <section appHero></section>
+      <section appSobre></section>
       <section appProjetos></section>
-      <section appTrabalhos></section>
+      <section appExperiencia></section>
       <section appSkills></section>
       <section appCommits></section>
       <section appFormacao></section>
-      <section appSaloon></section>
-      <section appDuelo></section>
+      <section appContato></section>
     </main>
-    <div class="coin-hud" id="coin-hud" appSecretsHud></div>
-    <!-- Xerife: o guia da vila -->
-    <div appGuide></div>
-    <footer class="foot" appSiteFooter></footer>
+    <footer appSiteFooter></footer>
+    <app-coin-news />
   `,
 })
 export class Site {
-  protected readonly siteOn = inject(IntroService).siteOn;
+  private readonly intro = inject(IntroService);
+  private readonly platform = inject(PlatformService);
+  /** a abertura está na frente (só no navegador: sem JavaScript o site fica utilizável) */
+  protected readonly covered = () => this.platform.isBrowser && !this.intro.done();
 
   constructor() {
-    const intro = inject(IntroService), injector = inject(Injector), reduceMotion = inject(PlatformService).reduceMotion;
-    // a chegada termina no mural: o visitante cai direto no conteúdo principal
+    const destroyRef = inject(DestroyRef), scroll = inject(ScrollState);
+    if (!this.platform.isBrowser) return;
+    afterNextRender(() => destroyRef.onDestroy(scroll.start()));
+    // rolagem com inércia: começa quando a cortina sobe e fica parada enquanto a abertura volta
+    let smooth: Promise<SmoothScroll> | null = null;
     effect(() => {
-      const e = intro.entered();
-      if (!e.n) return;
-      untracked(() => afterNextRender(() => {
-        const mural = document.getElementById('procurado');
-        window.scrollTo(0, 0);
-        raf(() => {
-          mural?.scrollIntoView({ behavior: reduceMotion || e.quick ? 'auto' : 'smooth', block: 'start' });
-          document.getElementById('t-mural')?.focus({ preventScroll: true });
-        });
-      }, { injector }));
+      const done = this.intro.done();
+      if (done) (smooth ??= startSmoothScroll()).then((s) => s.start());
+      else smooth?.then((s) => s.stop());
     });
+    destroyRef.onDestroy(() => smooth?.then((s) => s.destroy()));
   }
 }

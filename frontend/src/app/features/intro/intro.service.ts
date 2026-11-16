@@ -1,27 +1,38 @@
 import { DOCUMENT, inject, Injectable, signal } from '@angular/core';
 
-// abertura → site: a página sempre abre na tela inicial; "Rever a chegada" volta para ela
+// Abertura → site. A página sempre abre na abertura; "Rever a abertura" (no rodapé) a traz de volta.
+// No <html>: `intro-on` trava a rolagem enquanto ela está na tela; `ready` solta a entrada do topo do site.
 @Injectable({ providedIn: 'root' })
 export class IntroService {
   private readonly doc = inject(DOCUMENT);
-  /** o site está aberto (põe `site-on` no `<html>`) */
-  readonly siteOn = signal(false);
-  /** cada entrada no site (o `vila:enter`), com `quick` quando foi direto, sem cavalgada */
-  readonly entered = signal<{ n: number; quick: boolean }>({ n: 0, quick: false });
-  /** cada "Rever a chegada" (o `vila:replay`) */
-  readonly replays = signal(0);
+  /** a abertura está montada (some de vez depois que a cortina sobe) */
+  readonly showing = signal(true);
+  /** a cortina já começou a subir: o site pode animar o topo e rolar */
+  readonly done = signal(false);
 
-  enter(quick = false): void {
-    if (this.siteOn()) return;
-    this.doc.documentElement.classList.add('site-on');
-    this.siteOn.set(true);
-    this.entered.update((e) => ({ n: e.n + 1, quick }));
+  /** a abertura começou: trava a rolagem embaixo dela */
+  begin(): void {
+    this.doc.documentElement.classList.add('intro-on');
+  }
+
+  /** a cortina sobe e o site entra */
+  finish(): void {
+    if (this.done()) return;
+    const root = this.doc.documentElement;
+    root.classList.remove('intro-on');
+    root.classList.add('ready');
+    this.done.set(true);
+  }
+
+  /** a cortina terminou de subir */
+  hide(): void {
+    this.showing.set(false);
   }
 
   replay(): void {
     this.doc.defaultView?.scrollTo(0, 0);
-    this.doc.documentElement.classList.remove('site-on');
-    this.siteOn.set(false);
-    this.replays.update((n) => n + 1);
+    this.doc.documentElement.classList.remove('ready');
+    this.done.set(false);
+    this.showing.set(true);
   }
 }
