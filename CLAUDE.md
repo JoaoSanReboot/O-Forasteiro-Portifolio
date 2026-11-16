@@ -42,7 +42,7 @@ Dependências só num sentido: `features → shared → core → engine` (`conte
 ## Convenções
 
 - Textos da interface e comentários em português do Brasil.
-- Visual escuro (o sertão à noite, no tom da tela de carregamento): cores, fontes e curvas só pelos tokens de `src/styles/_tokens.scss`. Títulos de seção com `<header appSectionHead>`: tipo de madeira (Ultra) com a tinta da prensa (`filter: url(#tinta)`), o fim em itálico serifado e um `emblem` que desenha o título; ornamentos do sertão por `shared/ornaments`. Rye só em rótulos curtos; Sancreek (toscano de cartaz) e Special Elite (máquina de escrever) só em detalhes. Nada de pixel art.
+- Visual terroso e texturizado (chão de barro queimado com pintas e manchas em `--textura`, urucum, ocre, couro e mandacaru saturados): cores, fontes e curvas só pelos tokens de `src/styles/_tokens.scss`. Títulos de seção com `<header appSectionHead>`: tipo de madeira (Ultra) com a tinta da prensa (`filter: url(#tinta)`), o fim em itálico serifado e um `emblem` que desenha o título; ornamentos do sertão por `shared/ornaments`. Rye só em rótulos curtos; Sancreek (toscano de cartaz) e Special Elite (máquina de escrever) só em detalhes. Nada de pixel art.
 - Movimento: entradas com `appReveal` (+ `revealDelay`), o topo espera `html.ready`, efeitos de rolagem leem `--sy` ou usam `animation-timeline: view()`. Sempre respeitar "reduzir movimento" e deixar o conteúdo visível sem JavaScript (o que esconde para animar depende de `html.js`).
 - Estado que muda a cada quadro fica fora dos Signals (estilo ou variável CSS direto no elemento); Signals só para o que a interface mostra.
 - O código também roda no Node (prerender e SSR do `ng serve`): nada de `window`, `document` ou armazenamento fora do navegador.

@@ -8,7 +8,7 @@
   min-height: 100svh;
   padding-top: 20px;
   overflow: clip;
-  background: var(--paper);
+  background: var(--textura), var(--paper);
 }
 
 .hero-sun {
@@ -45,25 +45,13 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    "top top"
     "name poster"
     "role poster"
     "foot foot";
-  grid-template-rows: auto auto auto 1fr;
+  grid-template-rows: auto auto 1fr;
   column-gap: clamp(24px, 4vw, 72px);
 }
 
-.hero-top { grid-area: top; display: flex; justify-content: flex-end; gap: 16px; padding-top: 6px; }
-.hero-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font: 500 12px/1.4 var(--f-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.hero-clock { margin-left: 10px; padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .hero-name {
   grid-area: name;
@@ -226,9 +214,8 @@
 
 /* a entrada depois da abertura */
 html.js:not(.ready) .hero-name .ch { transform: translateY(108%); }
-html.js:not(.ready) :is(.hero-top, .hero-role, .poster, .hero-foot, .horizon, .hero-sun, .vento) { opacity: 0; }
+html.js:not(.ready) :is(.hero-role, .poster, .hero-foot, .horizon, .hero-sun, .vento) { opacity: 0; }
 html.ready .hero-name .ch { animation: rise 1.25s var(--ease) both; animation-delay: calc(0.15s + var(--i) * 50ms); }
-html.ready .hero-top { animation: fade-in 1s ease 0.2s both; }
 html.ready .hero-role { animation: fade-up 1.1s var(--ease) 0.7s both; }
 html.ready .poster { animation: poster-in 1.3s var(--ease) 0.45s both; }
 html.ready .vento { animation: fade-in 1s ease 1s both; }
@@ -240,8 +227,8 @@ html.ready .hero-sun { animation: fade-in 2s ease 0.1s both; }
 @media (max-width: 900px) {
   .hero-in {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "top" "name" "role" "poster" "foot";
-    grid-template-rows: auto auto auto auto 1fr;
+    grid-template-areas: "name" "role" "poster" "foot";
+    grid-template-rows: auto auto auto 1fr;
   }
   .hero-name { font-size: clamp(3.2rem, 17.5vw, 9rem); }
   .hn-2 { margin-left: 0; }
@@ -249,11 +236,7 @@ html.ready .hero-sun { animation: fade-in 2s ease 0.1s both; }
   .poster { justify-self: center; width: clamp(210px, 62vw, 300px); margin-top: clamp(36px, 8vw, 56px); }
   .poster-head { font-size: clamp(1.4rem, 7vw, 2rem); }
   .hero-sun { top: 16vh; right: -42vw; width: 100vw; opacity: 0.5; }
-  .hero-where { text-align: right; }
 }
 @media (max-width: 560px) {
-  /* o canto esquerdo é do bolso das moedas */
-  .hero-top { padding-left: 96px; }
-  .hero-where { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; min-width: 0; letter-spacing: 0.08em; }
   .hero-actions .btn { flex: 1; justify-content: center; }
 }
