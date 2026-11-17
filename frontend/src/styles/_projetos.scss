@@ -16,6 +16,14 @@
 
 /* ---------- o palco ---------- */
 html.js .baus { position: relative; }
+/* a folga de cima desce macia ao abrir e volta depois que o cartaz cai (junto com a entrada do appReveal) */
+html.js .baus[data-reveal] {
+  transition:
+    opacity 0.9s var(--ease) var(--rv-delay, 0ms),
+    transform 1.1s var(--ease) var(--rv-delay, 0ms),
+    padding-top 0.7s var(--ease) 0.35s;
+}
+html.js .baus[data-reveal].aberto { transition-delay: var(--rv-delay, 0ms), var(--rv-delay, 0ms), 0s; }
 html.js .baus-palco {
   position: relative;
   z-index: 2;
@@ -91,7 +99,8 @@ html.js .baus-palco > * { pointer-events: auto; }
 .bau:focus-visible { outline: none; }
 .bau:focus-visible .bau-svg { filter: drop-shadow(0 0 0 var(--sol)) drop-shadow(0 0 3px var(--sol)) drop-shadow(0 0 1px var(--sol)); }
 .baus.aberto .bau:not([data-pos="meio"]) { opacity: 0; pointer-events: none; }
-.baus.aberto .bau[data-pos="meio"] { cursor: default; }
+/* aberto, o baú do meio não recebe clique: a caixa do SVG passaria por cima dos botões do cartaz */
+.baus.aberto .bau[data-pos="meio"] { pointer-events: none; }
 
 .bau-svg { position: relative; z-index: 1; display: block; width: 100%; height: auto; overflow: visible; }
 .bau-svg * { transform-box: view-box; }
@@ -167,8 +176,8 @@ html.js .baus:not(.aberto) .bau[data-pos="meio"] .bau-svg { animation: bau-respi
 .baus.aberto .bau[data-pos="meio"] .bau-pulos i { animation: bau-pulo 1.25s cubic-bezier(0.25, 0.6, 0.5, 1) calc(0.55s + var(--atraso)) both; }
 
 /* ---------- o cartaz do projeto ---------- */
-/* o cartaz não reserva altura: parte da boca do baú e sobe por cima do que estiver acima (o pé dele desce 44px
-   para dentro do baú, atrás da frente) */
+/* o cartaz parte da boca do baú (o pé dele desce 44px para dentro, atrás da frente); ao abrir, o componente
+   dá ao palco a folga de cima que faltar para o cartaz caber embaixo do título, e tira quando fecha */
 html.js .bau-cartas {
   position: absolute;
   z-index: 1;
@@ -302,7 +311,7 @@ html:not(.js) .carta-fechar { display: none; }
 
 /* com "reduzir movimento": sem tremer nem pular; a tampa e a tranca somem e o cartaz aparece direto */
 @media (prefers-reduced-motion: reduce) {
-  .bau, html.js .bau-carta, html.js .bau-carta.on { transition-duration: 0.01ms; transition-delay: 0s; }
+  .bau, html.js .baus[data-reveal], html.js .bau-carta, html.js .bau-carta.on { transition-duration: 0.01ms; transition-delay: 0s; }
   .baus.aberto .bau[data-pos="meio"] :is(.bau-tampa, .bau-tranca) { animation: none; opacity: 0; }
   .baus.aberto .bau[data-pos="meio"] :is(.bau-luz, .bau-pulos i) { animation: none; }
   .baus.aberto .bau[data-pos="meio"] .bau-boca { transition-delay: 0s; }

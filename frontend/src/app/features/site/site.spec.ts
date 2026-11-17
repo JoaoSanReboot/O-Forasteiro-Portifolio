@@ -148,8 +148,11 @@ describe('Site', () => {
     const meio = el.querySelector<HTMLElement>('.bau[data-pos="meio"]')!;
     expect(meio.getAttribute('aria-expanded')).toBe('false');
     await click(fixture, meio);
-    expect(el.querySelector('.baus.aberto')).not.toBeNull();
+    const baus = el.querySelector<HTMLElement>('.baus.aberto');
+    expect(baus).not.toBeNull();
     expect(meio.getAttribute('aria-expanded')).toBe('true');
+    // o palco abre espaço em cima para o cartaz não cobrir o título
+    expect(parseFloat(baus!.style.paddingTop)).toBeGreaterThan(0);
     const abertas = el.querySelectorAll('.bau-carta.on');
     expect(abertas).toHaveLength(1);
     expect(abertas[0].querySelector('.carta-nome')?.textContent).toBe(PROJECTS[0].name);
@@ -159,6 +162,7 @@ describe('Site', () => {
 
     await click(fixture, abertas[0].querySelector('.carta-fechar'));
     expect(el.querySelector('.baus.aberto, .bau-carta.on')).toBeNull();
+    expect(parseFloat(el.querySelector<HTMLElement>('.baus')!.style.paddingTop || '0')).toBe(0);
   });
 
   it('experiência, skills e formação trazem todo o conteúdo', async () => {

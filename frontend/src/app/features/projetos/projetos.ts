@@ -31,7 +31,7 @@ const PULOS: readonly (readonly [number, number, number, number])[] = [
     <div class="wrap">
       <header appSectionHead num="02" label="Projetos" title="Forjados na" accent="bigorna." [aside]="count" emblem="bigorna" titleId="t-projetos"></header>
 
-      <div class="baus" appReveal [class.aberto]="aberto()" (keydown)="tecla($event)">
+      <div class="baus" appReveal [class.aberto]="aberto()" [style.padding-top.px]="folga()" (keydown)="tecla($event)">
         <div class="baus-palco">
           <p class="baus-dica" aria-hidden="true">Clique no baú para abrir</p>
           <button type="button" class="bau-seta esq" (click)="girar(-1)" [disabled]="aberto()" aria-label="Baú anterior">
@@ -117,6 +117,8 @@ export class Projetos {
   protected readonly pulos = PULOS;
   protected readonly atual = signal(0);
   protected readonly aberto = signal(false);
+  /** o espaço que o palco abre acima do baú para o cartaz caber embaixo do título, sem cobri-lo */
+  protected readonly folga = signal(0);
   /** depois da hidratação: só então os cartazes fechados saem do alcance do teclado (sem JS, ficam todos) */
   protected readonly pronto = signal(false);
   private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -143,14 +145,21 @@ export class Projetos {
   }
 
   private abrir(): void {
-    this.aberto.set(true);
-    // o cartaz sobe por cima do que está acima do baú: se o topo dele for ficar fora da tela, a página desce até ele
+    // o cartaz sobe da boca do baú; se não couber entre o título e o baú, o palco desce o que faltar
     const raiz = this.el.nativeElement;
     const carta = raiz.querySelector<HTMLElement>(`#carta-${this.atual()}`), cartas = raiz.querySelector<HTMLElement>('.bau-cartas');
-    if (carta && cartas) {
-      const topo = cartas.getBoundingClientRect().bottom - carta.offsetHeight;
-      if (topo < 24) window.scrollBy({ top: topo - 24, behavior: 'smooth' });
+    const titulo = raiz.querySelector<HTMLElement>('.sh'), palco = raiz.querySelector<HTMLElement>('.baus-palco');
+    if (carta && cartas && titulo && palco) {
+      const limite = titulo.getBoundingClientRect().bottom + 28;
+      const folga = Math.max(0, Math.ceil(limite - (cartas.getBoundingClientRect().bottom - carta.offsetHeight)));
+      this.folga.set(folga);
+      // e a página rola para mostrar o cartaz e o baú (se os dois não cabem na tela, o cartaz manda)
+      const topo = cartas.getBoundingClientRect().bottom + folga - carta.offsetHeight, fundo = palco.getBoundingClientRect().bottom + folga;
+      const margem = 16, alto = innerHeight - 2 * margem;
+      const passo = topo < margem || fundo - topo > alto ? topo - margem : fundo > innerHeight - margem ? fundo - (innerHeight - margem) : 0;
+      if (passo) window.scrollBy({ top: passo, behavior: 'smooth' });
     }
+    this.aberto.set(true);
     // o foco vai para o nome do projeto quando o cartaz termina de subir
     const reduz = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
     clearTimeout(this.foco);
@@ -161,6 +170,7 @@ export class Projetos {
     if (!this.aberto()) return;
     clearTimeout(this.foco);
     this.aberto.set(false);
+    this.folga.set(0);
     this.el.nativeElement.querySelector<HTMLElement>('.bau[data-pos="meio"]')?.focus({ preventScroll: true });
   }
 
