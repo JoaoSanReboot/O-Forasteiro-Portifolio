@@ -1,48 +1,263 @@
-/* 02 · Projetos: índice em linhas grandes. A tinta sobe pela linha ao passar o mouse e a prévia
-   (fixa, movida pelo componente com transform) acompanha o cursor. No toque, a imagem vem na linha. */
-.works { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
-.work { border-bottom: 1px solid var(--ink); }
-.work-link {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 70px minmax(0, 5fr) minmax(0, 4fr) minmax(170px, 2.3fr);
-  grid-template-areas: "num main desc side";
-  align-items: center;
-  gap: clamp(16px, 2.4vw, 32px);
-  padding: clamp(28px, 3.6vw, 48px) clamp(8px, 1.4vw, 20px);
-  color: var(--ink);
-  text-decoration: none;
-  transition: color 0.45s var(--ease);
+/* 02 · Projetos: três baús do velho oeste. O do meio fica em destaque e os outros dois nos cantos; as flechinhas giram
+   a fila. Ao abrir, o baú treme, a tranca cai, a tampa pula e encosta do lado, moedas e estrelas saltam e o cartaz do
+   projeto sobe de dentro dele (o pé do cartaz fica escondido atrás da frente do baú).
+   Sem JavaScript (sem html.js), o palco some e os cartazes ficam todos à mostra, um embaixo do outro. */
+.baus {
+  /* largura do baú do meio; a altura dele é 0,85 disso e a boca fica a 47% do topo */
+  --bau-w: clamp(190px, 25vw, 300px);
+  --bau-chao: 52px;
+  --canto: clamp(150px, 27vw, 400px);
+  margin-top: clamp(40px, 7vw, 110px);
 }
-.work-link::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--ink);
-  transform: scaleY(0);
-  transform-origin: 50% 0;
-  transition: transform 0.7s var(--ease);
-}
-.work-link:is(:hover, :focus-visible)::before { transform: scaleY(1); transform-origin: 50% 100%; }
-.work-link:is(:hover, :focus-visible) { color: var(--paper); }
-.work-link:focus-visible { outline-offset: -3px; }
 
-.work-num { grid-area: num; font: italic 400 30px/1 var(--f-serif); color: var(--urucum); }
-.work-link:hover .work-num { color: var(--sol); }
-.work-name {
-  display: block;
-  font: 400 clamp(1.9rem, 4.2vw, 4rem)/0.98 var(--f-wood);
-  letter-spacing: -0.005em;
-  text-transform: uppercase;
-  transition: transform 0.7s var(--ease);
+/* ---------- sem JavaScript: só os cartazes ---------- */
+.baus-palco { display: none; }
+.bau-cartas { display: grid; gap: 28px; justify-items: center; }
+
+/* ---------- o palco ---------- */
+html.js .baus { position: relative; }
+/* a folga de cima desce macia ao abrir e volta depois que o cartaz cai (junto com a entrada do appReveal) */
+html.js .baus[data-reveal] {
+  transition:
+    opacity 0.9s var(--ease) var(--rv-delay, 0ms),
+    transform 1.1s var(--ease) var(--rv-delay, 0ms),
+    padding-top 0.7s var(--ease) 0.35s;
 }
-.work-link:hover .work-name { transform: translateX(14px); }
-.work-main { grid-area: main; }
-.work-title { display: block; margin-top: 12px; font: italic 400 clamp(18px, 1.6vw, 22px)/1.2 var(--f-serif); }
-.tag {
+html.js .baus[data-reveal].aberto { transition-delay: var(--rv-delay, 0ms), var(--rv-delay, 0ms), 0s; }
+html.js .baus-palco {
+  position: relative;
+  z-index: 2;
+  display: block;
+  height: calc(var(--bau-w) * 0.85 + var(--bau-chao) + 64px);
+  pointer-events: none;
+}
+html.js .baus-palco > * { pointer-events: auto; }
+
+.baus-dica {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font: 400 15px/1 var(--f-type);
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  transition: opacity 0.3s;
+}
+.baus.aberto .baus-dica { opacity: 0; }
+
+/* as flechinhas: haste, ponta e penas */
+.bau-seta {
+  position: absolute;
+  z-index: 5;
+  bottom: calc(var(--bau-chao) + var(--bau-w) * 0.3);
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color 0.25s, transform 0.4s var(--ease), opacity 0.3s;
+}
+.bau-seta.esq { left: 0; }
+.bau-seta.dir { right: 0; }
+.bau-seta svg { width: 56px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.bau-seta .cheia { fill: currentColor; }
+.bau-seta:hover { color: var(--sol); }
+.bau-seta.esq:hover { transform: translateX(-6px); }
+.bau-seta.dir:hover { transform: translateX(6px); }
+.bau-seta:focus-visible { outline: 2px solid var(--sol); outline-offset: 4px; }
+.bau-seta:disabled { opacity: 0; pointer-events: none; }
+
+/* ---------- os baús ---------- */
+.bau {
+  --x: 0px;
+  --s: 1;
+  position: absolute;
+  z-index: 3;
+  bottom: var(--bau-chao);
+  left: 50%;
+  width: var(--bau-w);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transform: translateX(-50%) translateX(var(--x)) scale(var(--s));
+  transform-origin: 50% 100%;
+  transition: transform 0.75s var(--ease), opacity 0.5s, filter 0.5s;
+}
+.bau[data-pos="esq"] { --x: calc(var(--canto) * -1); --s: 0.62; z-index: 2; opacity: 0.75; filter: brightness(0.78) saturate(0.8); }
+.bau[data-pos="dir"] { --x: var(--canto); --s: 0.62; z-index: 2; opacity: 0.75; filter: brightness(0.78) saturate(0.8); }
+.bau[data-pos="fora"] { --s: 0.3; z-index: 1; opacity: 0; pointer-events: none; }
+.bau:is([data-pos="esq"], [data-pos="dir"]):hover { opacity: 1; filter: none; }
+.bau:focus-visible { outline: none; }
+.bau:focus-visible .bau-svg { filter: drop-shadow(0 0 0 var(--sol)) drop-shadow(0 0 3px var(--sol)) drop-shadow(0 0 1px var(--sol)); }
+.baus.aberto .bau:not([data-pos="meio"]) { opacity: 0; pointer-events: none; }
+/* aberto, o baú do meio não recebe clique: a caixa do SVG passaria por cima dos botões do cartaz */
+.baus.aberto .bau[data-pos="meio"] { pointer-events: none; }
+
+.bau-svg { position: relative; z-index: 1; display: block; width: 100%; height: auto; overflow: visible; }
+.bau-svg * { transform-box: view-box; }
+.bau-sombra { fill: rgba(12, 6, 3, 0.45); }
+.bau-madeira { fill: color-mix(in srgb, var(--couro) 62%, var(--night)); }
+.bau-tabua { fill: none; stroke: rgba(12, 6, 3, 0.4); stroke-width: 2; }
+.bau-ferro { fill: color-mix(in srgb, var(--night) 70%, var(--latao)); }
+.bau-prego { fill: var(--latao); }
+.bau-borda { fill: none; stroke: var(--night); stroke-width: 3.5; stroke-linejoin: round; }
+.bau-latao { fill: var(--latao); stroke: var(--night); stroke-width: 3; }
+.bau-buraco { fill: var(--night); }
+.bau-escuro { fill: #160b06; }
+.bau-ouro { fill: var(--sol); filter: blur(1.5px); }
+.bau-boca { opacity: 0; transition: opacity 0.2s; }
+
+/* a placa com o número e o nome, embaixo do baú */
+.bau-placa {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+  white-space: nowrap;
+  font: 400 clamp(15px, 1.5vw, 19px)/1 var(--f-west);
+  color: var(--ink);
+}
+.bau-placa b { font-weight: 400; color: var(--sol); margin-right: 6px; }
+.bau:not([data-pos="meio"]) .bau-placa { opacity: 0.8; }
+.baus.aberto .bau-placa { opacity: 0; transition: opacity 0.3s; }
+
+/* parado no meio: o baú respira e a tranca brilha; no mouse, a tampa sacode querendo abrir */
+html.js .baus:not(.aberto) .bau[data-pos="meio"] .bau-svg { animation: bau-respira 3.2s ease-in-out infinite; }
+.bau-tranca { transform-origin: 100px 68px; }
+.bau-tampa { transform-origin: 18px 80px; }
+.baus:not(.aberto) .bau[data-pos="meio"]:is(:hover, :focus-visible) .bau-tampa { animation: bau-sacode 0.6s ease-in-out infinite; }
+.baus:not(.aberto) .bau[data-pos="meio"]:is(:hover, :focus-visible) .bau-tranca { animation: bau-balanca 0.6s ease-in-out infinite; }
+
+/* ---------- abrindo ---------- */
+.baus.aberto .bau[data-pos="meio"] .bau-svg { animation: bau-treme 0.5s linear both; }
+.baus.aberto .bau[data-pos="meio"] .bau-tranca { animation: bau-tranca-cai 0.7s cubic-bezier(0.5, 0, 0.8, 0.6) 0.35s both; }
+.baus.aberto .bau[data-pos="meio"] .bau-tampa { animation: bau-tampa-pula 1s cubic-bezier(0.3, 0.7, 0.4, 1) 0.45s both; }
+.baus.aberto .bau[data-pos="meio"] .bau-boca { opacity: 1; transition-delay: 0.5s; }
+
+/* os raios de luz que saem da boca do baú e se apagam depois que o cartaz sobe */
+.bau-luz {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 46%;
+  width: calc(var(--bau-w) * 2.2);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--sol) 55%, transparent) 0deg 7deg, transparent 7deg 22deg);
+  mask: radial-gradient(closest-side, #000 20%, transparent);
+  opacity: 0;
+  scale: 0.2;
+  pointer-events: none;
+}
+.baus.aberto .bau[data-pos="meio"] .bau-luz { animation: bau-luz 2.2s ease-out 0.5s both, spin 9s linear infinite; }
+
+/* moedas e estrelas: sobem, giram e caem para fora */
+.bau-pulos { position: absolute; z-index: 2; left: 50%; top: 46%; width: 0; height: 0; pointer-events: none; }
+.bau-pulos i {
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+}
+.bau-pulos .moeda { border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff3c4, var(--sol) 45%, var(--couro)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--couro) 70%, var(--night)); }
+.bau-pulos .estrela { background: var(--sol); clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.baus.aberto .bau[data-pos="meio"] .bau-pulos i { animation: bau-pulo 1.25s cubic-bezier(0.25, 0.6, 0.5, 1) calc(0.55s + var(--atraso)) both; }
+
+/* ---------- o cartaz do projeto ---------- */
+/* o cartaz parte da boca do baú (o pé dele desce 44px para dentro, atrás da frente); ao abrir, o componente
+   dá ao palco a folga de cima que faltar para o cartaz caber embaixo do título, e tira quando fecha */
+html.js .bau-cartas {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bau-chao) + var(--bau-w) * 0.45 - 44px);
+  align-items: end;
+  justify-items: stretch;
+  pointer-events: none;
+}
+html.js .bau-carta.on { pointer-events: auto; }
+html.js .bau-cartas > * { grid-area: 1 / 1; }
+
+.bau-carta {
+  --pp: #ecd5a6;
+  --pi: #2e1b10;
+  justify-self: center;
+  width: min(640px, 100%);
+  padding: clamp(22px, 3vw, 34px) clamp(20px, 3vw, 36px);
+  border-block: 4px double var(--pi);
+  background: var(--pintas), var(--pp);
+  color: var(--pi);
+  box-shadow: 0 30px 60px -28px rgba(12, 6, 3, 0.75);
+}
+html.js .bau-carta {
+  padding-bottom: calc(clamp(22px, 3vw, 34px) + 44px);
+  transform-origin: 50% 100%;
+  transform: translateY(46%) scale(0.12) rotate(-8deg);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.35s var(--ease-io), opacity 0.25s, visibility 0s 0.35s;
+}
+html.js .bau-carta.on {
+  transform: none;
+  opacity: 1;
+  visibility: visible;
+  transition: transform 0.9s cubic-bezier(0.3, 1.45, 0.5, 1) 0.75s, opacity 0.3s 0.75s, visibility 0s 0.75s;
+}
+.carta-topo { display: flex; align-items: center; gap: clamp(14px, 2vw, 22px); }
+.carta-logo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(72px, 9vw, 100px);
+  aspect-ratio: 1;
+  padding: 12px;
+  border: 3px solid var(--pi);
+  outline: 1.5px solid var(--pi);
+  outline-offset: 3px;
+  border-radius: 50%;
+  background: #f6e6c1;
+}
+.carta-logo img { width: 100%; height: 100%; object-fit: contain; }
+.carta-num { margin: 0 0 6px; font: 400 14px/1 var(--f-type); letter-spacing: 0.08em; text-transform: uppercase; color: var(--urucum); }
+.carta-nome { margin: 0; font: 400 clamp(1.7rem, 3.4vw, 2.6rem)/1 var(--f-west); text-transform: uppercase; }
+.carta-nome:focus { outline: none; }
+.carta-titulo { margin: 8px 0 0; font: italic 400 clamp(18px, 1.7vw, 22px)/1.2 var(--f-serif); }
+.carta-desc { margin: 18px 0 0; font: 400 16px/1.6 var(--f-display); text-wrap: pretty; }
+.carta-chips { margin: 14px 0 0; font: 500 12px/1.5 var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--pi) 70%, var(--pp)); }
+.carta-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 22px; }
+.carta-link,
+.carta-fechar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 2px solid var(--pi);
+  border-radius: 999px;
+  font: 600 15px/1 var(--f-display);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.25s, color 0.25s, transform 0.3s var(--ease);
+}
+.carta-link { background: var(--urucum); border-color: var(--urucum); color: #fff7e6; }
+.carta-link:hover { background: var(--pi); border-color: var(--pi); transform: translateY(-2px); }
+.carta-fechar { background: none; color: var(--pi); }
+.carta-fechar:hover { background: var(--pi); color: var(--pp); }
+html:not(.js) .carta-fechar { display: none; }
+.bau-carta :is(.carta-link, .carta-fechar):focus-visible { outline: 3px solid var(--urucum); outline-offset: 3px; }
+.bau-carta .tag {
   display: inline-block;
   margin-left: 10px;
   padding: 5px 10px;
@@ -55,58 +270,49 @@
   vertical-align: 3px;
   color: var(--urucum);
 }
-.work-link:hover .tag { color: var(--sol); }
-.work-desc { grid-area: desc; font-size: 15px; line-height: 1.55; color: var(--muted); transition: color 0.45s; }
-.work-link:hover .work-desc { color: var(--on-night-muted); }
-.work-side { grid-area: side; display: grid; justify-items: end; gap: 16px; text-align: right; }
-.work-chips { font: 500 12px/1.5 var(--f-mono); letter-spacing: 0.04em; text-transform: uppercase; }
-.work-go { display: inline-flex; align-items: center; gap: 12px; font: 600 15px/1 var(--f-display); }
-.go-arrow {
-  display: inline-grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  font-size: 18px;
-  transition: transform 0.6s var(--ease), background-color 0.3s, border-color 0.3s, color 0.3s;
-}
-.work-link:hover .go-arrow { transform: rotate(45deg); background: var(--urucum); border-color: var(--urucum); color: var(--paper); }
-.work-thumb { display: none; }
 
-.work-preview {
-  position: fixed;
-  z-index: 30;
-  left: 0;
-  top: 0;
-  width: 300px;
-  height: 225px;
-  margin: -112px 0 0 -150px;
-  overflow: hidden;
-  border-radius: 8px;
-  background: var(--paper-2);
-  box-shadow: 0 40px 80px -30px rgba(12, 8, 6, 0.6);
-  pointer-events: none;
-  opacity: 0;
-  scale: 0.5;
-  transition: opacity 0.35s ease, scale 0.6s var(--ease);
+@keyframes bau-respira { 0%, 100% { transform: none; } 50% { transform: translateY(-4px); } }
+@keyframes bau-sacode { 0%, 100% { transform: none; } 25% { transform: translateY(-3px) rotate(-1.5deg); } 75% { transform: translateY(-2px) rotate(1deg); } }
+@keyframes bau-balanca { 0%, 100% { transform: none; } 50% { transform: rotate(8deg); } }
+@keyframes bau-treme {
+  0%, 100% { transform: none; }
+  15% { transform: translateX(-5px) rotate(-2.5deg); }
+  30% { transform: translateX(5px) rotate(2.5deg); }
+  45% { transform: translateX(-4px) rotate(-2deg); }
+  60% { transform: translateX(4px) rotate(1.5deg); }
+  80% { transform: translateY(3px) scale(1.03, 0.96); }
 }
-.work-preview.on { opacity: 1; scale: 1; }
-.work-preview img { position: absolute; inset: 0; width: 100%; height: 100%; padding: 30px; object-fit: contain; opacity: 0; transition: opacity 0.35s; }
-.work-preview img.on { opacity: 1; }
-@media (hover: none), (pointer: coarse) { .work-preview { display: none; } }
+@keyframes bau-tranca-cai { 0% { transform: none; } 30% { transform: translateY(-10px) rotate(-20deg); } 100% { transform: translateY(90px) rotate(70deg); opacity: 0; } }
+/* a tampa pula, dá uma cambalhota no ar e cai de boca para baixo no chão, do lado esquerdo do baú */
+@keyframes bau-tampa-pula {
+  0% { transform: none; }
+  28% { transform: translate(4px, -80px) rotate(-30deg); }
+  58% { transform: translate(-10px, -40px) rotate(-130deg); }
+  80% { transform: translate(-6px, 30px) rotate(-182deg); }
+  90% { transform: translate(-6px, 20px) rotate(-174deg); }
+  100% { transform: translate(-6px, 24px) rotate(-178deg); }
+}
+@keyframes bau-luz { 0% { opacity: 0; scale: 0.2; } 30% { opacity: 1; scale: 1; } 70% { opacity: 0.8; } 100% { opacity: 0; scale: 1.15; } }
+@keyframes bau-pulo {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  12% { opacity: 1; }
+  55% { transform: translate(calc(var(--dx) * 0.7), var(--dy)) rotate(calc(var(--gira) * 0.6)) scale(1); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) * 0.25)) rotate(var(--gira)) scale(0.8); }
+}
 
-@media (max-width: 900px) {
-  .work-link {
-    grid-template-columns: 40px minmax(0, 1fr) 76px;
-    grid-template-areas:
-      "num main thumb"
-      ". desc desc"
-      ". side side";
-    row-gap: 16px;
-  }
-  .work-num { align-self: start; padding-top: 6px; }
-  .work-thumb { grid-area: thumb; display: block; width: 76px; height: 76px; padding: 10px; border-radius: 10px; background: var(--paper-2); }
-  .work-thumb img { width: 100%; height: 100%; object-fit: contain; }
-  .work-side { justify-items: start; text-align: left; }
+@media (max-width: 700px) {
+  .baus { --bau-w: clamp(150px, 42vw, 210px); --canto: 30vw; --bau-chao: 46px; }
+  .bau[data-pos="esq"], .bau[data-pos="dir"] { --s: 0.5; }
+  .bau-seta { width: 48px; }
+  .bau-seta svg { width: 40px; }
+  .carta-topo { align-items: flex-start; }
+}
+
+/* com "reduzir movimento": sem tremer nem pular; a tampa e a tranca somem e o cartaz aparece direto */
+@media (prefers-reduced-motion: reduce) {
+  .bau, html.js .baus[data-reveal], html.js .bau-carta, html.js .bau-carta.on { transition-duration: 0.01ms; transition-delay: 0s; }
+  .baus.aberto .bau[data-pos="meio"] :is(.bau-tampa, .bau-tranca) { animation: none; opacity: 0; }
+  .baus.aberto .bau[data-pos="meio"] :is(.bau-luz, .bau-pulos i) { animation: none; }
+  .baus.aberto .bau[data-pos="meio"] .bau-boca { transition-delay: 0s; }
 }

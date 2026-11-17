@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SOBRE } from '../../content/profile';
 import { SectionHead } from '../../shared/section-head/section-head';
 
-// 01 · Sobre: "Olá, forasteiro!" com o vaqueiro que tira o chapéu quando o cabeçalho chega na tela, e a
+// 01 · Sobre: "Olá, forasteiro!" com o vaqueiro (virado para a esquerda) que tira o chapéu quando o cabeçalho chega na tela, e a
 // apresentação em parágrafos simples, num tipo só, já inteira e acesa.
 @Component({
   selector: 'section[appSobre]',
