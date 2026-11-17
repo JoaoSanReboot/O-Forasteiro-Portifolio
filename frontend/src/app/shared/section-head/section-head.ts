@@ -3,8 +3,8 @@ import { EmblemKind, Emblema } from '../emblems/emblems';
 import { Estrela } from '../ornaments/ornaments';
 import { Reveal } from '../reveal/reveal';
 
-// Cabeçalho de seção como cabeça de cartaz: "✦ Nº 02  PROJETOS ═════ 03 obras" e o título em tipo de
-// madeira (com a tinta falhada da prensa), terminando em itálico serifado. Ao lado, o emblema que
+// Cabeçalho de seção como cabeça de cartaz: "✦ Nº 02  PROJETOS ═════ 03 obras" e o título, num tipo e
+// numa cor só (o mesmo em todas as seções), entrando em duas partes. Ao lado, o emblema que
 // desenha o título (a bigorna, as pegadas, as peixeiras...) e se mexe quando entra na tela.
 @Component({
   selector: 'header[appSectionHead]',

@@ -119,13 +119,46 @@ describe('Site', () => {
     expect(el.querySelector('.e-brand, [data-em="ferro"]')).toBeNull();
   });
 
-  it('projetos: uma linha por projeto, cada uma levando ao projeto em outra aba', async () => {
+  it('projetos: um baú por projeto, e cada cartaz leva ao projeto em outra aba', async () => {
     const { el } = await render();
-    const links = [...el.querySelectorAll<HTMLAnchorElement>('.work-link')];
-    expect(links.map((a) => a.querySelector('.work-name')?.textContent)).toEqual(PROJECTS.map((p) => p.name));
+    expect(el.querySelectorAll('#projetos .bau')).toHaveLength(PROJECTS.length);
+    expect([...el.querySelectorAll('.carta-nome')].map((h) => h.textContent)).toEqual(PROJECTS.map((p) => p.name));
+    const links = [...el.querySelectorAll<HTMLAnchorElement>('.carta-link')];
     expect(links.map((a) => a.getAttribute('href'))).toEqual(PROJECTS.map((p) => p.href));
-    expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
-    expect(el.querySelector('.work .tag')?.textContent).toBe('Em desenvolvimento');
+    expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener' && a.textContent?.includes('(abre em outra aba)'))).toBe(true);
+    expect(el.querySelector('.bau-carta .tag')?.textContent).toBe('Em desenvolvimento');
+    // a lista antiga e a imagem que seguia o mouse saíram
+    expect(el.querySelector('.works, .work-preview')).toBeNull();
+  });
+
+  it('projetos: as flechinhas giram a fila e o baú do meio abre o cartaz do seu projeto', async () => {
+    const { fixture, el } = await render();
+    const pos = () => [...el.querySelectorAll('.bau')].map((b) => b.getAttribute('data-pos'));
+    expect(pos()).toEqual(['meio', 'dir', 'esq']);
+    await click(fixture, el.querySelector('.bau-seta.dir'));
+    expect(pos()).toEqual(['esq', 'meio', 'dir']);
+    await click(fixture, el.querySelector('.bau-seta.esq'));
+    await click(fixture, el.querySelector('.bau-seta.esq'));
+    expect(pos()).toEqual(['dir', 'esq', 'meio']);
+    // clicar no baú do canto traz ele para o meio, sem abrir
+    await click(fixture, el.querySelector('.bau[data-pos="dir"]'));
+    expect(pos()).toEqual(['meio', 'dir', 'esq']);
+    expect(el.querySelector('.baus.aberto')).toBeNull();
+
+    const meio = el.querySelector<HTMLElement>('.bau[data-pos="meio"]')!;
+    expect(meio.getAttribute('aria-expanded')).toBe('false');
+    await click(fixture, meio);
+    expect(el.querySelector('.baus.aberto')).not.toBeNull();
+    expect(meio.getAttribute('aria-expanded')).toBe('true');
+    const abertas = el.querySelectorAll('.bau-carta.on');
+    expect(abertas).toHaveLength(1);
+    expect(abertas[0].querySelector('.carta-nome')?.textContent).toBe(PROJECTS[0].name);
+    // os outros cartazes ficam fora do alcance do teclado e as flechinhas travam enquanto está aberto
+    expect(el.querySelectorAll('.bau-carta[inert]')).toHaveLength(PROJECTS.length - 1);
+    expect(el.querySelector<HTMLButtonElement>('.bau-seta.dir')!.disabled).toBe(true);
+
+    await click(fixture, abertas[0].querySelector('.carta-fechar'));
+    expect(el.querySelector('.baus.aberto, .bau-carta.on')).toBeNull();
   });
 
   it('experiência, skills e formação trazem todo o conteúdo', async () => {

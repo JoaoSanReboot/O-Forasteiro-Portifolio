@@ -109,27 +109,27 @@
   column-gap: 0.26em;
   row-gap: 0.04em;
   min-width: 0;
-  font: 400 clamp(2.05rem, 7.2vw, 7rem)/0.98 var(--f-wood);
-  letter-spacing: -0.005em;
+  /* o título inteiro num tipo só e numa cor só, igual em todas as seções: o letreiro de saloon (Rye) */
+  font: 400 clamp(1.9rem, 6.2vw, 6rem)/1.04 var(--f-west);
+  letter-spacing: 0.005em;
   text-transform: uppercase;
+  color: var(--ink);
 }
 .sh-title:focus { outline: none; }
 .sh-mask { display: inline-block; overflow: hidden; padding: 0.06em 0 0.1em; margin: -0.06em 0 -0.1em; }
 .sh-mask > * { display: inline-block; }
 /* a tinta da prensa: borda comida e falhas no preto */
-.sh-wood, .hn-txt, .foot-word, .intro-word { filter: url(#tinta); }
-.sh-title em {
-  font: italic 400 1.12em/0.9 var(--f-serif);
-  letter-spacing: -0.01em;
-  text-transform: none;
-  color: var(--urucum);
-}
+.hn-txt, .foot-word, .intro-word { filter: url(#tinta); }
+.sh-title em { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
 .sh-emblem { flex: none; width: clamp(100px, 13vw, 200px); height: auto; margin-bottom: 0.2em; }
+/* o vaqueiro olha para a esquerda, para o título */
+.sh-emblem[data-em="chapeu"] { scale: -1 1; }
 .sh-emblem[data-em="rastros"] { width: clamp(190px, 27vw, 400px); }
 .sh-emblem[data-em="telegrafo"] { width: clamp(170px, 20vw, 290px); }
 
 .sec-night .sh-meta { color: var(--on-night-muted); }
-.sec-night :is(.sh-num, .sh-star), .sec-night .sh-title em { color: var(--sol); }
+.sec-night :is(.sh-num, .sh-star) { color: var(--sol); }
+.sec-night .sh-title { color: var(--on-night); }
 .sec-night :is(.sh-aside, .sh-label) { color: var(--on-night); }
 
 @media (max-width: 720px) {
